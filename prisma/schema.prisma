@@ -1,0 +1,142 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String            @id @default(uuid())
+  email             String            @unique
+  name              String
+  encryptedPassword String
+  phoneNumber       Int
+  role              ROLE              @default(General)
+  RiderProfile      RiderProfile[]
+  GeneralProfile    GeneralProfile[]
+  Review            Review[]
+  Favorite          Favorite[]
+  estimateRequest   EstimateRequest[]
+}
+
+model RiderProfile {
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id           String        @id @default(uuid())
+  profileImage String?
+  nickname     String?
+  experience   Int
+  summary      String
+  description  String
+  services     ServiceType[]
+  serviceAreas Area[]
+  userId       String
+}
+
+model GeneralProfile {
+  user         User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id           String  @id @default(uuid())
+  profileImage String?
+  nickname     String
+  userId       String
+  livingAreas  Area[]
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [riderId], references: [id])
+  riderId   String
+  writerId  String
+  star      Int
+  createdAt DateTime @default(now())
+  content   String
+}
+
+model Favorite {
+  id      String @id @default(uuid())
+  user    User   @relation(fields: [userId], references: [id])
+  userId  String
+  riderId String
+}
+
+model EstimateRequest {
+  id          String                @id @default(uuid())
+  user        User                  @relation(fields: [userId], references: [id])
+  userId      String
+  movingType  ServiceType
+  movingDate  DateTime
+  departure   String
+  destination String
+  createdAt   DateTime              @default(now())
+  updatedAt   DateTime              @default(now())
+  status      EstimateRequestStatus
+  estimate    Estimate[]
+}
+
+model Estimate {
+  id                String          @id @default(uuid())
+  estimateRequset   EstimateRequest @relation(fields: [estimateRequestId], references: [id])
+  estimateRequestId String
+  userId            String
+  riderID           String
+  movingType        ServiceType
+  movingDate        DateTime
+  departure         String
+  destination       String
+  price             Int?
+  isCompleted       Boolean         @default(false)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @default(now())
+  rejectionMessage  String?
+  status            EstimateStatus
+}
+
+enum ROLE {
+  General
+  Rider
+}
+
+enum Area {
+  Seoul
+  Gyeonggi
+  Incheon
+  Gangwon
+  Chungbuk
+  Chungnam
+  Sejong
+  Daejeon
+  Jeonbuk
+  Jeonnam
+  Gwangju
+  Gyeongbuk
+  Gyeongnam
+  Daegu
+  Ulsan
+  Busan
+  Jeju
+}
+
+enum ServiceType {
+  SmallMove
+  HomeMove
+  OfficeMove
+}
+
+enum EstimateStatus {
+  General
+  Assigned
+  Rejected
+}
+
+enum EstimateRequestStatus {
+  Active
+  Inactive
+  Confirmed
+}
