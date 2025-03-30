@@ -18,8 +18,8 @@ model User {
   email             String            @unique
   name              String
   encryptedPassword String
-  phoneNumber       Int
-  role              ROLE              @default(General)
+  phoneNumber       String?
+  role              ROLE              @default(general)
   RiderProfile      RiderProfile[]
   GeneralProfile    GeneralProfile[]
   Review            Review[]
@@ -99,44 +99,44 @@ model Estimate {
 }
 
 enum ROLE {
-  General
-  Rider
+  general
+  rider
 }
 
 enum Area {
-  Seoul
-  Gyeonggi
-  Incheon
-  Gangwon
-  Chungbuk
-  Chungnam
-  Sejong
-  Daejeon
-  Jeonbuk
-  Jeonnam
-  Gwangju
-  Gyeongbuk
-  Gyeongnam
-  Daegu
-  Ulsan
-  Busan
+  seoul
+  gyeonggi
+  incheon
+  gangwon
+  chungbuk
+  chungnam
+  sejong
+  daejeon
+  jeonbuk
+  jeonnam
+  gwangju
+  gyeongbuk
+  gyeongnam
+  daegu
+  ulsan
+  busan
   Jeju
 }
 
 enum ServiceType {
-  SmallMove
-  HomeMove
-  OfficeMove
+  smallMove
+  homeMove
+  officeMove
 }
 
 enum EstimateStatus {
-  General
-  Assigned
-  Rejected
+  general
+  assigned
+  rejected
 }
 
 enum EstimateRequestStatus {
-  Active
-  Inactive
-  Confirmed
+  active
+  inactive
+  confirmed
 }

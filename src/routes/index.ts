@@ -1,8 +1,10 @@
-import express from "express"
+import express from "express";
+import authRouter from "./auth.route";
+import { authMiddleware } from "../middlewear/auth.middlewwaer";
 
+const router = express.Router();
 
-const router = express.Router()
+router.use(authMiddleware);
+router.use("/auth", authRouter);
 
-// router.use()
-
-export default router
+export default router;
