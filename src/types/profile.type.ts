@@ -1,13 +1,13 @@
 import { Area, ServiceType } from "@prisma/client";
 
-type UserProfile = {
+type UserProfileDto = {
   profileImage: string | null;
   livingArea: Area;
   services: ServiceType[];
   userId: string;
 };
 
-type workerProfile = {
+type WorkerProfileDto = {
   profileImage: string | null;
   nickname: string;
   experience: number;
@@ -18,4 +18,4 @@ type workerProfile = {
   userId: string;
 };
 
-export { UserProfile, workerProfile };
+export { UserProfileDto, WorkerProfileDto };

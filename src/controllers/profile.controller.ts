@@ -1,7 +1,7 @@
 import { RequestHandler } from "express";
 import { asyncHandler } from "../middlewear/error.middleware";
-import prisma from "../db/prisma/client";
-import { UserProfile, workerProfile } from "../types/profile.type";
+import { UserProfileDto, WorkerProfileDto } from "../types/profile.type";
+import profileService from "../servieces/profile.service";
 
 const createUserProfileController: RequestHandler = asyncHandler(
   async (req, res, next) => {
@@ -12,30 +12,20 @@ const createUserProfileController: RequestHandler = asyncHandler(
     }
     const userId = req.userId;
     if (!userId) return;
-    const parsedServices =
-      typeof services === "string" ? JSON.parse(services) : services;
 
-    const data: UserProfile = {
+    const userProfileDto: UserProfileDto = {
       profileImage,
       livingArea,
-      services: parsedServices,
+      services,
       userId,
     };
-    const existingProfile = await prisma.userProfile.findFirst({
-      where:{userId}
-    })
-    if(existingProfile){
-      throw new Error("400/profile already exist")
-    }
+    await profileService.createUserProfile(userProfileDto);
 
-    await prisma.userProfile.create({
-      data,
-    });
     res.sendStatus(201);
   }
 );
 
-const createRiderProfileController: RequestHandler = asyncHandler(
+const createWorkerProfileController: RequestHandler = asyncHandler(
   async (req, res, next) => {
     const {
       nickname,
@@ -53,40 +43,23 @@ const createRiderProfileController: RequestHandler = asyncHandler(
     const userId = req.userId;
     if (!userId) return;
 
-    const parsedServices =
-      typeof services === "string" ? JSON.parse(services) : services;
-
-    const parsedArea =
-      typeof serviceAreas === "string"
-        ? JSON.parse(serviceAreas)
-        : serviceAreas;
-
-    const data: workerProfile = {
+    const workerProfileDto: WorkerProfileDto = {
       profileImage,
       nickname,
-      experience: Number(experience),
+      experience,
       summary,
       description,
-      serviceAreas: parsedArea,
-      services: parsedServices,
+      serviceAreas,
+      services,
       userId,
     };
 
-    const existingProfile = await prisma.workProfile.findFirst({
-      where:{userId}
-    })
-    if(existingProfile){
-      throw new Error("400/profile already exist")
-    }
+    await profileService.createWorkProfile(workerProfileDto);
 
-
-    await prisma.workProfile.create({
-      data,
-    });
     res.sendStatus(201);
   }
 );
 
-const profile = { createRiderProfileController, createUserProfileController };
+const profile = { createWorkerProfileController, createUserProfileController };
 
 export default profile;
