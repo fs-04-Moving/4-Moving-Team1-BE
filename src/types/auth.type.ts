@@ -1,3 +1,5 @@
+import { ROLE } from "@prisma/client";
+
 type payloadData = {
   id: string;
   email: string;
@@ -7,6 +9,7 @@ type payloadData = {
 type logInDto = {
   email: string;
   password: string;
+  role: ROLE;
 };
 
 type signUpDto = logInDto & {
