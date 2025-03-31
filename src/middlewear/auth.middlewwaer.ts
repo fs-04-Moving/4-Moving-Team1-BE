@@ -5,7 +5,8 @@ const jwtSecretKey = process.env.JWT_SECRET_KEY;
 
 const authMiddleware: RequestHandler = (req, res, next) => {
   try {
-    if (req.url === "/auth/signUp" || req.url === "/auth/lo") return next();
+    if (req.url === "/auth/sign-up" || req.url === "/auth/log-in")
+      return next();
     const token = req.headers.authorization;
     if (!token) {
       return next();
@@ -13,12 +14,12 @@ const authMiddleware: RequestHandler = (req, res, next) => {
 
     const accessToken = token.split("Bearer ")[1];
     if (!jwtSecretKey) {
-      throw new Error("JWT_SECRET is not defined in environment variables");
+      throw new Error("401/JWT_SECRET is not defined in environment variables");
     }
     const { sub } = jwt.verify(accessToken, jwtSecretKey);
 
     if (typeof sub !== "string") {
-      throw new Error("sub is not string");
+      throw new Error("400/sub is not string");
     }
 
     req.userId = sub;

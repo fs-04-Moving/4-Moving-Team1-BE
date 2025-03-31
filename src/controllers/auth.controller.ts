@@ -1,4 +1,4 @@
-import express, { RequestHandler } from "express";
+import { RequestHandler } from "express";
 import { asyncHandler } from "../middlewear/error.middleware";
 import authService from "../servieces/auth.service";
 

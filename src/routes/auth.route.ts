@@ -7,8 +7,8 @@ import {
 
 const authRouter = express.Router();
 
-authRouter.post("/logIn", validateSignInContext, auth.logInController);
-authRouter.post("/signUp", validateSignUpContext, auth.signUpController);
-authRouter.post("/refreshToken", auth.refreshTokenController);
+authRouter.post("/log-in", validateSignInContext, auth.logInController);
+authRouter.post("/sign-up", validateSignUpContext, auth.signUpController);
+authRouter.post("/refresh-token", auth.refreshTokenController);
 
 export default authRouter;
