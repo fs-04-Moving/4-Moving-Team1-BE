@@ -29,7 +29,7 @@ const createToken = (data: payloadData) => {
     if (e instanceof Error) {
       throw e;
     }
-    throw new Error(String(e));
+    throw e;
   }
 };
 
@@ -60,7 +60,7 @@ const logIn = async (logInDto: logInDto) => {
       const { sub } = jwt.verify(accessToken, jwtSecretKey);
 
       if (typeof sub !== "string") {
-        throw new Error("sub is not string");
+        throw new Error("400/sub is not string");
       }
 
       return {
@@ -71,7 +71,7 @@ const logIn = async (logInDto: logInDto) => {
     });
     return result;
   } catch (e) {
-    throw new Error(String(e));
+    throw e;
   }
 };
 
@@ -98,14 +98,14 @@ const signUp = async (signUpDto: signUpDto) => {
       const { sub } = jwt.verify(accessToken, jwtSecretKey);
 
       if (typeof sub !== "string") {
-        throw new Error("sub is not string");
+        throw new Error("400/sub is not string");
       }
       return { sub, accessToken, refreshToken };
     });
 
     return result;
   } catch (e) {
-    throw new Error(String(e));
+    throw e;
   }
 };
 
@@ -115,7 +115,7 @@ const refreshToken = async (refreshToken: string) => {
     jwtSecretKey
   ) as jwt.JwtPayload;
   if (typeof sub !== "string") {
-    throw new Error("sub is not string");
+    throw new Error("400/sub is not string");
   }
   const data: payloadData = {
     id: sub,
