@@ -19,7 +19,7 @@ model User {
   name              String
   encryptedPassword String
   phoneNumber       String?
-  role              ROLE              @default(general)
+  role              ROLE              @default(user)
   RiderProfile      RiderProfile[]
   GeneralProfile    GeneralProfile[]
   Review            Review[]
@@ -99,8 +99,8 @@ model Estimate {
 }
 
 enum ROLE {
-  general
-  rider
+  user
+  worker
 }
 
 enum Area {

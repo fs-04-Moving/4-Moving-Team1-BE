@@ -36,10 +36,12 @@ const createToken = (data: payloadData) => {
 const logIn = async (logInDto: logInDto) => {
   try {
     const result = await prisma.$transaction(async (prisma) => {
-      const { email, password } = logInDto;
-      const user = await prisma.user.findFirstOrThrow({
-        where: { email },
+      const { email, password, role } = logInDto;
+      const user = await prisma.user.findUnique({
+        where: { email, role },
       });
+      if (!user) throw new Error("400/유저가 존재하지 않습니다.");
+
       const checkPassword = await bcrypt.compare(
         password,
         user.encryptedPassword
@@ -75,16 +77,16 @@ const logIn = async (logInDto: logInDto) => {
 
 const signUp = async (signUpDto: signUpDto) => {
   try {
-    const { email, password, name, phoneNumber } = signUpDto;
+    const { email, password, name, phoneNumber, role } = signUpDto;
     const encryptedPassword = await bcrypt.hash(password, 12);
 
     const result = await prisma.$transaction(async (prisma) => {
       const isExistingEmail = await prisma.user.findUnique({
-        where: { email },
+        where: { email, role },
       });
       if (isExistingEmail) throw new Error("400/이미 존재하는 이메일입니다.");
       const newUser = await prisma.user.create({
-        data: { email, name, encryptedPassword, phoneNumber },
+        data: { email, name, encryptedPassword, phoneNumber, role },
       });
 
       const data = {

@@ -3,8 +3,8 @@ import { asyncHandler } from "../middlewear/error.middleware";
 import authService from "../servieces/auth.service";
 
 const logInController: RequestHandler = asyncHandler(async (req, res, next) => {
-  const { email, password } = req.body;
-  const logInDto = { email, password };
+  const { email, password, role } = req.body;
+  const logInDto = { email, password, role };
   const { sub, accessToken, refreshToken } = await authService.logIn(logInDto);
   req.userId = sub;
   res.status(200).send({ accessToken, refreshToken });
@@ -12,8 +12,8 @@ const logInController: RequestHandler = asyncHandler(async (req, res, next) => {
 
 const signUpController: RequestHandler = asyncHandler(
   async (req, res, next) => {
-    const { email, password, name, phoneNumber } = req.body;
-    const signUpDto = { email, password, name, phoneNumber };
+    const { email, password, name, phoneNumber, role } = req.body;
+    const signUpDto = { email, password, name, phoneNumber, role };
     const { sub, accessToken, refreshToken } = await authService.signUp(
       signUpDto
     );
