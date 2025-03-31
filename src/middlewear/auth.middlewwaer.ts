@@ -1,5 +1,6 @@
 import { RequestHandler } from "express";
 import jwt from "jsonwebtoken";
+import prisma from "../db/prisma/client";
 
 const jwtSecretKey = process.env.JWT_SECRET_KEY;
 
@@ -42,4 +43,32 @@ const authenticatedOnly: RequestHandler = (req, res, next) => {
   }
 };
 
-export { authMiddleware, authenticatedOnly };
+const userOnly: RequestHandler = async (req, res, next) => {
+  try {
+    const userId = req.userId;
+    const user = await prisma.user.findFirstOrThrow({ where: { id: userId } });
+    if (user.role === "user") {
+      next();
+    } else {
+      throw new Error("403/Unauthenticated : admin only");
+    }
+  } catch (e) {
+    next(e);
+  }
+};
+
+const workerOnly: RequestHandler = async (req, res, next) => {
+  try {
+    const userId = req.userId;
+    const user = await prisma.user.findFirstOrThrow({ where: { id: userId } });
+    if (user.role === "worker") {
+      next();
+    } else {
+      throw new Error("403/Unauthenticated : admin only");
+    }
+  } catch (e) {
+    next(e);
+  }
+};
+
+export { authMiddleware, authenticatedOnly, userOnly, workerOnly };
