@@ -10,16 +10,17 @@ import { uploadProfileImage } from "../middlewear/upload";
 const profileRouter = express.Router();
 
 profileRouter.post(
-  "user",
+  "/user",
   authenticatedOnly,
   userOnly,
   uploadProfileImage,
   profile.createUserProfileController
 );
 profileRouter.post(
-  "user",
+  "/worker",
   authenticatedOnly,
   workerOnly,
+  uploadProfileImage,
   profile.createRiderProfileController
 );
 

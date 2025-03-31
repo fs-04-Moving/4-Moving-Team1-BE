@@ -7,6 +7,6 @@ const router = express.Router();
 
 router.use(authMiddleware);
 router.use("/auth", authRouter);
-router.use("profile", profileRouter);
+router.use("/profile", profileRouter);
 
 export default router;

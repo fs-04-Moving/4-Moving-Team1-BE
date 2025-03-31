@@ -50,7 +50,7 @@ const userOnly: RequestHandler = async (req, res, next) => {
     if (user.role === "user") {
       next();
     } else {
-      throw new Error("403/Unauthenticated : admin only");
+      throw new Error("403/Unauthenticated : user only");
     }
   } catch (e) {
     next(e);
@@ -64,7 +64,7 @@ const workerOnly: RequestHandler = async (req, res, next) => {
     if (user.role === "worker") {
       next();
     } else {
-      throw new Error("403/Unauthenticated : admin only");
+      throw new Error("403/Unauthenticated : work only");
     }
   } catch (e) {
     next(e);

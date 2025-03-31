@@ -16,9 +16,9 @@ model User {
   role              ROLE              @default(user)
   estimateRequest   EstimateRequest[]
   favorite          Favorite[]
-  userProfile       UserProfile[]
+  userProfile       UserProfile?
   review            Review[]
-  workProfile       WorkProfile[]
+  workProfile       WorkProfile?
 }
 
 model WorkProfile {
@@ -30,17 +30,17 @@ model WorkProfile {
   description  String
   services     ServiceType[]
   serviceAreas Area[]
-  userId       String
+  userId       String        @unique
   user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model UserProfile {
-  id           String  @id @default(uuid())
+  id           String        @id @default(uuid())
   profileImage String?
-  userId       String
+  userId       String        @unique
   livingArea   Area
   services     ServiceType[]
-  user         User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Review {
