@@ -4,23 +4,31 @@ import {
   authenticatedOnly,
   userOnly,
   workerOnly,
-} from "../middlewear/auth.middlewwaer";
-import { uploadProfileImage } from "../middlewear/upload";
+} from "../middleware/auth.middleware";
+import { uploadProfileImage } from "../middleware/upload";
+import {
+  validateUserProfileContext,
+  validateWorkerProfileContext,
+} from "../vaildataions/profile.validation";
 
 const profileRouter = express.Router();
 
 profileRouter.post(
-  "user",
+  "/user",
   authenticatedOnly,
   userOnly,
   uploadProfileImage,
+  validateUserProfileContext,
   profile.createUserProfileController
 );
+
 profileRouter.post(
-  "user",
+  "/worker",
   authenticatedOnly,
   workerOnly,
-  profile.createRiderProfileController
+  uploadProfileImage,
+  validateWorkerProfileContext,
+  profile.createWorkerProfileController
 );
 
 export default profileRouter;

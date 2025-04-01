@@ -1,5 +1,5 @@
 import prisma from "../db/prisma/client";
-import { logInDto, payloadData, signUpDto } from "../types/auth.type";
+import { LogInDto, PayloadData, SignUpDto } from "../types/auth.type";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
@@ -9,7 +9,7 @@ if (!jwtSecretKey) {
   throw new Error("jwtSerectKey is not exist");
 }
 
-const createToken = (data: payloadData) => {
+const createToken = (data: PayloadData) => {
   try {
     const payload = {
       sub: data.id,
@@ -33,7 +33,7 @@ const createToken = (data: payloadData) => {
   }
 };
 
-const logIn = async (logInDto: logInDto) => {
+const logIn = async (logInDto: LogInDto) => {
   try {
     const result = await prisma.$transaction(async (prisma) => {
       const { email, password, role } = logInDto;
@@ -75,7 +75,7 @@ const logIn = async (logInDto: logInDto) => {
   }
 };
 
-const signUp = async (signUpDto: signUpDto) => {
+const signUp = async (signUpDto: SignUpDto) => {
   try {
     const { email, password, name, phoneNumber, role } = signUpDto;
     const encryptedPassword = await bcrypt.hash(password, 12);
@@ -117,7 +117,7 @@ const refreshToken = async (refreshToken: string) => {
   if (typeof sub !== "string") {
     throw new Error("400/sub is not string");
   }
-  const data: payloadData = {
+  const data: PayloadData = {
     id: sub,
     email,
     name,

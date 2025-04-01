@@ -3,7 +3,6 @@ import { Prisma } from "@prisma/client";
 
 const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
   console.error("error는 ", err);
-  console.log(typeof err);
   const [statusCodeText, message] = err.message.split("/");
   const statusCode = Number(statusCodeText);
 

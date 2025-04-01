@@ -1,20 +1,20 @@
 import { ROLE } from "@prisma/client";
 
-type payloadData = {
+type PayloadData = {
   id: string;
   email: string;
   name: string;
 };
 
-type logInDto = {
+type LogInDto = {
   email: string;
   password: string;
   role: ROLE;
 };
 
-type signUpDto = logInDto & {
+type SignUpDto = LogInDto & {
   name: string;
   phoneNumber: string;
 };
 
-export { payloadData, logInDto, signUpDto };
+export { PayloadData, LogInDto, SignUpDto };
