@@ -13,6 +13,7 @@ model User {
   name              String
   encryptedPassword String
   phoneNumber       String?
+  hasProfile        Boolean           @default(false)
   role              ROLE              @default(user)
   estimateRequest   EstimateRequest[]
   favorite          Favorite[]
@@ -78,7 +79,7 @@ model Estimate {
   id                String          @id @default(uuid())
   estimateRequestId String
   userId            String
-  workerId           String
+  workerId          String
   movingType        ServiceType
   movingDate        DateTime
   departure         String

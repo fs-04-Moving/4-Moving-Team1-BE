@@ -42,6 +42,25 @@ const createWorkerProfile = async (workerProfileDto: WorkerProfileDto) => {
   }
 };
 
-const profileService = { createUserProfile, createWorkerProfile };
+const updateUserProfileStatus = async (userId: string) => {
+  try {
+    const user = await prisma.user.findFirst({
+      where: { id: userId },
+    });
+    if (!user) throw new Error("400/User not exist");
+    await prisma.user.update({
+      where: { id: userId },
+      data: { hasProfile: true },
+    });
+  } catch (e) {
+    throw e;
+  }
+};
+
+const profileService = {
+  createUserProfile,
+  createWorkerProfile,
+  updateUserProfileStatus,
+};
 
 export default profileService;
