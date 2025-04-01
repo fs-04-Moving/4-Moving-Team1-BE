@@ -40,7 +40,7 @@ const logInValidation = z.object({
   role: z.enum([ROLE.user, ROLE.worker], { message: "Invalid role" }),
 });
 
-const validateSignUpContext: RequestHandler = (req, res, next) => {
+const validateSignUp: RequestHandler = (req, res, next) => {
   try {
     const { email, name, password, passwordConfirm, phoneNumber, role } =
       req.body;
@@ -64,7 +64,7 @@ const validateSignUpContext: RequestHandler = (req, res, next) => {
   }
 };
 
-const validateSignInContext: RequestHandler = (req, res, next) => {
+const validateSignIn: RequestHandler = (req, res, next) => {
   try {
     const { email, password, role } = req.body;
 
@@ -84,4 +84,4 @@ const validateSignInContext: RequestHandler = (req, res, next) => {
   }
 };
 
-export { validateSignUpContext, validateSignInContext };
+export { validateSignUp, validateSignIn };

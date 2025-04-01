@@ -7,8 +7,8 @@ import {
 } from "../middleware/auth.middleware";
 import { uploadProfileImage } from "../middleware/upload";
 import {
-  validateUserProfileContext,
-  validateWorkerProfileContext,
+  validateUserProfile,
+  validateWorkerProfile,
 } from "../vaildataions/profile.validation";
 
 const profileRouter = express.Router();
@@ -18,7 +18,7 @@ profileRouter.post(
   authenticatedOnly,
   userOnly,
   uploadProfileImage,
-  validateUserProfileContext,
+  validateUserProfile(false),
   profile.createUserProfileController
 );
 
@@ -27,8 +27,26 @@ profileRouter.post(
   authenticatedOnly,
   workerOnly,
   uploadProfileImage,
-  validateWorkerProfileContext,
+  validateWorkerProfile(false),
   profile.createWorkerProfileController
+);
+
+profileRouter.put(
+  "/user",
+  authenticatedOnly,
+  userOnly,
+  uploadProfileImage,
+  validateUserProfile(true),
+  profile.updateUserProfileController
+);
+
+profileRouter.put(
+  "/worker",
+  authenticatedOnly,
+  workerOnly,
+  uploadProfileImage,
+  validateWorkerProfile(true),
+  profile.updateWorkerProfileController
 );
 
 export default profileRouter;

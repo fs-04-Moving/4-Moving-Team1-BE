@@ -16,53 +16,73 @@ const workerProfileSchema = z.object({
   serviceAreas: z.array(z.nativeEnum(Area)),
 });
 
-const validateUserProfileContext: RequestHandler = (req, res, next) => {
-  try {
-    let { livingArea, services } = req.body;
+const validateUserProfile = (isUpdate: boolean): RequestHandler => {
+  return (req, res, next) => {
+    try {
+      let { livingArea, services } = req.body;
 
-    if (typeof services === "string") services = services.split(",");
+      if (typeof services === "string") services = services.split(",");
 
-    const parsedContext = userProfileSchema.safeParse({
-      livingArea,
-      services,
-    });
+      const schema = isUpdate ? userProfileSchema.partial() : userProfileSchema;
 
-    if (!parsedContext.success) {
-      throw new Error(`400/Validation error: ${parsedContext.error}`);
+      const parsedContext = schema.safeParse({
+        livingArea,
+        services,
+      });
+
+      if (!parsedContext.success) {
+        throw new Error(`400/Validation error: ${parsedContext.error}`);
+      }
+
+      req.body = parsedContext.data;
+      next();
+    } catch (e) {
+      next(e);
     }
-    req.body = parsedContext.data;
-    next();
-  } catch (e) {
-    next(e);
-  }
+  };
 };
 
-const validateWorkerProfileContext: RequestHandler = (req, res, next) => {
-  try {
-    let { nickname, experience, summary, description, services, serviceAreas } =
-      req.body;
+const validateWorkerProfile = (isUpdate: boolean): RequestHandler => {
+  return (req, res, next) => {
+    try {
+      let {
+        nickname,
+        experience,
+        summary,
+        description,
+        services,
+        serviceAreas,
+      } = req.body;
 
-    if (typeof services === "string") services = services.split(",");
-    if (typeof serviceAreas === "string")
-      serviceAreas = serviceAreas.split(",");
+      if (typeof services === "string") services = services.split(",");
+      if (typeof serviceAreas === "string")
+        serviceAreas = serviceAreas.split(",");
 
-    const parsedContext = workerProfileSchema.safeParse({
-      nickname,
-      experience: Number(experience),
-      summary,
-      description,
-      services,
-      serviceAreas,
-    });
+      const schema = isUpdate
+        ? workerProfileSchema.partial()
+        : workerProfileSchema;
 
-    if (!parsedContext.success) {
-      throw new Error(`400/Validation error: ${parsedContext.error}`);
+      experience = isNaN(Number(experience)) ? undefined : Number(experience);
+
+      const parsedContext = schema.safeParse({
+        nickname,
+        experience,
+        summary,
+        description,
+        services,
+        serviceAreas,
+      });
+
+      if (!parsedContext.success) {
+        throw new Error(`400/Validation error: ${parsedContext.error}`);
+      }
+
+      req.body = parsedContext.data;
+      next();
+    } catch (e) {
+      next(e);
     }
-    req.body = parsedContext.data;
-    next();
-  } catch (e) {
-    next(e);
-  }
+  };
 };
 
-export { validateUserProfileContext, validateWorkerProfileContext };
+export { validateUserProfile, validateWorkerProfile };

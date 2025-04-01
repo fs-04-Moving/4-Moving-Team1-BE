@@ -62,6 +62,66 @@ const createWorkerProfileController: RequestHandler = asyncHandler(
   }
 );
 
-const profile = { createWorkerProfileController, createUserProfileController };
+const updateUserProfileController: RequestHandler = asyncHandler(
+  async (req, res, next) => {
+    const { livingArea, services } = req.body;
+    let profileImage = null;
+    if (req.file) {
+      profileImage = req.file.path;
+    }
+    const userId = req.userId;
+    if (!userId) return;
+
+    const userProfileDto: Partial<UserProfileDto> = {
+      profileImage,
+      livingArea,
+      services,
+      userId,
+    };
+    await profileService.updateUserProfile(userProfileDto); //유저 프로필 수정
+    res.sendStatus(204);
+  }
+);
+
+const updateWorkerProfileController: RequestHandler = asyncHandler(
+  async (req, res, next) => {
+    const {
+      nickname,
+      experience,
+      summary,
+      description,
+      services,
+      serviceAreas,
+    } = req.body;
+
+    let profileImage = null;
+    if (req.file) {
+      profileImage = req.file.path;
+    }
+    const userId = req.userId;
+    if (!userId) return;
+
+    const workerProfileDto: Partial<WorkerProfileDto> = {
+      profileImage,
+      nickname,
+      experience,
+      summary,
+      description,
+      serviceAreas,
+      services,
+      userId,
+    };
+
+    await profileService.updateWorkerProfile(workerProfileDto); //유저 프로필 생성
+    res.sendStatus(204);
+  }
+);
+
+const profile = {
+  createWorkerProfileController,
+  createUserProfileController,
+  updateUserProfileController,
+  updateWorkerProfileController,
+};
 
 export default profile;
