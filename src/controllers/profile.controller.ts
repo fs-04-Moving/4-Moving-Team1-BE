@@ -1,5 +1,5 @@
 import { RequestHandler } from "express";
-import { asyncHandler } from "../middlewear/error.middleware";
+import { asyncHandler } from "../middleware/error.middleware";
 import { UserProfileDto, WorkerProfileDto } from "../types/profile.type";
 import profileService from "../servieces/profile.service";
 
@@ -54,7 +54,7 @@ const createWorkerProfileController: RequestHandler = asyncHandler(
       userId,
     };
 
-    await profileService.createWorkProfile(workerProfileDto);
+    await profileService.createWorkerProfile(workerProfileDto);
 
     res.sendStatus(201);
   }

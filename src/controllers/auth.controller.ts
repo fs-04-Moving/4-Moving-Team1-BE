@@ -1,5 +1,5 @@
 import { RequestHandler } from "express";
-import { asyncHandler } from "../middlewear/error.middleware";
+import { asyncHandler } from "../middleware/error.middleware";
 import authService from "../servieces/auth.service";
 
 const logInController: RequestHandler = asyncHandler(async (req, res, next) => {

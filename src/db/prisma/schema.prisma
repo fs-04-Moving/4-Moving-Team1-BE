@@ -18,10 +18,10 @@ model User {
   favorite          Favorite[]
   userProfile       UserProfile?
   review            Review[]
-  workProfile       WorkProfile?
+  workProfile       WorkerProfile?
 }
 
-model WorkProfile {
+model WorkerProfile {
   id           String        @id @default(uuid())
   profileImage String?
   nickname     String?
@@ -45,18 +45,18 @@ model UserProfile {
 
 model Review {
   id        String   @id @default(uuid())
-  riderId   String
+  workerId   String
   writerId  String
   star      Int
   createdAt DateTime @default(now())
   content   String
-  user      User     @relation(fields: [riderId], references: [id])
+  user      User     @relation(fields: [workerId], references: [id])
 }
 
 model Favorite {
   id      String @id @default(uuid())
   userId  String
-  riderId String
+  workerId String
   user    User   @relation(fields: [userId], references: [id])
 }
 
@@ -78,7 +78,7 @@ model Estimate {
   id                String          @id @default(uuid())
   estimateRequestId String
   userId            String
-  riderID           String
+  workerId           String
   movingType        ServiceType
   movingDate        DateTime
   departure         String

@@ -21,18 +21,18 @@ const createUserProfile = async (userProfileDto: UserProfileDto) => {
   }
 };
 
-const createWorkProfile = async (workerProfileDto: WorkerProfileDto) => {
+const createWorkerProfile = async (workerProfileDto: WorkerProfileDto) => {
   try {
     const { userId } = workerProfileDto;
 
-    const existingProfile = await prisma.workProfile.findFirst({
+    const existingProfile = await prisma.workerProfile.findFirst({
       where: { userId },
     });
     if (existingProfile) {
       throw new Error("400/profile already exist");
     }
 
-    await prisma.workProfile.create({
+    await prisma.workerProfile.create({
       data: workerProfileDto,
     });
 
@@ -42,6 +42,6 @@ const createWorkProfile = async (workerProfileDto: WorkerProfileDto) => {
   }
 };
 
-const profileService = { createUserProfile, createWorkProfile };
+const profileService = { createUserProfile, createWorkerProfile };
 
 export default profileService;

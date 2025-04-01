@@ -4,8 +4,8 @@ import {
   authenticatedOnly,
   userOnly,
   workerOnly,
-} from "../middlewear/auth.middlewaer";
-import { uploadProfileImage } from "../middlewear/upload";
+} from "../middleware/auth.middleware";
+import { uploadProfileImage } from "../middleware/upload";
 import {
   validateUserProfileContext,
   validateWorkerProfileContext,
