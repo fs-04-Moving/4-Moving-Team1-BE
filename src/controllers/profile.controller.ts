@@ -19,7 +19,8 @@ const createUserProfileController: RequestHandler = asyncHandler(
       services,
       userId,
     };
-    await profileService.createUserProfile(userProfileDto);
+    await profileService.createUserProfile(userProfileDto); //유저 프로필 생성
+    await profileService.updateUserProfileStatus(userId); // 유저 프로필 상태 업데이트 (hasProfile :true)
 
     res.sendStatus(201);
   }
@@ -54,7 +55,8 @@ const createWorkerProfileController: RequestHandler = asyncHandler(
       userId,
     };
 
-    await profileService.createWorkerProfile(workerProfileDto);
+    await profileService.createWorkerProfile(workerProfileDto); //유저 프로필 생성
+    await profileService.updateUserProfileStatus(userId); // 유저 프로필 상태 업데이트 (hasProfile :true)
 
     res.sendStatus(201);
   }
