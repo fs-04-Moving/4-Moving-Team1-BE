@@ -20,8 +20,17 @@ const createEstimateRequestController: RequestHandler = asyncHandler(
   }
 );
 
-const estimateRequst = {
+const deleteEstimateRequestController: RequestHandler = asyncHandler(
+  async (req, res, next) => {
+    const customerId = req.userId as string;
+    await estimateRequstService.deleteEstimateRequest(customerId);
+    res.sendStatus(204);
+  }
+);
+
+const estimateRequest = {
   createEstimateRequestController,
+  deleteEstimateRequestController,
 };
 
-export default estimateRequst;
+export default estimateRequest;
