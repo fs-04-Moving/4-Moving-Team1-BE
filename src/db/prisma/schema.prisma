@@ -44,14 +44,17 @@ model CustomerProfile {
   user         User          @relation(fields: [customerId], references: [id], onDelete: Cascade)
 }
 
+// 견적이랑 추가
 model Review {
-  id        String   @id @default(uuid())
-  workerId  String
-  writerId  String
-  star      Int
-  createdAt DateTime @default(now())
-  content   String
-  user      User     @relation(fields: [workerId], references: [id])
+  id         String   @id @default(uuid())
+  workerId   String
+  customerId String
+  star       Int
+  createdAt  DateTime @default(now())
+  content    String
+  estimate   Estimate @relation(fields: [estimateId], references: [id])
+  user       User     @relation(fields: [workerId], references: [id])
+  estimateId String
 }
 
 model Favorite {
@@ -90,7 +93,9 @@ model Estimate {
   updatedAt         DateTime        @default(now())
   rejectionMessage  String?
   status            EstimateStatus
-  estimateRequset   EstimateRequest @relation(fields: [estimateRequestId], references: [id])
+  comment           String?
+  estimateRequset   EstimateRequest @relation(fields: [estimateRequestId], references: [id], onDelete: Cascade)
+  Review            Review[]
 }
 
 enum ROLE {
@@ -115,7 +120,7 @@ enum Area {
   daegu
   ulsan
   busan
-  Jeju
+  jeju
 }
 
 enum ServiceType {

@@ -17,4 +17,13 @@ type SignUpDto = LogInDto & {
   phoneNumber: string;
 };
 
-export { PayloadData, LogInDto, SignUpDto };
+type UpdateUserDto = {
+  userId: string;
+  email: string;
+  password: string;
+  newPassword: string;
+  name: string;
+  phoneNumber: string;
+};
+
+export { PayloadData, LogInDto, SignUpDto, UpdateUserDto };

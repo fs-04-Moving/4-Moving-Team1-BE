@@ -33,6 +33,20 @@ const createToken = (data: PayloadData) => {
   }
 };
 
+export const checkPassword = async (
+  password: string,
+  encryptedPassword: string
+) => {
+  try {
+    const checkPassword = await bcrypt.compare(password, encryptedPassword);
+    if (!checkPassword) {
+      throw new Error("400/Incorrect password");
+    }
+  } catch (e) {
+    throw e;
+  }
+};
+
 const logIn = async (logInDto: LogInDto) => {
   try {
     const result = await prisma.$transaction(async (prisma) => {
@@ -42,13 +56,7 @@ const logIn = async (logInDto: LogInDto) => {
       });
       if (!user) throw new Error("400/유저가 존재하지 않습니다.");
 
-      const checkPassword = await bcrypt.compare(
-        password,
-        user.encryptedPassword
-      );
-      if (!checkPassword) {
-        throw new Error("400/Incorrect password");
-      }
+      checkPassword(password, user.encryptedPassword);
 
       const data = {
         id: user.id,

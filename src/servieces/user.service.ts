@@ -1,4 +1,7 @@
 import prisma from "../db/prisma/client";
+import { UpdateUserDto } from "../types/auth.type";
+import { checkPassword } from "./auth.service";
+import bcrypt from "bcrypt";
 
 const BASE_URL = "http://localhost:5050";
 
@@ -32,7 +35,7 @@ const getProfileImage = async (userId: string) => {
     }
     // 기사인 경우
     const workerProfile = await prisma.workerProfile.findFirst({
-      where: { workerId:userId },
+      where: { workerId: userId },
     });
     if (workerProfile?.profileImage) {
       return {
@@ -48,5 +51,26 @@ const getProfileImage = async (userId: string) => {
   }
 };
 
-const userService = { getUserMe, getProfileImage };
+//유저 정보 업데이트, 기존의 signup validation을 사용하기, + 새비밀번호의 데이터가 올바른지 확인하기
+const updateUserInfo = async (updateUserDto: UpdateUserDto) => {
+  try {
+    const { userId, password, newPassword, ...rest } = updateUserDto;
+    const user = await prisma.user.findFirst({ where: { id: userId } });
+    if (!user) {
+      throw new Error("400/user not found");
+    }
+    // 비밀번호 확인하기
+    checkPassword(password, user.encryptedPassword);
+    // 비밀번호 생성
+    const encryptedPassword = await bcrypt.hash(password, 12);
+    await prisma.user.update({
+      where: { id: userId },
+      data: { ...rest, encryptedPassword },
+    });
+  } catch (e) {
+    throw e;
+  }
+};
+
+const userService = { getUserMe, getProfileImage, updateUserInfo };
 export default userService;

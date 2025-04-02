@@ -10,6 +10,7 @@ import {
   validateCustomerProfile,
   validateWorkerProfile,
 } from "../vaildataions/profile.validation";
+import { validateSignUp } from "../vaildataions/auth.validation";
 
 const profileRouter = express.Router();
 
