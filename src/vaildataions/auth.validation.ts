@@ -26,7 +26,7 @@ const signUpvalidation = z
       .min(1, { message: "전화번호를 입력해주세요" })
       .regex(phoneNumberRegex, "잘못된 전화번호 형식입니다")
       .optional(),
-    role: z.enum([ROLE.user, ROLE.worker], { message: "Invalid role" }),
+    role: z.nativeEnum(ROLE, { message: "Invalid role" }),
   })
   .refine((data) => data.passwordConfirm === data.password, {
     message: "password don't match ",
@@ -37,7 +37,7 @@ const logInValidation = z.object({
   password: z
     .string()
     .min(8, { message: "password must be 8 or more characters long" }),
-  role: z.enum([ROLE.user, ROLE.worker], { message: "Invalid role" }),
+  role: z.nativeEnum(ROLE, { message: "Invalid role" }),
 });
 
 const validateSignUp: RequestHandler = (req, res, next) => {

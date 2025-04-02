@@ -1,20 +1,23 @@
+import user from "../controllers/user.controller";
 import prisma from "../db/prisma/client";
-import { UserProfileDto, WorkerProfileDto } from "../types/profile.type";
+import { CustomerProfileDto, WorkerProfileDto } from "../types/profile.type";
 
 // 유저 프로필 생성
-const createUserProfile = async (userProfileDto: UserProfileDto) => {
+const createCustomerProfile = async (
+  customerProfileDto: CustomerProfileDto
+) => {
   try {
-    const { userId } = userProfileDto;
+    const { customerId } = customerProfileDto;
 
-    const existingProfile = await prisma.userProfile.findFirst({
-      where: { userId },
+    const existingProfile = await prisma.customerProfile.findFirst({
+      where: { customerId },
     });
     if (existingProfile) {
       throw new Error("400/profile already exist");
     }
 
-    await prisma.userProfile.create({
-      data: userProfileDto,
+    await prisma.customerProfile.create({
+      data: customerProfileDto,
     });
     return;
   } catch (e) {
@@ -24,10 +27,10 @@ const createUserProfile = async (userProfileDto: UserProfileDto) => {
 // 기사 프로필 생성
 const createWorkerProfile = async (workerProfileDto: WorkerProfileDto) => {
   try {
-    const { userId } = workerProfileDto;
+    const { workerId } = workerProfileDto;
 
     const existingProfile = await prisma.workerProfile.findFirst({
-      where: { userId },
+      where: { workerId },
     });
     if (existingProfile) {
       throw new Error("400/profile already exist");
@@ -59,20 +62,22 @@ const updateUserProfileStatus = async (userId: string) => {
 };
 
 // 유저 프로필 업데이트
-const updateUserProfile = async (userProfileDto: Partial<UserProfileDto>) => {
+const updateCustomerProfile = async (
+  customerProfileDto: Partial<CustomerProfileDto>
+) => {
   try {
-    const { userId } = userProfileDto;
-    if (!userId) throw new Error("401/userId not exist");
-    const existingProfile = await prisma.userProfile.findFirst({
-      where: { userId },
+    const { customerId } = customerProfileDto;
+    if (!customerId) throw new Error("401/customerId not exist");
+    const existingProfile = await prisma.customerProfile.findFirst({
+      where: { customerId },
     });
     if (!existingProfile) {
       throw new Error("400/profile not exist");
     }
 
-    await prisma.userProfile.update({
-      where: { userId },
-      data: userProfileDto,
+    await prisma.customerProfile.update({
+      where: { customerId },
+      data: customerProfileDto,
     });
     return;
   } catch (e) {
@@ -85,17 +90,17 @@ const updateWorkerProfile = async (
   workerProfileDto: Partial<WorkerProfileDto>
 ) => {
   try {
-    const { userId } = workerProfileDto;
-    if (!userId) throw new Error("401/userId not exist");
+    const { workerId } = workerProfileDto;
+    if (!workerId) throw new Error("401/userId not exist");
     const existingProfile = await prisma.workerProfile.findFirst({
-      where: { userId },
+      where: { workerId: workerId },
     });
     if (!existingProfile) {
       throw new Error("400/profile not exist");
     }
 
     await prisma.workerProfile.update({
-      where: { userId },
+      where: { workerId: workerId },
       data: workerProfileDto,
     });
 
@@ -106,10 +111,10 @@ const updateWorkerProfile = async (
 };
 
 const profileService = {
-  createUserProfile,
+  createCustomerProfile,
   createWorkerProfile,
   updateUserProfileStatus,
-  updateUserProfile,
+  updateCustomerProfile,
   updateWorkerProfile,
 };
 

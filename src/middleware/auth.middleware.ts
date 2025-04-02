@@ -43,11 +43,11 @@ const authenticatedOnly: RequestHandler = (req, res, next) => {
   }
 };
 
-const userOnly: RequestHandler = async (req, res, next) => {
+const customerOnly: RequestHandler = async (req, res, next) => {
   try {
     const userId = req.userId;
     const user = await prisma.user.findFirstOrThrow({ where: { id: userId } });
-    if (user.role === "user") {
+    if (user.role === "customer") {
       next();
     } else {
       throw new Error("403/Unauthenticated : user only");
@@ -71,4 +71,4 @@ const workerOnly: RequestHandler = async (req, res, next) => {
   }
 };
 
-export { authMiddleware, authenticatedOnly, userOnly, workerOnly };
+export { authMiddleware, authenticatedOnly, customerOnly, workerOnly };

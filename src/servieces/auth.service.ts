@@ -82,7 +82,7 @@ const signUp = async (signUpDto: SignUpDto) => {
 
     const result = await prisma.$transaction(async (prisma) => {
       const isExistingEmail = await prisma.user.findUnique({
-        where: { email, role },
+        where: { email },
       });
       if (isExistingEmail) throw new Error("400/이미 존재하는 이메일입니다.");
       const newUser = await prisma.user.create({

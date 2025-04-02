@@ -20,19 +20,19 @@ const getUserMe = async (userId: string) => {
 const getProfileImage = async (userId: string) => {
   try {
     // 유저인 경우
-    const userProfile = await prisma.userProfile.findFirst({
-      where: { userId },
+    const customerProfile = await prisma.customerProfile.findFirst({
+      where: { customerId: userId },
     });
-    if (userProfile?.profileImage) {
+    if (customerProfile?.profileImage) {
       return {
-        profileImage: `${BASE_URL}/static/${userProfile.profileImage
+        profileImage: `${BASE_URL}/static/${customerProfile.profileImage
           .split("/")
           .pop()}`,
       };
     }
     // 기사인 경우
     const workerProfile = await prisma.workerProfile.findFirst({
-      where: { userId },
+      where: { workerId:userId },
     });
     if (workerProfile?.profileImage) {
       return {

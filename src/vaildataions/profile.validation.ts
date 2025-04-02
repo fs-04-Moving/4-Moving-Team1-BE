@@ -2,7 +2,7 @@ import { Area, ServiceType } from "@prisma/client";
 import { RequestHandler } from "express";
 import { string, z } from "zod";
 
-const userProfileSchema = z.object({
+const customerProfileSchema = z.object({
   livingArea: z.nativeEnum(Area),
   services: z.array(z.nativeEnum(ServiceType)), // 특정 eunm 값만 들어갈수있음 소형이사, 가정이사,
 });
@@ -16,14 +16,16 @@ const workerProfileSchema = z.object({
   serviceAreas: z.array(z.nativeEnum(Area)),
 });
 
-const validateUserProfile = (isUpdate: boolean): RequestHandler => {
+const validateCustomerProfile = (isUpdate: boolean): RequestHandler => {
   return (req, res, next) => {
     try {
       let { livingArea, services } = req.body;
 
       if (typeof services === "string") services = services.split(",");
 
-      const schema = isUpdate ? userProfileSchema.partial() : userProfileSchema;
+      const schema = isUpdate
+        ? customerProfileSchema.partial()
+        : customerProfileSchema;
 
       const parsedContext = schema.safeParse({
         livingArea,
@@ -85,4 +87,4 @@ const validateWorkerProfile = (isUpdate: boolean): RequestHandler => {
   };
 };
 
-export { validateUserProfile, validateWorkerProfile };
+export { validateCustomerProfile, validateWorkerProfile };

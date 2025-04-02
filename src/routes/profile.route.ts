@@ -2,24 +2,24 @@ import express from "express";
 import profile from "../controllers/profile.controller";
 import {
   authenticatedOnly,
-  userOnly,
+  customerOnly,
   workerOnly,
 } from "../middleware/auth.middleware";
 import { uploadProfileImage } from "../middleware/upload";
 import {
-  validateUserProfile,
+  validateCustomerProfile,
   validateWorkerProfile,
 } from "../vaildataions/profile.validation";
 
 const profileRouter = express.Router();
 
 profileRouter.post(
-  "/user",
+  "/customer",
   authenticatedOnly,
-  userOnly,
+  customerOnly,
   uploadProfileImage,
-  validateUserProfile(false),
-  profile.createUserProfileController
+  validateCustomerProfile(false),
+  profile.createCustomerProfileController
 );
 
 profileRouter.post(
@@ -32,12 +32,12 @@ profileRouter.post(
 );
 
 profileRouter.put(
-  "/user",
+  "/customer",
   authenticatedOnly,
-  userOnly,
+  customerOnly,
   uploadProfileImage,
-  validateUserProfile(true),
-  profile.updateUserProfileController
+  validateCustomerProfile(true),
+  profile.updateCustomerProfileController
 );
 
 profileRouter.put(
