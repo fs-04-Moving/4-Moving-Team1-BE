@@ -14,10 +14,10 @@ model User {
   encryptedPassword String
   phoneNumber       String?
   hasProfile        Boolean           @default(false)
-  role              ROLE              @default(user)
+  role              ROLE
   estimateRequest   EstimateRequest[]
   favorite          Favorite[]
-  userProfile       UserProfile?
+  customerProfile   CustomerProfile?
   review            Review[]
   workProfile       WorkerProfile?
 }
@@ -31,22 +31,22 @@ model WorkerProfile {
   description  String
   services     ServiceType[]
   serviceAreas Area[]
-  userId       String        @unique
-  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workerId     String        @unique
+  user         User          @relation(fields: [workerId], references: [id], onDelete: Cascade)
 }
 
-model UserProfile {
+model CustomerProfile {
   id           String        @id @default(uuid())
   profileImage String?
-  userId       String        @unique
+  customerId   String        @unique
   livingArea   Area
   services     ServiceType[]
-  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User          @relation(fields: [customerId], references: [id], onDelete: Cascade)
 }
 
 model Review {
   id        String   @id @default(uuid())
-  workerId   String
+  workerId  String
   writerId  String
   star      Int
   createdAt DateTime @default(now())
@@ -55,30 +55,30 @@ model Review {
 }
 
 model Favorite {
-  id      String @id @default(uuid())
-  userId  String
-  workerId String
-  user    User   @relation(fields: [userId], references: [id])
+  id         String @id @default(uuid())
+  customerId String
+  workerId   String
+  user       User   @relation(fields: [customerId], references: [id])
 }
 
 model EstimateRequest {
   id          String                @id @default(uuid())
-  userId      String
+  customerId  String
   movingType  ServiceType
   movingDate  DateTime
   departure   String
   destination String
   createdAt   DateTime              @default(now())
   updatedAt   DateTime              @default(now())
-  status      EstimateRequestStatus
+  status      EstimateRequestStatus @default(active)
   estimate    Estimate[]
-  user        User                  @relation(fields: [userId], references: [id])
+  user        User                  @relation(fields: [customerId], references: [id])
 }
 
 model Estimate {
   id                String          @id @default(uuid())
   estimateRequestId String
-  userId            String
+  customerId        String
   workerId          String
   movingType        ServiceType
   movingDate        DateTime
@@ -94,7 +94,7 @@ model Estimate {
 }
 
 enum ROLE {
-  user
+  customer
   worker
 }
 

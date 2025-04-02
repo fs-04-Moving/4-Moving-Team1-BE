@@ -9,6 +9,7 @@ const port = 5050;
 
 app.use(express.json());
 app.use(cors());
+app.use("/static", express.static("upload"));
 app.use(router);
 app.use(errorHandler);
 
