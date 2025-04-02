@@ -2,8 +2,6 @@ import { RequestHandler } from "express";
 import { asyncHandler } from "../middleware/error.middleware";
 import { CustomerProfileDto, WorkerProfileDto } from "../types/profile.type";
 import profileService from "../servieces/profile.service";
-import { UpdateUserDto } from "../types/auth.type";
-import userService from "../servieces/user.service";
 
 const createCustomerProfileController: RequestHandler = asyncHandler(
   async (req, res, next) => {
@@ -66,15 +64,7 @@ const createWorkerProfileController: RequestHandler = asyncHandler(
 
 const updateCustomerProfileController: RequestHandler = asyncHandler(
   async (req, res, next) => {
-    const {
-      livingArea,
-      services,
-      email,
-      name,
-      phoneNumber,
-      password,
-      newPassword,
-    } = req.body;
+    const { livingArea, services } = req.body;
     let profileImage = null;
     if (req.file) {
       profileImage = req.file.path;
@@ -87,15 +77,6 @@ const updateCustomerProfileController: RequestHandler = asyncHandler(
       livingArea,
       services,
       customerId,
-    };
-
-    const newUserDto: UpdateUserDto = {
-      userId: customerId,
-      email,
-      name,
-      phoneNumber,
-      newPassword,
-      password,
     };
 
     await profileService.updateCustomerProfile(customerProfileDto); //유저 프로필 수정

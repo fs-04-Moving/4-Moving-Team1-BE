@@ -60,9 +60,9 @@ const updateUserInfo = async (updateUserDto: UpdateUserDto) => {
       throw new Error("400/user not found");
     }
     // 비밀번호 확인하기
-    checkPassword(password, user.encryptedPassword);
+    await checkPassword(password, user.encryptedPassword);
     // 비밀번호 생성
-    const encryptedPassword = await bcrypt.hash(password, 12);
+    const encryptedPassword = await bcrypt.hash(newPassword, 12);
     await prisma.user.update({
       where: { id: userId },
       data: { ...rest, encryptedPassword },

@@ -67,7 +67,7 @@ model Favorite {
 model EstimateRequest {
   id          String                @id @default(uuid())
   customerId  String
-  movingType  ServiceType
+  serviceType ServiceType
   movingDate  DateTime
   departure   String
   destination String
@@ -83,7 +83,7 @@ model Estimate {
   estimateRequestId String
   customerId        String
   workerId          String
-  movingType        ServiceType
+  serviceType       ServiceType
   movingDate        DateTime
   departure         String
   destination       String
