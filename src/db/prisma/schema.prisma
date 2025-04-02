@@ -15,7 +15,7 @@ model User {
   phoneNumber       String?
   hasProfile        Boolean           @default(false)
   role              ROLE
-  estimateRequest   EstimateRequest[]
+  estimateRequests  EstimateRequest[]
   favorite          Favorite[]
   customerProfile   CustomerProfile?
   review            Review[]
@@ -71,7 +71,7 @@ model EstimateRequest {
   createdAt   DateTime              @default(now())
   updatedAt   DateTime              @default(now())
   status      EstimateRequestStatus @default(active)
-  estimate    Estimate[]
+  estimates   Estimate[]
   user        User                  @relation(fields: [customerId], references: [id])
 }
 
