@@ -18,7 +18,7 @@ model User {
   estimateRequests  EstimateRequest[]
   favorite          Favorite[]
   customerProfile   CustomerProfile?
-  review            Review[]
+  reviews            Review[]
   workProfile       WorkerProfile?
 }
 
@@ -95,7 +95,7 @@ model Estimate {
   status            EstimateStatus
   comment           String?
   estimateRequset   EstimateRequest @relation(fields: [estimateRequestId], references: [id], onDelete: Cascade)
-  Review            Review[]
+  reviews            Review[]
 }
 
 enum ROLE {
