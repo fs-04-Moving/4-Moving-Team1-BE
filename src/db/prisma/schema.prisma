@@ -16,9 +16,9 @@ model User {
   hasProfile        Boolean           @default(false)
   role              ROLE
   estimateRequests  EstimateRequest[]
-  favorite          Favorite[]
+  favorites         Favorite[]
   customerProfile   CustomerProfile?
-  reviews            Review[]
+  reviews           Review[]
   workProfile       WorkerProfile?
 }
 
