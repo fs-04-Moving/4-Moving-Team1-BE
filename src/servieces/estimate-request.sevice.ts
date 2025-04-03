@@ -1,6 +1,8 @@
 import prisma from "../db/prisma/client";
 import { EstimateRequstDto } from "../types/estimate-request.type";
+import { findActiveEstimateRequest } from "./utills";
 
+// 견적 요청 생성 함수
 const createEstimateRequest = async (estimateRequstDto: EstimateRequstDto) => {
   try {
     const { customerId } = estimateRequstDto;
@@ -21,6 +23,7 @@ const createEstimateRequest = async (estimateRequstDto: EstimateRequstDto) => {
   }
 };
 
+// 견적 요청 삭제 함수
 const deleteEstimateRequest = async (customerId: string) => {
   try {
     const estimateRequest = await prisma.estimateRequest.findFirst({
@@ -43,6 +46,19 @@ const deleteEstimateRequest = async (customerId: string) => {
   }
 };
 
-const estimateRequstService = { createEstimateRequest, deleteEstimateRequest };
+// 견적 요청의 상태를 confirm으로 변경하는함수
+const confirmEstimateRequest = async (customerId: string) => {
+  const { id: estimateRequestId } = await findActiveEstimateRequest(customerId);
+  await prisma.estimateRequest.update({
+    where: { id: estimateRequestId },
+    data: { status: "confirmed" },
+  });
+};
+
+const estimateRequstService = {
+  createEstimateRequest,
+  deleteEstimateRequest,
+  confirmEstimateRequest,
+};
 
 export default estimateRequstService;

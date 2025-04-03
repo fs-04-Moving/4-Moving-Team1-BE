@@ -1,3 +1,4 @@
+import user from "../controllers/user.controller";
 import prisma from "../db/prisma/client";
 import { UpdateUserDto } from "../types/auth.type";
 import { checkPassword } from "./auth.service";
@@ -5,6 +6,7 @@ import bcrypt from "bcrypt";
 
 const BASE_URL = "http://localhost:5050";
 
+// 내정보 가져오는 함수 : 이름 , 프로필 생성 여부
 const getUserMe = async (userId: string) => {
   try {
     const user = await prisma.user.findFirst({ where: { id: userId } });
@@ -20,6 +22,7 @@ const getUserMe = async (userId: string) => {
   }
 };
 
+// 내정보 가져오는 함수 : 프로필 이미지 가져오는 함수
 const getProfileImage = async (userId: string) => {
   try {
     // 유저인 경우
@@ -51,7 +54,7 @@ const getProfileImage = async (userId: string) => {
   }
 };
 
-//유저 정보 업데이트, 기존의 signup validation을 사용하기, + 새비밀번호의 데이터가 올바른지 확인하기
+//유저 정보 업데이트하는 함수
 const updateUserInfo = async (updateUserDto: UpdateUserDto) => {
   try {
     const { userId, password, newPassword, ...rest } = updateUserDto;

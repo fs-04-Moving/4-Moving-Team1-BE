@@ -3,6 +3,7 @@ import { asyncHandler } from "../middleware/error.middleware";
 import { CustomerProfileDto, WorkerProfileDto } from "../types/profile.type";
 import profileService from "../servieces/profile.service";
 
+// 일반 유저 프로필 생성
 const createCustomerProfileController: RequestHandler = asyncHandler(
   async (req, res, next) => {
     const { livingArea, services } = req.body;
@@ -26,6 +27,7 @@ const createCustomerProfileController: RequestHandler = asyncHandler(
   }
 );
 
+// 기사 유저 프로필 생성
 const createWorkerProfileController: RequestHandler = asyncHandler(
   async (req, res, next) => {
     const {
@@ -62,6 +64,7 @@ const createWorkerProfileController: RequestHandler = asyncHandler(
   }
 );
 
+// 일반 유저 프로필 수정
 const updateCustomerProfileController: RequestHandler = asyncHandler(
   async (req, res, next) => {
     const { livingArea, services } = req.body;
@@ -84,6 +87,7 @@ const updateCustomerProfileController: RequestHandler = asyncHandler(
   }
 );
 
+// 기사 유저 프로필 수정
 const updateWorkerProfileController: RequestHandler = asyncHandler(
   async (req, res, next) => {
     const {

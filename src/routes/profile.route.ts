@@ -10,10 +10,10 @@ import {
   validateCustomerProfile,
   validateWorkerProfile,
 } from "../vaildataions/profile.validation";
-import { validateSignUp } from "../vaildataions/auth.validation";
 
 const profileRouter = express.Router();
 
+// 일반 유저가 프로필 생성
 profileRouter.post(
   "/customer",
   authenticatedOnly,
@@ -23,6 +23,7 @@ profileRouter.post(
   profile.createCustomerProfileController
 );
 
+// 기사사 유저가 프로필 생성
 profileRouter.post(
   "/worker",
   authenticatedOnly,
@@ -32,6 +33,7 @@ profileRouter.post(
   profile.createWorkerProfileController
 );
 
+// 일반 유저가 프로필 수정
 profileRouter.put(
   "/customer",
   authenticatedOnly,
@@ -41,6 +43,7 @@ profileRouter.put(
   profile.updateCustomerProfileController
 );
 
+// 기사사 유저가 프로필 수정
 profileRouter.put(
   "/worker",
   authenticatedOnly,

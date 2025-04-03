@@ -24,6 +24,7 @@ const createCustomerProfile = async (
     throw e;
   }
 };
+
 // 기사 프로필 생성
 const createWorkerProfile = async (workerProfileDto: WorkerProfileDto) => {
   try {
@@ -45,6 +46,7 @@ const createWorkerProfile = async (workerProfileDto: WorkerProfileDto) => {
     throw e;
   }
 };
+
 // 프로필 상태 업데이트 - 유저가 프로필을 만들었는지 확인해서 true/false 값 반환
 const updateUserProfileStatus = async (userId: string) => {
   try {

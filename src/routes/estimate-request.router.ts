@@ -5,6 +5,7 @@ import { validateEstimateRequset } from "../vaildataions/estimate-requset.valida
 
 const estimateRequstRouter = express.Router();
 
+// 일반 유저가 견적 요청하기 생성
 estimateRequstRouter.post(
   "/",
   authenticatedOnly,
@@ -13,6 +14,7 @@ estimateRequstRouter.post(
   estimateRequest.createEstimateRequestController
 );
 
+// 일반 유저가 견적 요청하기 삭제
 estimateRequstRouter.delete(
   "/",
   authenticatedOnly,
