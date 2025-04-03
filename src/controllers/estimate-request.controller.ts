@@ -5,11 +5,11 @@ import estimateRequstService from "../servieces/estimate-request.sevice";
 
 const createEstimateRequestController: RequestHandler = asyncHandler(
   async (req, res, next) => {
-    const { movingType, departure, destination, movingDate } = req.body;
+    const { serviceType, departure, destination, movingDate } = req.body;
     const customerId = req.userId as string;
     const estimateRequstDto: EstimateRequstDto = {
       customerId,
-      movingType,
+      serviceType,
       departure,
       destination,
       movingDate,

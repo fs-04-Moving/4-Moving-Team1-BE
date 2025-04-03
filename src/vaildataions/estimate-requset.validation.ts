@@ -3,7 +3,7 @@ import { RequestHandler } from "express";
 import { z } from "zod";
 
 export const estimateRequestSchema = z.object({
-  movingType: z.nativeEnum(ServiceType),
+  serviceType: z.nativeEnum(ServiceType),
   movingDate: z.coerce.date(),
   departure: z.string().min(1, "Departure is required"),
   destination: z.string().min(1, "Destination is required"),
@@ -11,9 +11,9 @@ export const estimateRequestSchema = z.object({
 
 const validateEstimateRequset: RequestHandler = (req, res, next) => {
   try {
-    const { movingType, movingDate, departure, destination } = req.body;
+    const { serviceType, movingDate, departure, destination } = req.body;
     const parsedContext = estimateRequestSchema.safeParse({
-      movingType,
+      serviceType,
       movingDate,
       departure,
       destination,

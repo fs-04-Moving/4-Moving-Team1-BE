@@ -16,9 +16,9 @@ model User {
   hasProfile        Boolean           @default(false)
   role              ROLE
   estimateRequests  EstimateRequest[]
-  favorite          Favorite[]
+  favorites         Favorite[]
   customerProfile   CustomerProfile?
-  review            Review[]
+  reviews           Review[]
   workProfile       WorkerProfile?
 }
 
@@ -67,7 +67,7 @@ model Favorite {
 model EstimateRequest {
   id          String                @id @default(uuid())
   customerId  String
-  movingType  ServiceType
+  serviceType ServiceType
   movingDate  DateTime
   departure   String
   destination String
@@ -83,7 +83,7 @@ model Estimate {
   estimateRequestId String
   customerId        String
   workerId          String
-  movingType        ServiceType
+  serviceType       ServiceType
   movingDate        DateTime
   departure         String
   destination       String
@@ -95,7 +95,7 @@ model Estimate {
   status            EstimateStatus
   comment           String?
   estimateRequset   EstimateRequest @relation(fields: [estimateRequestId], references: [id], onDelete: Cascade)
-  Review            Review[]
+  reviews            Review[]
 }
 
 enum ROLE {

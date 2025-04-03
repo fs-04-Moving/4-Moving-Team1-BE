@@ -2,7 +2,7 @@ import { ServiceType } from "@prisma/client";
 
 type EstimateRequstDto = {
   customerId: string;
-  movingType: ServiceType;
+  serviceType: ServiceType;
   movingDate: Date;
   departure: string;
   destination: string;

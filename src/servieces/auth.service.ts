@@ -56,7 +56,7 @@ const logIn = async (logInDto: LogInDto) => {
       });
       if (!user) throw new Error("400/유저가 존재하지 않습니다.");
 
-      checkPassword(password, user.encryptedPassword);
+      await checkPassword(password, user.encryptedPassword);
 
       const data = {
         id: user.id,
