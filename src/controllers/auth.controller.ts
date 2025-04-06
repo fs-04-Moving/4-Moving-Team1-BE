@@ -1,14 +1,16 @@
 import { RequestHandler } from "express";
 import { asyncHandler } from "../middleware/error.middleware";
 import authService from "../servieces/auth.service";
+import userService from "../servieces/user.service";
 
 // 로그인 컨트롤러
 const logInController: RequestHandler = asyncHandler(async (req, res, next) => {
   const { email, password, role } = req.body;
   const logInDto = { email, password, role };
   const { sub, accessToken, refreshToken } = await authService.logIn(logInDto);
+  const { hasProfile } = await userService.getUserMe(sub);
   req.userId = sub;
-  res.status(200).send({ accessToken, refreshToken });
+  res.status(200).send({ accessToken, refreshToken, hasProfile, role });
 });
 
 // 회원가입 컨트롤러
