@@ -45,14 +45,14 @@ const createEstimate = async (
   }
 };
 
-// 견적의 isCompleted: ture로 변경, 만약 가격이 없으면 에러 반환
+// 견적의 isConfirmed: ture로 변경, 만약 가격이 없으면 에러 반환
 const confirmEstimate = async (estimateId: string) => {
   try {
     const { price } = await findEstimate(estimateId);
     if (!price) throw new Error("400/The estimate is not yet priced");
     await prisma.estimate.update({
       where: { id: estimateId },
-      data: { isCompleted: true },
+      data: { isConfirmed: true },
     });
   } catch (e) {
     throw e;
@@ -93,11 +93,100 @@ const priceEstimate = async (
   }
 };
 
+//pending 상태의 견적들 찾기기
+const getPendingEstimates = async (customerId: string) => {
+  try {
+    // 아이디 찾기
+    const { id: estimateRequestId } = await findActiveEstimateRequest(
+      customerId
+    );
+    const pendingEstimate = await prisma.estimate.findMany({
+      where: { estimateRequestId },
+    });
+    return pendingEstimate;
+  } catch (e) {
+    throw e;
+  }
+};
+
+//estimateRequestId에 해당하는 견적들 찾기
+const getEstimatesByEstimateRequestId = async (estimateRequestId: string) => {
+  try {
+    const estimates = await prisma.estimate.findMany({
+      where: { estimateRequestId },
+    });
+    return estimates;
+  } catch (e) {
+    throw e;
+  }
+};
+
+const getEstimateByEstimatetId = async (estimatetId: string) => {
+  try {
+    const estimate = await prisma.estimate.findFirst({
+      where: { id: estimatetId },
+    });
+    if (!estimate) throw new Error("400/Estimate not found");
+    return estimate;
+  } catch (e) {
+    throw e;
+  }
+};
+
+const getAssignedEstimate = async (workerId: string, isConfirmed?: boolean) => {
+  try {
+    const where: any = {
+      workerId,
+      status: "assigned",
+    };
+    if (typeof isConfirmed === "boolean") {
+      where.isConfirmed = isConfirmed;
+    }
+    const estimates = await prisma.estimate.findMany({
+      where,
+    });
+    if (!estimates) throw new Error("400/estimates not found");
+    return estimates;
+  } catch (e) {
+    throw e;
+  }
+};
+
+const getSentEstimates = async (workerId: string) => {
+  try {
+    const estimates = await prisma.estimate.findMany({
+      where: { workerId },
+    });
+    if (!estimates) throw new Error("400/estimates not found");
+    return estimates;
+  } catch (e) {
+    throw e;
+  }
+};
+
+const getRejectEstimates = async (workerId: string) => {
+  try {
+    const estimates = await prisma.estimate.findMany({
+      where: { workerId, status: "rejected" },
+    });
+    if (!estimates) throw new Error("400/estimates not found");
+    return estimates;
+  } catch (e) {
+    throw e;
+  }
+};
+
 const estimateService = {
   createEstimate,
   confirmEstimate,
   rejectEstimate,
   priceEstimate,
+  getPendingEstimates,
+  getEstimatesByEstimateRequestId,
+  getEstimateByEstimatetId,
+  getAssignedEstimate,
+  getSentEstimates,
+  getRejectEstimates,
 };
 
 export default estimateService;

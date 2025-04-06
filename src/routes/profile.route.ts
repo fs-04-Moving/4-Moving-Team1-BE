@@ -53,4 +53,16 @@ profileRouter.put(
   profile.updateWorkerProfileController
 );
 
+profileRouter.get(
+  "/worker/:workerId",
+  authenticatedOnly,
+  profile.getWorkerProfileController
+);
+
+// profileRouter.get(
+//   "/customer/:customerId",
+//   authenticatedOnly,
+//   profile.getCustomerProfileController
+// );
+
 export default profileRouter;

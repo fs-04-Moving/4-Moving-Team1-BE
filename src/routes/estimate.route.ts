@@ -10,7 +10,7 @@ const estimateRouter = express.Router();
 
 // 일반 유저가 지정견적 생성하기
 estimateRouter.post(
-  "/assinged/:workerId",
+  "/assigned/:workerId",
   authenticatedOnly,
   customerOnly,
   estimate.createAssignedEstimateController
@@ -45,7 +45,44 @@ estimateRouter.put(
   "/price/:estimateId",
   authenticatedOnly,
   workerOnly,
-  estimate.PriceEstimateController
+  estimate.priceEstimateController
+);
+
+//일반 유저 대기중인 견적 get
+estimateRouter.get(
+  "/pending",
+  authenticatedOnly,
+  customerOnly,
+  estimate.getPendingEstimatesController
+);
+
+//받은 견적들 get
+estimateRouter.get(
+  "/received/:estimateRequestId",
+  authenticatedOnly,
+  estimate.getEstimatesController
+);
+
+//상세 견적 가져오기
+estimateRouter.get(
+  "/detail/:estimateId",
+  authenticatedOnly,
+  estimate.getEstimateDetailController
+);
+
+//보낸 견적 조회
+estimateRouter.get(
+  "/sent",
+  authenticatedOnly,
+  workerOnly,
+  estimate.getSentEstimatesController
+);
+// 반려한 요청 조회회
+estimateRouter.get(
+  "/reject",
+  authenticatedOnly,
+  workerOnly,
+  estimate.getRejectEstimatesController
 );
 
 export default estimateRouter;

@@ -112,12 +112,39 @@ const updateWorkerProfile = async (
   }
 };
 
+// 기사 유저의 profile 가져오기
+const getWorkerProfile = async (workerId: string) => {
+  try {
+    const workerProfile = await prisma.workerProfile.findFirst({
+      where: { workerId },
+    });
+    if (!workerProfile) throw new Error("400/worker profile not exist");
+    return workerProfile;
+  } catch (e) {
+    throw e;
+  }
+};
+
+// // 일반 유저의 profile 가져오기
+// const getCustomerProfile = async (customerId: string) => {
+//   try {
+//     const customerProfile = await prisma.customerProfile.findFirst({
+//       where: { customerId },
+//     });
+//     if (!customerProfile) throw new Error("400/worker profile not exist");
+//     return customerProfile;
+//   } catch (e) {
+//     throw e;
+//   }
+// };
+
 const profileService = {
   createCustomerProfile,
   createWorkerProfile,
   updateUserProfileStatus,
   updateCustomerProfile,
   updateWorkerProfile,
+  getWorkerProfile,
 };
 
 export default profileService;

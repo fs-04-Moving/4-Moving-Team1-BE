@@ -122,11 +122,26 @@ const updateWorkerProfileController: RequestHandler = asyncHandler(
   }
 );
 
+const getWorkerProfileController: RequestHandler = asyncHandler(
+  async (req, res, next) => {
+    const { workerId } = req.params;
+    const { experience, nickname, profileImage } =
+      await profileService.getWorkerProfile(workerId);
+
+    res.status(200).send({
+      workerProfileImage: profileImage,
+      workerNickname: nickname,
+      workerExperience: experience,
+    });
+  }
+);
+
 const profile = {
   createWorkerProfileController,
   createCustomerProfileController,
   updateCustomerProfileController,
   updateWorkerProfileController,
+  getWorkerProfileController,
 };
 
 export default profile;

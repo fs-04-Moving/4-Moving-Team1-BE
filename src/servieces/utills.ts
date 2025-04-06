@@ -29,6 +29,34 @@ export const findActiveEstimateRequest = async (customerId: string) => {
   }
 };
 
+export const findInactiveEstimateRequests = async (customerId: string) => {
+  try {
+    const estimateRequest = await prisma.estimateRequest.findMany({
+      where: { customerId, status: "inactive" },
+    });
+    if (!estimateRequest)
+      throw new Error("400/acitve Estimate Request not found");
+
+    return estimateRequest;
+  } catch (e) {
+    throw e;
+  }
+};
+
+export const findActiveEstimateRequests = async () => {
+  try {
+    const estimateRequest = await prisma.estimateRequest.findMany({
+      where: { status: "active" },
+    });
+    if (!estimateRequest)
+      throw new Error("400/acitve Estimate Request not found");
+
+    return estimateRequest;
+  } catch (e) {
+    throw e;
+  }
+};
+
 // 기사-유저간의 존재하는 견적 가져오기 함수
 export const findEstimate = async (
   estimateId: string,
