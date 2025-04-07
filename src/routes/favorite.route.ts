@@ -20,6 +20,11 @@ favoriteRouter.delete(
 );
 
 //찜한 기사님 보기
-favoriteRouter.get("/", favorite.getFavoritesController);
+favoriteRouter.get(
+  "/",
+  authenticatedOnly,
+  customerOnly,
+  favorite.getFavoritesController
+);
 
 export default favoriteRouter;
