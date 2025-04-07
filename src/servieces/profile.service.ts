@@ -1,4 +1,3 @@
-import user from "../controllers/user.controller";
 import prisma from "../db/prisma/client";
 import { CustomerProfileDto, WorkerProfileDto } from "../types/profile.type";
 

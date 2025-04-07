@@ -17,12 +17,13 @@ model User {
   role                ROLE
   estimateRequests    EstimateRequest[]
   customerProfile     CustomerProfile?
-  reviews             Review[]
+  receivedReviews     Review[]          @relation("workerReview")
+  writtenReviews      Review[]          @relation("customerReview")
   workProfile         WorkerProfile?
-  estimatesAsWorker   Estimate[]        @relation("EstimateWorker")
-  estimatesAsCustomer Estimate[]        @relation("EstimateCustomer")
-  customerFavorites Favorite[] @relation("CustomerFavorites")
-  workerFavorites   Favorite[] @relation("WorkerFavorites")
+  estimatesAsWorker   Estimate[]        @relation("estimateWorker")
+  estimatesAsCustomer Estimate[]        @relation("estimateCustomer")
+  customerFavorites   Favorite[]        @relation("customerFavorites")
+  workerFavorites     Favorite[]        @relation("workerFavorites")
 }
 
 model WorkerProfile {
@@ -56,16 +57,17 @@ model Review {
   createdAt  DateTime @default(now())
   content    String
   estimate   Estimate @relation(fields: [estimateId], references: [id])
-  user       User     @relation(fields: [workerId], references: [id])
-  estimateId String
+  worker     User     @relation("workerReview", fields: [workerId], references: [id])
+  customer   User     @relation("customerReview", fields: [customerId], references: [id])
+  estimateId String   @unique
 }
 
 model Favorite {
   id         String @id @default(uuid())
   customerId String
   workerId   String
-  customer   User   @relation("CustomerFavorites", fields: [customerId], references: [id])
-  worker     User   @relation("WorkerFavorites", fields: [workerId], references: [id])
+  customer   User   @relation("customerFavorites", fields: [customerId], references: [id])
+  worker     User   @relation("workerFavorites", fields: [workerId], references: [id])
 
   @@unique([customerId, workerId])
 }
@@ -101,9 +103,9 @@ model Estimate {
   status            EstimateStatus
   comment           String?
   estimateRequset   EstimateRequest @relation(fields: [estimateRequestId], references: [id], onDelete: Cascade)
-  reviews           Review[]
-  worker            User?           @relation("EstimateWorker", fields: [workerId], references: [id])
-  customer          User?           @relation("EstimateCustomer", fields: [customerId], references: [id])
+  review            Review?
+  worker            User?           @relation("estimateWorker", fields: [workerId], references: [id])
+  customer          User?           @relation("estimateCustomer", fields: [customerId], references: [id])
   userId            String?
 }
 

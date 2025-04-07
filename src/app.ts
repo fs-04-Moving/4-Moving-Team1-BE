@@ -1,14 +1,21 @@
 import "dotenv/config";
-import express, { Request, Response } from "express";
+import express from "express";
 import cors from "cors";
 import router from "./routes";
 import { errorHandler } from "./middleware/error.middleware";
+import cookieParser from "cookie-parser";
 
 const app = express();
 const port = 5050;
 
 app.use(express.json());
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  })
+);
+app.use(cookieParser());
 app.use("/static", express.static("upload"));
 app.use(router);
 app.use(errorHandler);
