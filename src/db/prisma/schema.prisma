@@ -16,12 +16,13 @@ model User {
   hasProfile          Boolean           @default(false)
   role                ROLE
   estimateRequests    EstimateRequest[]
-  favorites           Favorite[]
   customerProfile     CustomerProfile?
   reviews             Review[]
   workProfile         WorkerProfile?
   estimatesAsWorker   Estimate[]        @relation("EstimateWorker")
   estimatesAsCustomer Estimate[]        @relation("EstimateCustomer")
+  customerFavorites Favorite[] @relation("CustomerFavorites")
+  workerFavorites   Favorite[] @relation("WorkerFavorites")
 }
 
 model WorkerProfile {
@@ -63,7 +64,8 @@ model Favorite {
   id         String @id @default(uuid())
   customerId String
   workerId   String
-  user       User   @relation(fields: [customerId], references: [id])
+  customer   User   @relation("CustomerFavorites", fields: [customerId], references: [id])
+  worker     User   @relation("WorkerFavorites", fields: [workerId], references: [id])
 
   @@unique([customerId, workerId])
 }

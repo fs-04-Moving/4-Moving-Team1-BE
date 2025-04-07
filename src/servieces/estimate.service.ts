@@ -102,7 +102,7 @@ const getPendingEstimates = async (customerId: string) => {
     );
     const pendingEstimate = await prisma.estimate.findMany({
       where: { estimateRequestId },
-      include: { worker: { include: { workProfile: true } } },
+      include: { worker: { select: { workProfile: true } } },
     });
     return pendingEstimate;
   } catch (e) {
@@ -115,7 +115,7 @@ const getEstimatesByEstimateRequestId = async (estimateRequestId: string) => {
   try {
     const estimates = await prisma.estimate.findMany({
       where: { estimateRequestId },
-      include: { worker: { include: { workProfile: true } } },
+      include: { worker: { select: { workProfile: true } } },
     });
     return estimates;
   } catch (e) {

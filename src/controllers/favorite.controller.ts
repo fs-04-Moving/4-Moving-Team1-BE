@@ -26,6 +26,21 @@ const deleteFavoriteController: RequestHandler = asyncHandler(
 const getFavoritesController: RequestHandler = asyncHandler(
   async (req, res, next) => {
     const customerId = req.userId as string;
+    const favoriteWorkers = await favoriteService.getFavorites(customerId);
+    const data = favoriteWorkers
+      .map((fav) => fav.worker?.workProfile)
+      .filter((profile): profile is NonNullable<typeof profile> => !!profile)
+      .map((profile) => ({
+        workerProfileImage: profile.profileImage,
+        workerNickname: profile.nickname,
+        workerExperience: profile.experience,
+        workerSummary: profile.summary,
+        workerDescription: profile.description,
+        services: profile.services,
+        serviceAreas: profile.serviceAreas,
+      }));
+
+    res.send(data).status(200);
   }
 );
 

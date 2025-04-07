@@ -32,14 +32,16 @@ const deleteFavorite = async (customerId: string, workerId: string) => {
 };
 const getFavorites = async (customerId: string) => {
   try {
-    await prisma.favorite.findMany({
+    const FavoriteWorkers = await prisma.favorite.findMany({
       where: { customerId },
+      include: { worker: { select: { workProfile: true } } },
     });
+    return FavoriteWorkers;
   } catch (e) {
     throw e;
   }
 };
 
-const favoriteService = { createFavorite, deleteFavorite };
+const favoriteService = { createFavorite, deleteFavorite, getFavorites };
 
 export default favoriteService;
