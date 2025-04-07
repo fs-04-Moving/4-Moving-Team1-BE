@@ -42,6 +42,22 @@ const getFavorites = async (customerId: string) => {
   }
 };
 
-const favoriteService = { createFavorite, deleteFavorite, getFavorites };
+const checkFavorite = async (customerId: string, workerId: string) => {
+  try {
+    const existFavorite = await prisma.favorite.findFirst({
+      where: { customerId, workerId },
+    });
+    return !!existFavorite;
+  } catch (e) {
+    throw e;
+  }
+};
+
+const favoriteService = {
+  createFavorite,
+  deleteFavorite,
+  getFavorites,
+  checkFavorite,
+};
 
 export default favoriteService;

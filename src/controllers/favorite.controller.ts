@@ -28,19 +28,32 @@ const getFavoritesController: RequestHandler = asyncHandler(
     const customerId = req.userId as string;
     const favoriteWorkers = await favoriteService.getFavorites(customerId);
     const data = favoriteWorkers
-      .map((fav) => fav.worker?.workProfile)
-      .filter((profile): profile is NonNullable<typeof profile> => !!profile)
-      .map((profile) => ({
-        workerProfileImage: profile.profileImage,
-        workerNickname: profile.nickname,
-        workerExperience: profile.experience,
-        workerSummary: profile.summary,
-        workerDescription: profile.description,
-        services: profile.services,
-        serviceAreas: profile.serviceAreas,
-      }));
+      .filter((fav) => fav.worker?.workProfile)
+      .map((fav) => {
+        const profile = fav.worker.workProfile!;
+        return {
+          workerId: fav.workerId,
+          workerProfileImage: profile.profileImage,
+          workerNickname: profile.nickname,
+          workerExperience: profile.experience,
+          workerSummary: profile.summary,
+          workerDescription: profile.description,
+          services: profile.services,
+          serviceAreas: profile.serviceAreas,
+        };
+      });
 
     res.send(data).status(200);
+  }
+);
+
+const checkFavoriteController: RequestHandler = asyncHandler(
+  async (req, res, next) => {
+    const customerId = req.userId as string;
+    const { workerId } = req.params;
+    await findUser(workerId);
+    const result = await favoriteService.checkFavorite(customerId, workerId);
+    res.status(200).send(result);
   }
 );
 
@@ -48,5 +61,6 @@ const favorite = {
   createFavoriteController,
   deleteFavoriteController,
   getFavoritesController,
+  checkFavoriteController,
 };
 export default favorite;

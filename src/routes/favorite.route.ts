@@ -19,6 +19,14 @@ favoriteRouter.delete(
   favorite.deleteFavoriteController
 );
 
+//기사님을 찜한적이 있는지 확인
+favoriteRouter.get(
+  "/:workerId",
+  authenticatedOnly,
+  customerOnly,
+  favorite.checkFavoriteController
+);
+
 //찜한 기사님 보기
 favoriteRouter.get(
   "/",
