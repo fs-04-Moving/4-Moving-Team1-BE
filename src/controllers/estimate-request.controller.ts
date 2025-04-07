@@ -89,9 +89,6 @@ const getRequsetEstimateRequestsController: RequestHandler = asyncHandler(
 
     const formattedEstimateRequests = await Promise.all(
       filteredEstimateRequests.map(async (estimateRequest) => {
-        const { name } = await userService.getUserMe(
-          estimateRequest.customerId
-        );
         return {
           id: estimateRequest.id,
           customerId: estimateRequest.customerId,
@@ -102,14 +99,13 @@ const getRequsetEstimateRequestsController: RequestHandler = asyncHandler(
           createdAt: estimateRequest.createdAt,
           updatedAt: estimateRequest.updatedAt,
           status: null,
-          customerName: name,
+          customerName: estimateRequest.user.name,
         };
       })
     );
 
     const formattedAssignedEstimates = await Promise.all(
       assignedEstimates.map(async (estimate) => {
-        const { name } = await userService.getUserMe(estimate.customerId);
         return {
           id: estimate.id,
           customerId: estimate.customerId,
@@ -120,7 +116,7 @@ const getRequsetEstimateRequestsController: RequestHandler = asyncHandler(
           createdAt: estimate.createdAt,
           updatedAt: estimate.updatedAt,
           status: estimate.status,
-          customerName: name,
+          customerName: estimate.customer?.name,
         };
       })
     );

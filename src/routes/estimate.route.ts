@@ -77,7 +77,7 @@ estimateRouter.get(
   workerOnly,
   estimate.getSentEstimatesController
 );
-// 반려한 요청 조회회
+// 반려한 요청 조회
 estimateRouter.get(
   "/reject",
   authenticatedOnly,

@@ -5,6 +5,7 @@ import profileRouter from "./profile.route";
 import userRouter from "./user.route";
 import estimateRequstRouter from "./estimate-request.router";
 import estimateRouter from "./estimate.route";
+import favoriteRouter from "./favorite.route";
 
 const router = express.Router();
 
@@ -14,5 +15,6 @@ router.use("/profile", profileRouter);
 router.use("/user", userRouter);
 router.use("/estimate-request", estimateRequstRouter);
 router.use("/estimate", estimateRouter);
+router.use("/favorite", favoriteRouter);
 
 export default router;
