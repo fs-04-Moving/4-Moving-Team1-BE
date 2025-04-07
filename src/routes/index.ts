@@ -7,9 +7,6 @@ import estimateRequstRouter from "./estimate-request.router";
 import estimateRouter from "./estimate.route";
 import favoriteRouter from "./favorite.route";
 import reviewRouter from "./review.route";
-import cookieParser from "cookie-parser";
-
-app.use(cookieParser());
 
 const router = express.Router();
 
