@@ -113,13 +113,32 @@ const updateWorkerProfile = async (
 };
 
 // 기사 유저의 profile 가져오기
+// workerProfileImage: string;
+// workerSummary: string;
+// workerNickname: string;
+// workerFavoritesCount: number;
+// workerReviewsCount: number;
+// workerRating: number;
+// workerExperience: number;
+// workerConfirmedEstimatesCount: number;
 const getWorkerProfile = async (workerId: string) => {
   try {
     const workerProfile = await prisma.workerProfile.findFirst({
       where: { workerId },
     });
     if (!workerProfile) throw new Error("400/worker profile not exist");
-    return workerProfile;
+    const {
+      profileImage: workerProfileImage,
+      nickname: workerNickname,
+      summary: workerSummary,
+      experience: workerExperience,
+    } = workerProfile;
+    return {
+      workerProfileImage,
+      workerNickname,
+      workerSummary,
+      workerExperience,
+    };
   } catch (e) {
     throw e;
   }

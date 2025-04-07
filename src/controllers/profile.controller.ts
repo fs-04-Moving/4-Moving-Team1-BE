@@ -125,14 +125,9 @@ const updateWorkerProfileController: RequestHandler = asyncHandler(
 const getWorkerProfileController: RequestHandler = asyncHandler(
   async (req, res, next) => {
     const { workerId } = req.params;
-    const { experience, nickname, profileImage } =
-      await profileService.getWorkerProfile(workerId);
+    const workerProfile = await profileService.getWorkerProfile(workerId);
 
-    res.status(200).send({
-      workerProfileImage: profileImage,
-      workerNickname: nickname,
-      workerExperience: experience,
-    });
+    res.status(200).send(workerProfile);
   }
 );
 

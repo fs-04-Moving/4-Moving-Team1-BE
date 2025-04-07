@@ -97,7 +97,7 @@ const getPendingEstimatesController: RequestHandler = asyncHandler(
           isConfirmed,
           workerId,
         } = estimate;
-
+        const workerProfile = await profileService.getWorkerProfile(workerId);
         return {
           id,
           price: price ? price : null,
@@ -107,7 +107,7 @@ const getPendingEstimatesController: RequestHandler = asyncHandler(
           departure,
           destination,
           isConfirmed,
-          workerId,
+          ...workerProfile,
         };
       })
     );
@@ -135,7 +135,7 @@ const getEstimatesController: RequestHandler = asyncHandler(
           isConfirmed,
           workerId,
         } = estimate;
-
+        const workerProfile = await profileService.getWorkerProfile(workerId);
         return {
           id,
           price: price ? price : null,
@@ -145,7 +145,7 @@ const getEstimatesController: RequestHandler = asyncHandler(
           departure,
           destination,
           isConfirmed,
-          workerId,
+          ...workerProfile,
         };
       })
     );
