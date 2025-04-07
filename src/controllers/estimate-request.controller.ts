@@ -7,6 +7,7 @@ import {
   findInactiveEstimateRequests,
 } from "../servieces/utills";
 import estimateService from "../servieces/estimate.service";
+import userService from "../servieces/user.service";
 
 // 견적 요청 생성하기
 const createEstimateRequestController: RequestHandler = asyncHandler(
@@ -86,31 +87,43 @@ const getRequsetEstimateRequestsController: RequestHandler = asyncHandler(
       (req) => !assignedCustomerIds.has(req.customerId)
     );
 
-    const formattedEstimateRequests = filteredEstimateRequests.map(
-      (estimateRequest) => ({
-        id: estimateRequest.id,
-        customerId: estimateRequest.customerId,
-        serviceType: estimateRequest.serviceType,
-        movingDate: estimateRequest.movingDate,
-        departure: estimateRequest.departure,
-        destination: estimateRequest.destination,
-        createdAt: estimateRequest.createdAt,
-        updatedAt: estimateRequest.updatedAt,
-        status: null,
+    const formattedEstimateRequests = await Promise.all(
+      filteredEstimateRequests.map(async (estimateRequest) => {
+        const { name } = await userService.getUserMe(
+          estimateRequest.customerId
+        );
+        return {
+          id: estimateRequest.id,
+          customerId: estimateRequest.customerId,
+          serviceType: estimateRequest.serviceType,
+          movingDate: estimateRequest.movingDate,
+          departure: estimateRequest.departure,
+          destination: estimateRequest.destination,
+          createdAt: estimateRequest.createdAt,
+          updatedAt: estimateRequest.updatedAt,
+          status: null,
+          customerName: name,
+        };
       })
     );
 
-    const formattedAssignedEstimates = assignedEstimates.map((estimate) => ({
-      id: estimate.id,
-      customerId: estimate.customerId,
-      serviceType: estimate.serviceType,
-      movingDate: estimate.movingDate,
-      departure: estimate.departure,
-      destination: estimate.destination,
-      createdAt: estimate.createdAt,
-      updatedAt: estimate.updatedAt,
-      status: estimate.status,
-    }));
+    const formattedAssignedEstimates = await Promise.all(
+      assignedEstimates.map(async (estimate) => {
+        const { name } = await userService.getUserMe(estimate.customerId);
+        return {
+          id: estimate.id,
+          customerId: estimate.customerId,
+          serviceType: estimate.serviceType,
+          movingDate: estimate.movingDate,
+          departure: estimate.departure,
+          destination: estimate.destination,
+          createdAt: estimate.createdAt,
+          updatedAt: estimate.updatedAt,
+          status: estimate.status,
+          customerName: name,
+        };
+      })
+    );
 
     const allEstimates = [
       ...formattedAssignedEstimates,
