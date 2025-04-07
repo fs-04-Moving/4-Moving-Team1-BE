@@ -3,7 +3,14 @@ import { ReviewDto } from "../types/review.type";
 
 const createReview = async (reviewDto: ReviewDto) => {
   try {
-    const { star, content, customerId, estimateId } = reviewDto;
+    const { estimateId } = reviewDto;
+
+    const existReview = await prisma.review.findFirst({
+      where: { estimateId },
+    });
+
+    if (existReview) throw new Error("400/Review already exist");
+
     await prisma.review.create({
       data: reviewDto,
     });
@@ -11,3 +18,6 @@ const createReview = async (reviewDto: ReviewDto) => {
     throw e;
   }
 };
+
+const reviewService = { createReview };
+export default reviewService;

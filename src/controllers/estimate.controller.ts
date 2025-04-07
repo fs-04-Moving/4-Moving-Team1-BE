@@ -275,6 +275,27 @@ const getRejectEstimatesController: RequestHandler = asyncHandler(
   }
 );
 
+const getReviewableEstimatesController: RequestHandler = asyncHandler(
+  async (req, res, next) => {
+    const customerId = req.userId as string;
+    const estimates = await estimateService.getReviewableEstimates(customerId);
+
+    const data = estimates.map((estimate) => ({
+      id: estimate.id,
+      workerId: estimate.workerId,
+      serviceType: estimate.serviceType,
+      movingDate: estimate.movingDate,
+      departure: estimate.departure,
+      destination: estimate.destination,
+      price: estimate.price,
+      status: estimate.status,
+      workerNickname: estimate.worker?.workProfile?.nickname ?? null,
+    }));
+
+    res.send(data).status(200);
+  }
+);
+
 const estimate = {
   createAssignedEstimateController,
   confirmEstimateController,
@@ -286,6 +307,7 @@ const estimate = {
   getEstimateDetailController,
   getSentEstimatesController,
   getRejectEstimatesController,
+  getReviewableEstimatesController,
 };
 
 export default estimate;

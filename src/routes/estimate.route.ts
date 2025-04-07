@@ -85,4 +85,12 @@ estimateRouter.get(
   estimate.getRejectEstimatesController
 );
 
+// 리뷰 가능한 견적들
+estimateRouter.get(
+  "/reviewable",
+  authenticatedOnly,
+  customerOnly,
+  estimate.getReviewableEstimatesController
+);
+
 export default estimateRouter;

@@ -59,10 +59,4 @@ profileRouter.get(
   profile.getWorkerProfileController
 );
 
-// profileRouter.get(
-//   "/customer/:customerId",
-//   authenticatedOnly,
-//   profile.getCustomerProfileController
-// );
-
 export default profileRouter;

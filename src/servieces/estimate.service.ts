@@ -188,9 +188,41 @@ const getReviewableEstimates = async (customerId: string) => {
         movingDate: { lt: new Date() },
         review: null,
       },
-      include: { worker: { select: { workProfile: true } } },
+      select: {
+        id: true,
+        workerId: true,
+        serviceType: true,
+        movingDate: true,
+        departure: true,
+        destination: true,
+        price: true,
+        status: true,
+        worker: {
+          select: {
+            workProfile: {
+              select: {
+                nickname: true,
+              },
+            },
+          },
+        },
+      },
     });
     return estimates;
+  } catch (e) {
+    throw e;
+  }
+};
+
+const getworkerIdByEstimateId = async (estimateId: string) => {
+  try {
+    const estimate = await prisma.estimate.findFirst({
+      where: { id: estimateId },
+      select: { workerId: true },
+    });
+    if (!estimate?.workerId) throw new Error("400/worker not found");
+
+    return estimate.workerId;
   } catch (e) {
     throw e;
   }
@@ -208,6 +240,7 @@ const estimateService = {
   getSentEstimates,
   getRejectEstimates,
   getReviewableEstimates,
+  getworkerIdByEstimateId,
 };
 
 export default estimateService;
