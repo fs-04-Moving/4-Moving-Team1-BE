@@ -11,10 +11,11 @@ const getUserMe = async (userId: string) => {
   try {
     const user = await prisma.user.findFirst({ where: { id: userId } });
     if (!user) throw new Error("400/user not found");
-    const { name, hasProfile } = user;
+    const { name, hasProfile, role } = user;
     const userData = {
       name,
       hasProfile,
+      role,
     };
     return userData;
   } catch (e) {
