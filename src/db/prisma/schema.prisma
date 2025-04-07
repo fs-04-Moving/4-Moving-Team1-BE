@@ -25,7 +25,7 @@ model User {
 model WorkerProfile {
   id           String        @id @default(uuid())
   profileImage String?
-  nickname     String?
+  nickname     String
   experience   Int
   summary      String
   description  String
@@ -88,7 +88,7 @@ model Estimate {
   departure         String
   destination       String
   price             Int?
-  isCompleted       Boolean         @default(false)
+  isConfirmed       Boolean         @default(false)
   createdAt         DateTime        @default(now())
   updatedAt         DateTime        @default(now())
   rejectionMessage  String?

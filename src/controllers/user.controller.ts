@@ -3,6 +3,7 @@ import { asyncHandler } from "../middleware/error.middleware";
 import userService from "../servieces/user.service";
 import { UpdateUserDto } from "../types/auth.type";
 
+// 내정보 가저오기 : 이름 프로필 이미지 , 프로필 생성 여부
 const getUserMeController: RequestHandler = asyncHandler(
   async (req, res, next) => {
     const userId = req.userId as string;
@@ -12,6 +13,7 @@ const getUserMeController: RequestHandler = asyncHandler(
   }
 );
 
+// 유저 정보 업데이트 : 이름 , 이메일 , 전화번호, 비밀번호
 const updateUserMeController: RequestHandler = asyncHandler(
   async (req, res, next) => {
     const userId = req.userId as string;

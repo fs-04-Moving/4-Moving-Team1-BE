@@ -9,6 +9,7 @@ if (!jwtSecretKey) {
   throw new Error("jwtSerectKey is not exist");
 }
 
+// 토큰 생성 함수
 const createToken = (data: PayloadData) => {
   try {
     const payload = {
@@ -33,6 +34,7 @@ const createToken = (data: PayloadData) => {
   }
 };
 
+// 비밀번호가 암호화된(DB에 저장된) 비밀번호와 같은지 확인하는 함수
 export const checkPassword = async (
   password: string,
   encryptedPassword: string
@@ -47,6 +49,7 @@ export const checkPassword = async (
   }
 };
 
+// 로그인 함수
 const logIn = async (logInDto: LogInDto) => {
   try {
     const result = await prisma.$transaction(async (prisma) => {
@@ -83,6 +86,7 @@ const logIn = async (logInDto: LogInDto) => {
   }
 };
 
+// 회원가입 함수
 const signUp = async (signUpDto: SignUpDto) => {
   try {
     const { email, password, name, phoneNumber, role } = signUpDto;
@@ -117,6 +121,7 @@ const signUp = async (signUpDto: SignUpDto) => {
   }
 };
 
+// 리프레쉬 토큰 함수
 const refreshToken = async (refreshToken: string) => {
   const { sub, email, name } = jwt.verify(
     refreshToken,
