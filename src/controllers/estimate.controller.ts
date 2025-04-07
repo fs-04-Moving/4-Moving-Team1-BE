@@ -4,6 +4,7 @@ import estimateService from "../servieces/estimate.service";
 import estimateRequstService from "../servieces/estimate-request.sevice";
 import profileService from "../servieces/profile.service";
 import { findInactiveEstimateRequests } from "../servieces/utills";
+import userService from "../servieces/user.service";
 
 //일반 유저가 지정 견적 생성 (일반 유저가 기사 유저에게 견적 보내기)
 const createAssignedEstimateController: RequestHandler = asyncHandler(
@@ -189,28 +190,34 @@ const getSentEstimatesController: RequestHandler = asyncHandler(
     const workerId = req.userId as string;
     const estimates = await estimateService.getSentEstimates(workerId);
 
-    const data = estimates.map(
-      ({
-        id,
-        customerId,
-        serviceType,
-        movingDate,
-        departure,
-        destination,
-        createdAt,
-        updatedAt,
-        status,
-      }) => ({
-        id,
-        customerId,
-        serviceType,
-        movingDate,
-        departure,
-        destination,
-        createdAt,
-        updatedAt,
-        status,
-      })
+    const data = await Promise.all(
+      estimates.map(
+        async ({
+          id,
+          customerId,
+          serviceType,
+          movingDate,
+          departure,
+          destination,
+          createdAt,
+          updatedAt,
+          status,
+        }) => {
+          const { name } = await userService.getUserMe(customerId);
+          return {
+            id,
+            customerId,
+            serviceType,
+            movingDate,
+            departure,
+            destination,
+            createdAt,
+            updatedAt,
+            status,
+            customerName: name,
+          };
+        }
+      )
     );
 
     res.status(200).send(data);
@@ -222,28 +229,34 @@ const getRejectEstimatesController: RequestHandler = asyncHandler(
     const workerId = req.userId as string;
     const estimates = await estimateService.getRejectEstimates(workerId);
 
-    const data = estimates.map(
-      ({
-        id,
-        customerId,
-        serviceType,
-        movingDate,
-        departure,
-        destination,
-        createdAt,
-        updatedAt,
-        status,
-      }) => ({
-        id,
-        customerId,
-        serviceType,
-        movingDate,
-        departure,
-        destination,
-        createdAt,
-        updatedAt,
-        status,
-      })
+    const data = await Promise.all(
+      estimates.map(
+        async ({
+          id,
+          customerId,
+          serviceType,
+          movingDate,
+          departure,
+          destination,
+          createdAt,
+          updatedAt,
+          status,
+        }) => {
+          const { name } = await userService.getUserMe(customerId);
+          return {
+            id,
+            customerId,
+            serviceType,
+            movingDate,
+            departure,
+            destination,
+            createdAt,
+            updatedAt,
+            status,
+            customerName: name,
+          };
+        }
+      )
     );
 
     res.status(200).send(data);
