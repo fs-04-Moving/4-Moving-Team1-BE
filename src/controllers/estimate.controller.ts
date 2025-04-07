@@ -5,6 +5,7 @@ import estimateRequstService from "../servieces/estimate-request.sevice";
 import profileService from "../servieces/profile.service";
 import { findInactiveEstimateRequests } from "../servieces/utills";
 import userService from "../servieces/user.service";
+import { EstimateDto } from "../types/estimate.type";
 
 //일반 유저가 지정 견적 생성 (일반 유저가 기사 유저에게 견적 보내기)
 const createAssignedEstimateController: RequestHandler = asyncHandler(
@@ -14,7 +15,12 @@ const createAssignedEstimateController: RequestHandler = asyncHandler(
       throw new Error("400/workerId is invalid");
     const customerId = req.userId as string;
     // 지정 견적 생성
-    await estimateService.createEstimate(workerId, customerId, "assigned");
+    const estimateDto: EstimateDto = {
+      workerId,
+      customerId,
+      status: "assigned",
+    };
+    await estimateService.createEstimate(estimateDto);
     res.sendStatus(201);
   }
 );
@@ -43,12 +49,13 @@ const createGeneralEstimateController: RequestHandler = asyncHandler(
     if (typeof customerId !== "string")
       throw new Error("400/workerId is invalid");
     // 일반 견적 생성
-    await estimateService.createEstimate(
+    const estimateDto: EstimateDto = {
       workerId,
       customerId,
-      "general",
-      price
-    );
+      status: "general",
+      price,
+    };
+    await estimateService.createEstimate(estimateDto);
     res.sendStatus(201);
   }
 );

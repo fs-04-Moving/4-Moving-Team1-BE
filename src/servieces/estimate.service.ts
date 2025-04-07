@@ -1,15 +1,13 @@
 import { EstimateStatus } from "@prisma/client";
 import prisma from "../db/prisma/client";
 import { findActiveEstimateRequest, findEstimate, findUser } from "./utills";
+import { EstimateDto } from "../types/estimate.type";
 
 // 견적 생성 함수
-const createEstimate = async (
-  workerId: string,
-  customerId: string,
-  status: EstimateStatus,
-  price?: number
-) => {
+const createEstimate = async (estimateDto: EstimateDto) => {
   try {
+    const { workerId, customerId, status, price } = estimateDto;
+
     const estimateRequest = await findActiveEstimateRequest(customerId);
 
     await findUser(workerId);
@@ -181,6 +179,23 @@ const getRejectEstimates = async (workerId: string) => {
   }
 };
 
+const getReviewableEstimates = async (customerId: string) => {
+  try {
+    const estimates = await prisma.estimate.findMany({
+      where: {
+        customerId,
+        isConfirmed: true,
+        movingDate: { lt: new Date() },
+        review: null,
+      },
+      include: { worker: { select: { workProfile: true } } },
+    });
+    return estimates;
+  } catch (e) {
+    throw e;
+  }
+};
+
 const estimateService = {
   createEstimate,
   confirmEstimate,
@@ -192,6 +207,7 @@ const estimateService = {
   getAssignedEstimate,
   getSentEstimates,
   getRejectEstimates,
+  getReviewableEstimates,
 };
 
 export default estimateService;

@@ -6,6 +6,10 @@ import userRouter from "./user.route";
 import estimateRequstRouter from "./estimate-request.router";
 import estimateRouter from "./estimate.route";
 import favoriteRouter from "./favorite.route";
+import reviewRouter from "./review.route";
+import cookieParser from "cookie-parser";
+
+app.use(cookieParser());
 
 const router = express.Router();
 
@@ -16,5 +20,6 @@ router.use("/user", userRouter);
 router.use("/estimate-request", estimateRequstRouter);
 router.use("/estimate", estimateRouter);
 router.use("/favorite", favoriteRouter);
+router.use("/review", reviewRouter);
 
 export default router;
