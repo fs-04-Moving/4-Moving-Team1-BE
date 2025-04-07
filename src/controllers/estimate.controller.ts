@@ -77,11 +77,6 @@ const priceEstimateController: RequestHandler = asyncHandler(
   }
 );
 //일반 유저 대기중인 견적 get
-//나중에 추가해야하는것
-//workerFavoritesCount
-//workerReviewsCount
-//workerRating
-//workerConfirmedEstimatesCount
 const getPendingEstimatesController: RequestHandler = asyncHandler(
   async (req, res, next) => {
     const customerId = req.userId as string;
@@ -120,7 +115,7 @@ const getPendingEstimatesController: RequestHandler = asyncHandler(
     res.status(200).send(mergedData);
   }
 );
-
+//일반 유저 견적 컨트롤러 (받았던 견적 조회할때)
 const getEstimatesController: RequestHandler = asyncHandler(
   async (req, res, next) => {
     const { estimateRequestId } = req.params;
@@ -158,7 +153,7 @@ const getEstimatesController: RequestHandler = asyncHandler(
     res.status(200).send(mergedData);
   }
 );
-
+//상세 견적
 const getEstimateDetailController: RequestHandler = asyncHandler(
   async (req, res, next) => {
     const { estimateId } = req.params;

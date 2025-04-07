@@ -1,8 +1,16 @@
 import { ErrorRequestHandler, RequestHandler } from "express";
 import { Prisma } from "@prisma/client";
+import { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
 
 const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
   console.error("error는 ", err);
+  if (err instanceof TokenExpiredError) {
+    res.status(419).send("token expired");
+  }
+
+  if (err instanceof JsonWebTokenError) {
+    res.status(401).send("Invalid token in authentication");
+  }
   const [statusCodeText, message] = err.message.split("/");
   const statusCode = Number(statusCodeText);
 
