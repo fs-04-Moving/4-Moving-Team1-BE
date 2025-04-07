@@ -8,18 +8,20 @@ datasource db {
 }
 
 model User {
-  id                String            @id @default(uuid())
-  email             String            @unique
-  name              String
-  encryptedPassword String
-  phoneNumber       String?
-  hasProfile        Boolean           @default(false)
-  role              ROLE
-  estimateRequests  EstimateRequest[]
-  favorites         Favorite[]
-  customerProfile   CustomerProfile?
-  reviews           Review[]
-  workProfile       WorkerProfile?
+  id                  String            @id @default(uuid())
+  email               String            @unique
+  name                String
+  encryptedPassword   String
+  phoneNumber         String?
+  hasProfile          Boolean           @default(false)
+  role                ROLE
+  estimateRequests    EstimateRequest[]
+  favorites           Favorite[]
+  customerProfile     CustomerProfile?
+  reviews             Review[]
+  workProfile         WorkerProfile?
+  estimatesAsWorker   Estimate[]        @relation("EstimateWorker")
+  estimatesAsCustomer Estimate[]        @relation("EstimateCustomer")
 }
 
 model WorkerProfile {
@@ -62,6 +64,8 @@ model Favorite {
   customerId String
   workerId   String
   user       User   @relation(fields: [customerId], references: [id])
+
+  @@unique([customerId, workerId])
 }
 
 model EstimateRequest {
@@ -95,7 +99,10 @@ model Estimate {
   status            EstimateStatus
   comment           String?
   estimateRequset   EstimateRequest @relation(fields: [estimateRequestId], references: [id], onDelete: Cascade)
-  reviews            Review[]
+  reviews           Review[]
+  worker            User?           @relation("EstimateWorker", fields: [workerId], references: [id])
+  customer          User?           @relation("EstimateCustomer", fields: [customerId], references: [id])
+  userId            String?
 }
 
 enum ROLE {

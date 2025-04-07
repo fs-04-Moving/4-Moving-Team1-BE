@@ -47,6 +47,7 @@ export const findActiveEstimateRequests = async () => {
   try {
     const estimateRequest = await prisma.estimateRequest.findMany({
       where: { status: "active" },
+      include: { user: { select: { name: true } } },
     });
     if (!estimateRequest)
       throw new Error("400/acitve Estimate Request not found");

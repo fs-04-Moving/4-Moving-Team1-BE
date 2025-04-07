@@ -96,9 +96,8 @@ const getPendingEstimatesController: RequestHandler = asyncHandler(
           departure,
           destination,
           isConfirmed,
-          workerId,
+          worker,
         } = estimate;
-        const workerProfile = await profileService.getWorkerProfile(workerId);
         return {
           id,
           price: price ? price : null,
@@ -108,7 +107,10 @@ const getPendingEstimatesController: RequestHandler = asyncHandler(
           departure,
           destination,
           isConfirmed,
-          ...workerProfile,
+          workerProfileImage: worker?.workProfile?.profileImage ?? null,
+          workerSummary: worker?.workProfile?.summary ?? null,
+          workerNickname: worker?.workProfile?.nickname ?? null,
+          workerExperience: worker?.workProfile?.experience ?? null,
         };
       })
     );
@@ -134,9 +136,9 @@ const getEstimatesController: RequestHandler = asyncHandler(
           departure,
           destination,
           isConfirmed,
-          workerId,
+          worker,
         } = estimate;
-        const workerProfile = await profileService.getWorkerProfile(workerId);
+
         return {
           id,
           price: price ? price : null,
@@ -146,7 +148,10 @@ const getEstimatesController: RequestHandler = asyncHandler(
           departure,
           destination,
           isConfirmed,
-          ...workerProfile,
+          workerProfileImage: worker?.workProfile?.profileImage ?? null,
+          workerSummary: worker?.workProfile?.summary ?? null,
+          workerNickname: worker?.workProfile?.nickname ?? null,
+          workerExperience: worker?.workProfile?.experience ?? null,
         };
       })
     );
@@ -202,8 +207,8 @@ const getSentEstimatesController: RequestHandler = asyncHandler(
           createdAt,
           updatedAt,
           status,
+          customer,
         }) => {
-          const { name } = await userService.getUserMe(customerId);
           return {
             id,
             customerId,
@@ -214,7 +219,7 @@ const getSentEstimatesController: RequestHandler = asyncHandler(
             createdAt,
             updatedAt,
             status,
-            customerName: name,
+            customerName: customer?.name,
           };
         }
       )
@@ -241,8 +246,8 @@ const getRejectEstimatesController: RequestHandler = asyncHandler(
           createdAt,
           updatedAt,
           status,
+          customer,
         }) => {
-          const { name } = await userService.getUserMe(customerId);
           return {
             id,
             customerId,
@@ -253,7 +258,7 @@ const getRejectEstimatesController: RequestHandler = asyncHandler(
             createdAt,
             updatedAt,
             status,
-            customerName: name,
+            customerName: customer?.name,
           };
         }
       )

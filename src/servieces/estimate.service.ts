@@ -102,6 +102,7 @@ const getPendingEstimates = async (customerId: string) => {
     );
     const pendingEstimate = await prisma.estimate.findMany({
       where: { estimateRequestId },
+      include: { worker: { include: { workProfile: true } } },
     });
     return pendingEstimate;
   } catch (e) {
@@ -114,6 +115,7 @@ const getEstimatesByEstimateRequestId = async (estimateRequestId: string) => {
   try {
     const estimates = await prisma.estimate.findMany({
       where: { estimateRequestId },
+      include: { worker: { include: { workProfile: true } } },
     });
     return estimates;
   } catch (e) {
@@ -144,6 +146,7 @@ const getAssignedEstimate = async (workerId: string, isConfirmed?: boolean) => {
     }
     const estimates = await prisma.estimate.findMany({
       where,
+      include: { customer: { select: { name: true } } },
     });
     if (!estimates) throw new Error("400/estimates not found");
     return estimates;
@@ -156,6 +159,7 @@ const getSentEstimates = async (workerId: string) => {
   try {
     const estimates = await prisma.estimate.findMany({
       where: { workerId },
+      include: { customer: { select: { name: true } } },
     });
     if (!estimates) throw new Error("400/estimates not found");
     return estimates;
@@ -168,6 +172,7 @@ const getRejectEstimates = async (workerId: string) => {
   try {
     const estimates = await prisma.estimate.findMany({
       where: { workerId, status: "rejected" },
+      include: { customer: { select: { name: true } } },
     });
     if (!estimates) throw new Error("400/estimates not found");
     return estimates;
