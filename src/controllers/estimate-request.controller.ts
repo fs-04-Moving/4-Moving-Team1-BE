@@ -151,14 +151,17 @@ const getRequsetEstimateRequestsController: RequestHandler = asyncHandler(
     ];
 
     const sortedEstimates = allEstimates.sort((a, b) => {
-      if (orderBy === "createdAt") {
+      if (orderBy === "earliestRequest") {
         return (
           new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
         );
+      } else if (orderBy === "earliestMove") {
+        return (
+          new Date(a.movingDate).getTime() - new Date(b.movingDate).getTime()
+        );
+      } else {
+        throw new Error("400/orderBy is not correct form");
       }
-      return (
-        new Date(a.movingDate).getTime() - new Date(b.movingDate).getTime()
-      );
     });
 
     res.status(200).send(sortedEstimates);
