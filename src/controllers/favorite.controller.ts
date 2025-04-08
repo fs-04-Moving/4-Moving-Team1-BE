@@ -42,6 +42,10 @@ const getFavoriteWorkersController: RequestHandler = asyncHandler(
           workerDescription: profile.description,
           services: profile.services,
           serviceAreas: profile.serviceAreas,
+          workerConfirmedEstimatesCount: fav.worker.confirmedEstimateCount,
+          workerReviewsCount: fav.worker._count.receivedReviews,
+          workerFavoritesCount: fav.worker._count.workerFavorites,
+          workerRating: fav.worker.avgStar,
         };
       });
 
