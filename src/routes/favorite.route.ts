@@ -32,7 +32,7 @@ favoriteRouter.get(
   "/",
   authenticatedOnly,
   customerOnly,
-  favorite.getFavoritesController
+  favorite.getFavoriteWorkersController
 );
 
 export default favoriteRouter;

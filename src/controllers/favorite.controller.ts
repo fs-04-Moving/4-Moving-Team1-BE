@@ -23,10 +23,12 @@ const deleteFavoriteController: RequestHandler = asyncHandler(
   }
 );
 
-const getFavoritesController: RequestHandler = asyncHandler(
+const getFavoriteWorkersController: RequestHandler = asyncHandler(
   async (req, res, next) => {
     const customerId = req.userId as string;
-    const favoriteWorkers = await favoriteService.getFavorites(customerId);
+    const favoriteWorkers = await favoriteService.getFavoriteWorkers(
+      customerId
+    );
     const data = favoriteWorkers
       .filter((fav) => fav.worker?.workProfile)
       .map((fav) => {
@@ -60,7 +62,7 @@ const checkFavoriteController: RequestHandler = asyncHandler(
 const favorite = {
   createFavoriteController,
   deleteFavoriteController,
-  getFavoritesController,
+  getFavoriteWorkersController,
   checkFavoriteController,
 };
 export default favorite;

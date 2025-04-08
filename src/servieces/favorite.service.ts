@@ -30,7 +30,7 @@ const deleteFavorite = async (customerId: string, workerId: string) => {
     throw e;
   }
 };
-const getFavorites = async (customerId: string) => {
+const getFavoriteWorkers = async (customerId: string) => {
   try {
     const FavoriteWorkers = await prisma.favorite.findMany({
       where: { customerId },
@@ -56,7 +56,7 @@ const checkFavorite = async (customerId: string, workerId: string) => {
 const favoriteService = {
   createFavorite,
   deleteFavorite,
-  getFavorites,
+  getFavoriteWorkers,
   checkFavorite,
 };
 
