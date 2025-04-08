@@ -93,16 +93,69 @@ const priceEstimate = async (
 
 //pending 상태의 견적들 찾기기
 const getPendingEstimates = async (customerId: string) => {
+  const now = new Date();
   try {
     // 아이디 찾기
     const { id: estimateRequestId } = await findActiveEstimateRequest(
       customerId
     );
-    const pendingEstimate = await prisma.estimate.findMany({
+    const pendingEstimates = await prisma.estimate.findMany({
       where: { estimateRequestId },
-      include: { worker: { select: { workProfile: true } } },
+      include: {
+        worker: {
+          include: {
+            workProfile: true,
+            _count: {
+              select: {
+                receivedReviews: true,
+                workerFavorites: true,
+              },
+            },
+          },
+        },
+      },
     });
-    return pendingEstimate;
+
+    const workerIds = pendingEstimates.map((estimate) => estimate.workerId);
+
+    const [avgStars, confirmedEstimateCounts] = await Promise.all([
+      prisma.review.groupBy({
+        by: ["workerId"],
+        where: { workerId: { in: workerIds } },
+        _avg: { star: true },
+      }),
+      prisma.estimate.groupBy({
+        by: ["workerId"],
+        where: {
+          workerId: { in: workerIds },
+          isConfirmed: true,
+          movingDate: { lt: now },
+        },
+        _count: { _all: true },
+      }),
+    ]);
+
+    const pendingEstimatesWithData = pendingEstimates.map((estimate) => {
+      const workerId = estimate.workerId;
+      const avgStar =
+        avgStars.find((review) => review.workerId === workerId)?._avg.star ||
+        null;
+      const confirmedEstimateCount =
+        confirmedEstimateCounts.find(
+          (estimate) => estimate.workerId === workerId
+        )?._count._all || 0;
+
+      return {
+        ...estimate,
+        worker: {
+          ...estimate.worker,
+          avgStar,
+          confirmedEstimateCount,
+        },
+      };
+    });
+
+    return pendingEstimatesWithData;
   } catch (e) {
     throw e;
   }
@@ -110,12 +163,64 @@ const getPendingEstimates = async (customerId: string) => {
 
 //estimateRequestId에 해당하는 견적들 찾기
 const getEstimatesByEstimateRequestId = async (estimateRequestId: string) => {
+  const now = new Date();
   try {
     const estimates = await prisma.estimate.findMany({
       where: { estimateRequestId },
-      include: { worker: { select: { workProfile: true } } },
+      include: {
+        worker: {
+          include: {
+            workProfile: true,
+            _count: {
+              select: {
+                receivedReviews: true,
+                workerFavorites: true,
+              },
+            },
+          },
+        },
+      },
     });
-    return estimates;
+
+    const workerIds = estimates.map((estimate) => estimate.workerId);
+
+    const [avgStars, confirmedEstimateCounts] = await Promise.all([
+      prisma.review.groupBy({
+        by: ["workerId"],
+        where: { workerId: { in: workerIds } },
+        _avg: { star: true },
+      }),
+      prisma.estimate.groupBy({
+        by: ["workerId"],
+        where: {
+          workerId: { in: workerIds },
+          isConfirmed: true,
+          movingDate: { lt: now },
+        },
+        _count: { _all: true },
+      }),
+    ]);
+
+    const EstimatesWithData = estimates.map((estimate) => {
+      const workerId = estimate.workerId;
+      const avgStar =
+        avgStars.find((review) => review.workerId === workerId)?._avg.star ||
+        null;
+      const confirmedEstimateCount =
+        confirmedEstimateCounts.find(
+          (estimate) => estimate.workerId === workerId
+        )?._count._all || 0;
+
+      return {
+        ...estimate,
+        worker: {
+          ...estimate.worker,
+          avgStar,
+          confirmedEstimateCount,
+        },
+      };
+    });
+    return EstimatesWithData;
   } catch (e) {
     throw e;
   }

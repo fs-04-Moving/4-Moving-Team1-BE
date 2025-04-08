@@ -114,10 +114,14 @@ const getPendingEstimatesController: RequestHandler = asyncHandler(
           departure,
           destination,
           isConfirmed,
-          workerProfileImage: worker?.workProfile?.profileImage ?? null,
-          workerSummary: worker?.workProfile?.summary ?? null,
-          workerNickname: worker?.workProfile?.nickname ?? null,
-          workerExperience: worker?.workProfile?.experience ?? null,
+          workerProfileImage: worker.workProfile?.profileImage,
+          workerSummary: worker.workProfile?.summary,
+          workerNickname: worker.workProfile?.nickname,
+          workerExperience: worker.workProfile?.experience,
+          workerConfirmedEstimatesCount: worker.confirmedEstimateCount,
+          workerReviewsCount: worker._count?.receivedReviews,
+          workerFavoritesCount: worker._count?.workerFavorites,
+          workerRating: worker.avgStar,
         };
       })
     );
@@ -155,10 +159,14 @@ const getEstimatesController: RequestHandler = asyncHandler(
           departure,
           destination,
           isConfirmed,
-          workerProfileImage: worker?.workProfile?.profileImage ?? null,
-          workerSummary: worker?.workProfile?.summary ?? null,
-          workerNickname: worker?.workProfile?.nickname ?? null,
-          workerExperience: worker?.workProfile?.experience ?? null,
+          workerProfileImage: worker.workProfile?.profileImage,
+          workerSummary: worker.workProfile?.summary,
+          workerNickname: worker.workProfile?.nickname,
+          workerExperience: worker.workProfile?.experience,
+          workerConfirmedEstimatesCount: worker.confirmedEstimateCount,
+          workerReviewsCount: worker._count?.receivedReviews,
+          workerFavoritesCount: worker._count?.workerFavorites,
+          workerRating: worker.avgStar,
         };
       })
     );

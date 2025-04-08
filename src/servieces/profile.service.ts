@@ -121,22 +121,47 @@ const updateWorkerProfile = async (
 // workerExperience: number;
 // workerConfirmedEstimatesCount: number;
 const getWorkerProfile = async (workerId: string) => {
+  const now = new Date();
   try {
-    const workerProfile = await prisma.workerProfile.findFirst({
-      where: { workerId },
+    const worker = await prisma.user.findFirst({
+      where: { id: workerId },
+      include: {
+        _count: { select: { customerFavorites: true, receivedReviews: true } },
+        workProfile: {
+          select: {
+            profileImage: true,
+            nickname: true,
+            summary: true,
+            experience: true,
+          },
+        },
+      },
     });
-    if (!workerProfile) throw new Error("400/worker profile not exist");
-    const {
-      profileImage: workerProfileImage,
-      nickname: workerNickname,
-      summary: workerSummary,
-      experience: workerExperience,
-    } = workerProfile;
+
+    if (!worker) throw new Error("400/worker not found");
+    if (!worker.workProfile) throw new Error("400/worker profile not found");
+    const avgStar = await prisma.review.aggregate({
+      where: { workerId },
+      _avg: { star: true },
+    });
+
+    const confirmedEstimateCount = await prisma.estimate.count({
+      where: {
+        workerId,
+        isConfirmed: true,
+        movingDate: { lt: now },
+      },
+    });
+
     return {
-      workerProfileImage,
-      workerNickname,
-      workerSummary,
-      workerExperience,
+      workerProfileImage: worker.workProfile.profileImage ?? null,
+      workerSummary: worker.workProfile.summary,
+      workerNickname: worker.workProfile.nickname,
+      workerExperience: worker.workProfile.experience,
+      workerFavoritesCount: worker._count.customerFavorites || 0,
+      workerReviewsCount: worker._count.receivedReviews || 0,
+      workerRating: avgStar._avg.star ?? null,
+      workerConfirmedEstimatesCount: confirmedEstimateCount || 0,
     };
   } catch (e) {
     throw e;
