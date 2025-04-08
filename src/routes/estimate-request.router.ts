@@ -5,7 +5,10 @@ import {
   customerOnly,
   workerOnly,
 } from "../middleware/auth.middleware";
-import { validateEstimateRequset } from "../vaildataions/estimate-requset.validation";
+import {
+  validateEstimateRequset,
+  validateEstimateRequsetQuery,
+} from "../vaildataions/estimate-requset.validation";
 
 const estimateRequstRouter = express.Router();
 
@@ -39,6 +42,7 @@ estimateRequstRouter.get(
   "/received",
   authenticatedOnly,
   workerOnly,
+  validateEstimateRequsetQuery,
   estimateRequest.getRequsetEstimateRequestsController
 );
 

@@ -1,4 +1,4 @@
-import { EstimateStatus } from "@prisma/client";
+import { Area, EstimateStatus, Prisma, ServiceType } from "@prisma/client";
 import prisma from "../db/prisma/client";
 import { findActiveEstimateRequest, findEstimate, findUser } from "./utills";
 import { EstimateDto } from "../types/estimate.type";
@@ -12,8 +12,14 @@ const createEstimate = async (estimateDto: EstimateDto) => {
 
     await findUser(workerId);
 
-    const { id, serviceType, departure, destination, movingDate } =
-      estimateRequest;
+    const {
+      id,
+      serviceType,
+      departureAddress,
+      destination,
+      movingDate,
+      departureArea,
+    } = estimateRequest;
 
     const estimate = await prisma.estimate.findFirst({
       where: { customerId, workerId },
@@ -31,10 +37,11 @@ const createEstimate = async (estimateDto: EstimateDto) => {
         customerId,
         workerId,
         serviceType,
-        departure,
+        departureAddress,
         destination,
         movingDate,
         status,
+        departureArea,
         ...(status === "general" ? { price } : {}),
       },
     });
@@ -238,15 +245,36 @@ const getEstimateByEstimatetId = async (estimatetId: string) => {
   }
 };
 
-const getAssignedEstimate = async (workerId: string, isConfirmed?: boolean) => {
+const getAssignedEstimate = async (
+  workerId: string,
+  isConfirmed?: boolean,
+  serviceType?: ServiceType[],
+  serviceArea?: Area[],
+  search?: string
+) => {
   try {
-    const where: any = {
+    const where: Prisma.EstimateWhereInput = {
       workerId,
       status: "assigned",
+      ...(typeof isConfirmed === "boolean" && { isConfirmed }),
+      ...(serviceType &&
+        serviceType.length > 0 && {
+          serviceType: { in: serviceType },
+        }),
+      ...(serviceArea &&
+        serviceArea.length > 0 && {
+          departureArea: { in: serviceArea },
+        }),
+      ...(search && {
+        customer: {
+          name: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+      }),
     };
-    if (typeof isConfirmed === "boolean") {
-      where.isConfirmed = isConfirmed;
-    }
+
     const estimates = await prisma.estimate.findMany({
       where,
       include: { customer: { select: { name: true } } },
@@ -298,7 +326,7 @@ const getReviewableEstimates = async (customerId: string) => {
         workerId: true,
         serviceType: true,
         movingDate: true,
-        departure: true,
+        departureAddress: true,
         destination: true,
         price: true,
         status: true,

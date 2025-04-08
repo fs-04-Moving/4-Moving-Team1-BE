@@ -1,11 +1,14 @@
-import { ServiceType } from "@prisma/client";
+import { Area, ServiceType } from "@prisma/client";
 
 type EstimateRequstDto = {
   customerId: string;
   serviceType: ServiceType;
   movingDate: Date;
-  departure: string;
+  departureAddress: string;
   destination: string;
+  departureArea: Area;
 };
 
-export { EstimateRequstDto };
+type EstimateRequestOrderBy = "earliestMove" | "earliestRequest";
+
+export { EstimateRequstDto, EstimateRequestOrderBy };

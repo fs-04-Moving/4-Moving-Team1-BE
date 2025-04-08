@@ -168,6 +168,19 @@ const getWorkerProfile = async (workerId: string) => {
   }
 };
 
+const getWorkerServiceArea = async (workerId: string) => {
+  try {
+    const serviceAreas = await prisma.workerProfile.findFirst({
+      where: { workerId },
+      select: { serviceAreas: true },
+    });
+    if (!serviceAreas) throw new Error("400/worker profile not found");
+    return serviceAreas.serviceAreas;
+  } catch (e) {
+    throw e;
+  }
+};
+
 // // 일반 유저의 profile 가져오기
 // const getCustomerProfile = async (customerId: string) => {
 //   try {
@@ -188,6 +201,7 @@ const profileService = {
   updateCustomerProfile,
   updateWorkerProfile,
   getWorkerProfile,
+  getWorkerServiceArea,
 };
 
 export default profileService;
