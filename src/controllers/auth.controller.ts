@@ -55,6 +55,21 @@ const refreshTokenController: RequestHandler = asyncHandler(
   }
 );
 
-const auth = { logInController, signUpController, refreshTokenController };
+const logOutController: RequestHandler = (req, res) => {
+  res.clearCookie("refreshToken", {
+    httpOnly: true,
+    // secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+  });
+
+  res.status(200).send({ message: "로그아웃 완료" });
+};
+
+const auth = {
+  logInController,
+  signUpController,
+  refreshTokenController,
+  logOutController,
+};
 
 export default auth;
