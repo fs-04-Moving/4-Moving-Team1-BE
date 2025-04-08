@@ -19,5 +19,27 @@ const createReview = async (reviewDto: ReviewDto) => {
   }
 };
 
-const reviewService = { createReview };
+const getMyReview = async (customerId: string) => {
+  try {
+    const reviews = await prisma.review.findMany({
+      where: { customerId },
+      include: {
+        estimate: {
+          select: {
+            serviceType: true,
+            movingDate: true,
+            price: true,
+            status: true,
+            worker: { select: { workProfile: { select: { nickname: true } } } },
+          },
+        },
+      },
+    });
+    return reviews;
+  } catch (e) {
+    throw e;
+  }
+};
+
+const reviewService = { createReview, getMyReview };
 export default reviewService;

@@ -10,4 +10,11 @@ reviewRouter.post(
   review.createReviewController
 );
 
+reviewRouter.get(
+  "/",
+  authenticatedOnly,
+  customerOnly,
+  review.getMyReviewController
+);
+
 export default reviewRouter;
