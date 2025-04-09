@@ -19,23 +19,45 @@ const createReview = async (reviewDto: ReviewDto) => {
   }
 };
 
-const getMyReview = async (customerId: string) => {
+const getMyReview = async ({
+  customerId,
+  page,
+  pageSize,
+}: {
+  customerId: string;
+  page: number;
+  pageSize: number;
+}) => {
   try {
-    const reviews = await prisma.review.findMany({
-      where: { customerId },
-      include: {
-        estimate: {
-          select: {
-            serviceType: true,
-            movingDate: true,
-            price: true,
-            status: true,
-            worker: { select: { workProfile: { select: { nickname: true } } } },
+    const [reviews, totalCount] = await Promise.all([
+      prisma.review.findMany({
+        where: { customerId },
+        include: {
+          estimate: {
+            select: {
+              serviceType: true,
+              movingDate: true,
+              price: true,
+              status: true,
+              worker: {
+                select: {
+                  workProfile: {
+                    select: {
+                      nickname: true,
+                    },
+                  },
+                },
+              },
+            },
           },
         },
-      },
-    });
-    return reviews;
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+      }),
+      prisma.review.count({ where: { customerId } }),
+    ]);
+
+    return { reviews, totalCount };
   } catch (e) {
     throw e;
   }

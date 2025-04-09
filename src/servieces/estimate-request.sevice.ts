@@ -76,7 +76,7 @@ const getRecivedEstimateReuests = async ({
   serviceArea?: Area[];
   search?: string;
   orderBy?: EstimateRequestOrderBy;
-  isAssigned: boolean;
+  isAssigned?: boolean;
 }) => {
   const where: Prisma.EstimateRequestWhereInput = {
     status: "active",

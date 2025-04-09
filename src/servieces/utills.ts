@@ -30,15 +30,30 @@ export const findActiveEstimateRequest = async (customerId: string) => {
   }
 };
 
-export const findInactiveEstimateRequests = async (customerId: string) => {
+export const findInactiveEstimateRequests = async ({
+  customerId,
+  page,
+  pageSize,
+}: {
+  customerId: string;
+  page: number;
+  pageSize: number;
+}) => {
   try {
-    const estimateRequest = await prisma.estimateRequest.findMany({
-      where: { customerId, status: "inactive" },
-    });
-    if (!estimateRequest)
+    const [inactiveEstimateRequests, totalCount] = await Promise.all([
+      prisma.estimateRequest.findMany({
+        where: { customerId, status: "inactive" },
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+      }),
+      prisma.estimateRequest.count({
+        where: { customerId, status: "inactive" },
+      }),
+    ]);
+    if (!inactiveEstimateRequests)
       throw new Error("400/acitve Estimate Request not found");
 
-    return estimateRequest;
+    return { inactiveEstimateRequests, totalCount };
   } catch (e) {
     throw e;
   }

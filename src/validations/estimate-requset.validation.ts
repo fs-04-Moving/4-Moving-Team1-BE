@@ -16,8 +16,8 @@ const estimateRequestQuerySchema = z.object({
   serviceType: z.array(z.nativeEnum(ServiceType)).optional(),
   filter: z.array(z.enum(["area", "assigned"] as const)).optional(),
   search: z.string().optional(),
-  page: z.number().min(0).optional(),
-  pageSize: z.number().min(0).optional(),
+  page: z.number().min(0),
+  pageSize: z.number().min(0),
 });
 
 export type EstimateRequestQuery = z.infer<typeof estimateRequestQuerySchema>;

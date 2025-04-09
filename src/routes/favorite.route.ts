@@ -1,6 +1,7 @@
 import express from "express";
 import favorite from "../controllers/favorite.controller";
 import { authenticatedOnly, customerOnly } from "../middleware/auth.middleware";
+import { validatePaginationQuery } from "../validations/common.validation";
 const favoriteRouter = express.Router();
 
 //유저 찜하기
@@ -32,6 +33,7 @@ favoriteRouter.get(
   "/",
   authenticatedOnly,
   customerOnly,
+  validatePaginationQuery,
   favorite.getFavoriteWorkersController
 );
 

@@ -7,6 +7,7 @@ import {
 } from "../types/profile.type";
 import profileService from "../servieces/profile.service";
 import { Area, ServiceType } from "@prisma/client";
+import { GetWorkerProfilesQuery } from "../validations/profile.validation";
 
 // 일반 유저 프로필 생성
 const createCustomerProfileController: RequestHandler = asyncHandler(
@@ -157,16 +158,15 @@ const getWorkerProfileController: RequestHandler = asyncHandler(
 
 const getWorkerProfilesController: RequestHandler = asyncHandler(
   async (req, res, next) => {
-    const { orderBy, serviceType, serviceArea } = req.query as {
-      orderBy: profileOrderBy;
-      serviceType: ServiceType | undefined;
-      serviceArea: Area | undefined;
-    };
-    const workerProfiles = await profileService.getWorkerProfiles(
+    const { orderBy, serviceType, serviceArea, page, pageSize } =
+      req.validateQuery as GetWorkerProfilesQuery;
+    const workerProfiles = await profileService.getWorkerProfiles({
       orderBy,
       serviceType,
-      serviceArea
-    );
+      serviceArea,
+      page,
+      pageSize,
+    });
 
     res.status(200).send(workerProfiles);
   }

@@ -213,12 +213,23 @@ const getWorkerServiceArea = async (workerId: string) => {
 //   }
 // };
 
-const getWorkerProfiles = async (
-  orderBy?: profileOrderBy,
-  service?: ServiceType,
-  area?: Area
-) => {
+const getWorkerProfiles = async ({
+  orderBy,
+  serviceType,
+  serviceArea,
+  page = 1,
+  pageSize = 10,
+}: {
+  orderBy?: profileOrderBy;
+  serviceType?: ServiceType;
+  serviceArea?: Area;
+  page?: number;
+  pageSize?: number;
+}) => {
   try {
+    const offset = (page - 1) * pageSize;
+    const limit = pageSize;
+
     let order = "";
 
     switch (orderBy) {
@@ -238,7 +249,19 @@ const getWorkerProfiles = async (
         order = '"reviewCount" DESC';
     }
 
-    const result = await prisma.$queryRawUnsafe(`
+    const where = `u.role = 'worker' AND u."hasProfile" = true
+      ${
+        serviceType
+          ? `AND wp."services" @> ARRAY['${serviceType}']::"ServiceType"[]`
+          : ""
+      }
+      ${
+        serviceArea
+          ? `AND wp."serviceAreas" @> ARRAY['${serviceArea}']::"Area"[]`
+          : ""
+      }`;
+
+    const list = await prisma.$queryRawUnsafe(`
       SELECT 
         u.id as "workerId",
         wp."profileImage",
@@ -258,18 +281,30 @@ const getWorkerProfiles = async (
       LEFT JOIN "Review" r ON u.id = r."workerId" 
       LEFT JOIN "Favorite" f ON f."workerId" = u.id 
       LEFT JOIN "Estimate" e ON u.id = e."workerId" 
-      WHERE u.role = 'worker' AND u."hasProfile" = true
-      ${
-        service
-          ? `AND wp."services" @> ARRAY['${service}']::"ServiceType"[]`
-          : ""
-      }
-      ${area ? `AND wp."serviceAreas" @> ARRAY['${area}']::"Area"[]` : ""}
+      WHERE ${where}
       GROUP BY u.id, wp."profileImage", wp."experience", wp."nickname", wp."services", wp."serviceAreas"
-      ORDER BY ${order};
+      ORDER BY ${order}
+      LIMIT ${limit}
+      OFFSET ${offset};
     `);
 
-    return result;
+    const totalCountResult = await prisma.$queryRawUnsafe<{ count: number }[]>(`
+      SELECT COUNT(*)::int as count FROM (
+        SELECT 
+          u.id
+          FROM "User" u 
+          LEFT JOIN "WorkerProfile" wp ON u.id = wp."workerId" 
+          LEFT JOIN "Review" r ON u.id = r."workerId" 
+          LEFT JOIN "Favorite" f ON f."workerId" = u.id 
+          LEFT JOIN "Estimate" e ON u.id = e."workerId" 
+          WHERE ${where}
+          GROUP BY u.id, wp."profileImage", wp."experience", wp."nickname", wp."services", wp."serviceAreas"
+      ) AS subquery;
+    `);
+
+    const totalCount = totalCountResult[0]?.count ?? 0;
+
+    return { list, totalCount };
   } catch (e) {
     throw e;
   }

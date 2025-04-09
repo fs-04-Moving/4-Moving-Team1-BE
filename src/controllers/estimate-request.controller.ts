@@ -2,15 +2,11 @@ import { RequestHandler } from "express";
 import { asyncHandler } from "../middleware/error.middleware";
 import { EstimateRequstDto } from "../types/estimate-request.type";
 import estimateRequstService from "../servieces/estimate-request.sevice";
-import {
-  findActiveEstimateRequests,
-  findInactiveEstimateRequests,
-} from "../servieces/utills";
-import estimateService from "../servieces/estimate.service";
-import userService from "../servieces/user.service";
-import { Area, ServiceType } from "@prisma/client";
-import { profile } from "console";
+import { findInactiveEstimateRequests } from "../servieces/utills";
+import { Area } from "@prisma/client";
 import profileService from "../servieces/profile.service";
+import { EstimateRequestQuery } from "../validations/estimate-requset.validation";
+import { PaginationQuery } from "../validations/common.validation";
 
 // 견적 요청 생성하기
 const createEstimateRequestController: RequestHandler = asyncHandler(
@@ -50,9 +46,13 @@ const deleteEstimateRequestController: RequestHandler = asyncHandler(
 const getEstimateRequestsController: RequestHandler = asyncHandler(
   async (req, res, next) => {
     const customerId = req.userId as string;
-    const inactiveEstimateRequests = await findInactiveEstimateRequests(
-      customerId
-    );
+    const { page, pageSize } = req.validateQuery as PaginationQuery;
+    const { inactiveEstimateRequests, totalCount } =
+      await findInactiveEstimateRequests({
+        customerId,
+        page,
+        pageSize,
+      });
     const estimateRequests = await Promise.all(
       inactiveEstimateRequests.map(async (inactiveEstimateRequest) => {
         const {
@@ -73,7 +73,7 @@ const getEstimateRequestsController: RequestHandler = asyncHandler(
         };
       })
     );
-    res.status(200).send(estimateRequests);
+    res.status(200).send({ list: estimateRequests, totalCount });
   }
 );
 
@@ -86,7 +86,7 @@ const getRequsetEstimateRequestsController: RequestHandler = asyncHandler(
     const workerId = req.userId as string;
 
     const { orderBy, serviceType, filter, search, page, pageSize } =
-      req.validateQuery;
+      req.validateQuery as EstimateRequestQuery;
 
     const isAssigned = filter?.includes("assigned");
     const isServiceable = filter?.includes("area");
