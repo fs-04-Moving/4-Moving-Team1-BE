@@ -9,6 +9,7 @@ const logInController: RequestHandler = asyncHandler(async (req, res, next) => {
   const logInDto = { email, password, role };
   const { sub, accessToken, refreshToken } = await authService.logIn(logInDto);
   const { hasProfile } = await userService.getUserMe(sub);
+
   req.userId = sub;
 
   res.cookie("refreshToken", refreshToken, {

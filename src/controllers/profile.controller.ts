@@ -26,9 +26,10 @@ const createCustomerProfileController: RequestHandler = asyncHandler(
       customerId,
     };
     await profileService.createCustomerProfile(customerProfileDto); //유저 프로필 생성
-    await profileService.updateUserProfileStatus(customerId); // 유저 프로필 상태 업데이트 (hasProfile :true)
+    const { accessToken, refreshToken } =
+      await profileService.updateUserProfileStatus(customerId); // 유저 프로필 상태 업데이트 (hasProfile :true)
 
-    res.sendStatus(201);
+    res.status(200).send({ accessToken, refreshToken });
   }
 );
 
@@ -63,9 +64,11 @@ const createWorkerProfileController: RequestHandler = asyncHandler(
     };
 
     await profileService.createWorkerProfile(workerProfileDto); //유저 프로필 생성
-    await profileService.updateUserProfileStatus(workerId); // 유저 프로필 상태 업데이트 (hasProfile :true)
 
-    res.sendStatus(201);
+    const { accessToken, refreshToken } =
+      await profileService.updateUserProfileStatus(workerId); // 유저 프로필 상태 업데이트 (hasProfile :true)
+
+    res.status(200).send({ accessToken, refreshToken });
   }
 );
 
