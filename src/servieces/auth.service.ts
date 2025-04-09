@@ -11,7 +11,7 @@ if (!jwtSecretKey) {
 }
 
 // 토큰 생성 함수
-const createToken = (data: PayloadData) => {
+export const createToken = (data: PayloadData) => {
   try {
     const payload = {
       sub: data.id,
@@ -147,6 +147,8 @@ const refreshToken = async (refreshToken: string) => {
   const { accessToken } = createToken(data);
   return { accessToken };
 };
+
+// 토큰 업데이트
 
 const authService = { logIn, signUp, refreshToken };
 

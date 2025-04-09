@@ -8,7 +8,7 @@ const logInController: RequestHandler = asyncHandler(async (req, res, next) => {
   const { email, password, role } = req.body;
   const logInDto = { email, password, role };
   const { sub, accessToken, refreshToken } = await authService.logIn(logInDto);
-  const { hasProfile } = await userService.getUserMe(sub);
+
   req.userId = sub;
 
   res.cookie("refreshToken", refreshToken, {
@@ -19,7 +19,7 @@ const logInController: RequestHandler = asyncHandler(async (req, res, next) => {
     maxAge: 1000 * 60 * 60 * 24 * 7, // 7일
   });
 
-  res.status(200).send({ accessToken, hasProfile, role });
+  res.status(200).send({ accessToken });
 });
 
 // 회원가입 컨트롤러

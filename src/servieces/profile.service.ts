@@ -5,6 +5,8 @@ import {
   profileOrderBy,
   WorkerProfileDto,
 } from "../types/profile.type";
+import { PayloadData } from "../types/auth.type";
+import { createToken } from "./auth.service";
 
 // 유저 프로필 생성
 const createCustomerProfile = async (
@@ -23,6 +25,7 @@ const createCustomerProfile = async (
     await prisma.customerProfile.create({
       data: customerProfileDto,
     });
+
     return;
   } catch (e) {
     throw e;
@@ -44,24 +47,35 @@ const createWorkerProfile = async (workerProfileDto: WorkerProfileDto) => {
     await prisma.workerProfile.create({
       data: workerProfileDto,
     });
-
     return;
   } catch (e) {
     throw e;
   }
 };
 
-// 프로필 상태 업데이트 - 유저가 프로필을 만들었는지 확인해서 true/false 값 반환
+// 프로필 상태 업데이트 - 유저가 프로필을 만들었는지 확인해서 true/false 값, 토큰들 새로 발급급
 const updateUserProfileStatus = async (userId: string) => {
   try {
-    const user = await prisma.user.findFirst({
+    await prisma.user.findFirstOrThrow({
       where: { id: userId },
     });
-    if (!user) throw new Error("400/User not exist");
-    await prisma.user.update({
+    const user = await prisma.user.update({
       where: { id: userId },
       data: { hasProfile: true },
     });
+    const data: PayloadData = {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+      hasProfile: user.hasProfile,
+    };
+
+    const { accessToken, refreshToken } = createToken(data);
+    return {
+      accessToken,
+      refreshToken,
+    };
   } catch (e) {
     throw e;
   }
