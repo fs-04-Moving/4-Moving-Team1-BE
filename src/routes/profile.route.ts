@@ -53,12 +53,10 @@ profileRouter.put(
   profile.updateWorkerProfileController
 );
 
-profileRouter.get(
-  "/worker/:workerId",
-  authenticatedOnly,
-  profile.getWorkerProfileController
-);
+//기사 프로필 상세 보기
+profileRouter.get("/worker/:workerId", profile.getWorkerProfileController);
 
+//기사님 찾기
 profileRouter.get("/workers", profile.getWorkerProfilesController);
 
 export default profileRouter;

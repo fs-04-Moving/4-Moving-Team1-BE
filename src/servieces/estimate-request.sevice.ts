@@ -1,5 +1,9 @@
+import { Area, Prisma, ServiceType } from "@prisma/client";
 import prisma from "../db/prisma/client";
-import { EstimateRequstDto } from "../types/estimate-request.type";
+import {
+  EstimateRequestOrderBy,
+  EstimateRequstDto,
+} from "../types/estimate-request.type";
 import { findActiveEstimateRequest } from "./utills";
 
 // 견적 요청 생성 함수
@@ -55,10 +59,93 @@ const confirmEstimateRequest = async (customerId: string) => {
   });
 };
 
+const getRecivedEstimateReuests = async ({
+  workerId,
+  page = 1,
+  pageSize = 10,
+  serviceType,
+  serviceArea,
+  search,
+  orderBy = "earliestRequest",
+  isAssigned = false,
+}: {
+  workerId: string;
+  page?: number;
+  pageSize?: number;
+  serviceType?: ServiceType[];
+  serviceArea?: Area[];
+  search?: string;
+  orderBy?: EstimateRequestOrderBy;
+  isAssigned: boolean;
+}) => {
+  const where: Prisma.EstimateRequestWhereInput = {
+    status: "active",
+    ...(serviceType?.length && { serviceType: { in: serviceType } }),
+    ...(serviceArea?.length && { departureArea: { in: serviceArea } }),
+    ...(search && {
+      user: {
+        name: {
+          contains: search,
+          mode: "insensitive",
+        },
+      },
+    }),
+    ...(isAssigned && {
+      estimates: {
+        some: {
+          workerId,
+          status: "assigned",
+        },
+      },
+    }),
+  };
+
+  const orderByField: Prisma.EstimateRequestOrderByWithRelationInput =
+    orderBy === "earliestMove" ? { movingDate: "asc" } : { createdAt: "asc" };
+
+  const requests = await prisma.estimateRequest.findMany({
+    where,
+    include: {
+      estimates: {
+        where: { workerId, status: "assigned" },
+        take: 1,
+      },
+      user: true,
+    },
+    orderBy: orderByField,
+    skip: (page - 1) * pageSize,
+    take: pageSize,
+  });
+
+  const formatted = requests.map((r) => {
+    console.log(r.estimates);
+    return {
+      id: r.id,
+      customerId: r.customerId,
+      serviceType: r.serviceType,
+      movingDate: r.movingDate,
+      departure: r.departureAddress,
+      destination: r.destination,
+      createdAt: r.createdAt,
+      updatedAt: r.updatedAt,
+      customerName: r.user.name,
+      status: r.estimates.length !== 0 ? "assigned" : null,
+    };
+  });
+
+  const totalCount = await prisma.estimateRequest.count({ where });
+
+  return {
+    list: formatted,
+    totalCount,
+  };
+};
+
 const estimateRequstService = {
   createEstimateRequest,
   deleteEstimateRequest,
   confirmEstimateRequest,
+  getRecivedEstimateReuests,
 };
 
 export default estimateRequstService;

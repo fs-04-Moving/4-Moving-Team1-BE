@@ -17,4 +17,6 @@ reviewRouter.get(
   review.getMyReviewController
 );
 
+reviewRouter.get("/:workerId");
+
 export default reviewRouter;
