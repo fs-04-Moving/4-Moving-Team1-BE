@@ -1,6 +1,7 @@
 import { Area, ServiceType } from "@prisma/client";
 import { RequestHandler } from "express";
 import { z } from "zod";
+import { EstimateRequestOrderBy } from "../types/estimate-request.type";
 
 export const estimateRequestSchema = z.object({
   serviceType: z.nativeEnum(ServiceType),
@@ -48,7 +49,7 @@ const validateEstimateRequset: RequestHandler = (req, res, next) => {
 const validateEstimateRequsetQuery: RequestHandler = (req, res, next) => {
   try {
     const { orderBy, serviceType, filter, search } = req.query as {
-      orderBy: string;
+      orderBy: EstimateRequestOrderBy;
       serviceType: string;
       filter: string;
       search: string;

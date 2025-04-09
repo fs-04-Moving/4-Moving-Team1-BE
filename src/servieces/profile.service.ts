@@ -1,5 +1,10 @@
+import { Area, Prisma, ServiceType } from "@prisma/client";
 import prisma from "../db/prisma/client";
-import { CustomerProfileDto, WorkerProfileDto } from "../types/profile.type";
+import {
+  CustomerProfileDto,
+  profileOrderBy,
+  WorkerProfileDto,
+} from "../types/profile.type";
 
 // 유저 프로필 생성
 const createCustomerProfile = async (
@@ -194,6 +199,68 @@ const getWorkerServiceArea = async (workerId: string) => {
 //   }
 // };
 
+const getWorkerProfiles = async (
+  orderBy?: profileOrderBy,
+  service?: ServiceType,
+  area?: Area
+) => {
+  try {
+    let order = "";
+
+    switch (orderBy) {
+      case "mostReview":
+        order = '"reviewCount" DESC';
+        break;
+      case "highestRated":
+        order = '"avgStar" DESC';
+        break;
+      case "mostExperience":
+        order = 'wp."experience" DESC';
+        break;
+      case "mostConfirmed":
+        order = '"confirmedEstimateCount" DESC';
+        break;
+      default:
+        order = '"reviewCount" DESC';
+    }
+
+    const result = await prisma.$queryRawUnsafe(`
+      SELECT 
+        u.id as "workerId",
+        wp."profileImage",
+        wp."experience",
+        wp."nickname",
+        wp."services",
+        wp."serviceAreas",
+        count(distinct r.id)::int as "reviewCount",
+        count(distinct f.id)::int as "favoriteCount",
+        coalesce(avg(r.star), 0)::float as "avgStar",
+        count(distinct CASE 
+          WHEN e."isConfirmed" = true AND e."movingDate" < NOW() 
+          THEN e.id 
+        END)::int as "confirmedEstimateCount"
+      FROM "User" u 
+      LEFT JOIN "WorkerProfile" wp ON u.id = wp."workerId" 
+      LEFT JOIN "Review" r ON u.id = r."workerId" 
+      LEFT JOIN "Favorite" f ON f."workerId" = u.id 
+      LEFT JOIN "Estimate" e ON u.id = e."workerId" 
+      WHERE u.role = 'worker' AND u."hasProfile" = true
+      ${
+        service
+          ? `AND wp."services" @> ARRAY['${service}']::"ServiceType"[]`
+          : ""
+      }
+      ${area ? `AND wp."serviceAreas" @> ARRAY['${area}']::"Area"[]` : ""}
+      GROUP BY u.id, wp."profileImage", wp."experience", wp."nickname", wp."services", wp."serviceAreas"
+      ORDER BY ${order};
+    `);
+
+    return result;
+  } catch (e) {
+    throw e;
+  }
+};
+
 const profileService = {
   createCustomerProfile,
   createWorkerProfile,
@@ -202,6 +269,7 @@ const profileService = {
   updateWorkerProfile,
   getWorkerProfile,
   getWorkerServiceArea,
+  getWorkerProfiles,
 };
 
 export default profileService;

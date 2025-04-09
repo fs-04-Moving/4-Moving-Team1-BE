@@ -1,7 +1,12 @@
 import { RequestHandler } from "express";
 import { asyncHandler } from "../middleware/error.middleware";
-import { CustomerProfileDto, WorkerProfileDto } from "../types/profile.type";
+import {
+  CustomerProfileDto,
+  profileOrderBy,
+  WorkerProfileDto,
+} from "../types/profile.type";
 import profileService from "../servieces/profile.service";
+import { Area, ServiceType } from "@prisma/client";
 
 // 일반 유저 프로필 생성
 const createCustomerProfileController: RequestHandler = asyncHandler(
@@ -121,7 +126,7 @@ const updateWorkerProfileController: RequestHandler = asyncHandler(
     res.sendStatus(204);
   }
 );
-
+// 기사님 프로필 정보 가져오기
 const getWorkerProfileController: RequestHandler = asyncHandler(
   async (req, res, next) => {
     const { workerId } = req.params;
@@ -131,12 +136,30 @@ const getWorkerProfileController: RequestHandler = asyncHandler(
   }
 );
 
+const getWorkerProfilesController: RequestHandler = asyncHandler(
+  async (req, res, next) => {
+    const { orderBy, serviceType, serviceArea } = req.query as {
+      orderBy: profileOrderBy;
+      serviceType: ServiceType | undefined;
+      serviceArea: Area | undefined;
+    };
+    const workerProfiles = await profileService.getWorkerProfiles(
+      orderBy,
+      serviceType,
+      serviceArea
+    );
+
+    res.status(200).send(workerProfiles);
+  }
+);
+
 const profile = {
   createWorkerProfileController,
   createCustomerProfileController,
   updateCustomerProfileController,
   updateWorkerProfileController,
   getWorkerProfileController,
+  getWorkerProfilesController,
 };
 
 export default profile;

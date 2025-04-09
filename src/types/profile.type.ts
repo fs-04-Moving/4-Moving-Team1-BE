@@ -18,4 +18,10 @@ type WorkerProfileDto = {
   workerId: string;
 };
 
-export { CustomerProfileDto, WorkerProfileDto };
+type profileOrderBy =
+  | "mostReview"
+  | "highestRated"
+  | "mostExperience"
+  | "mostConfirmed";
+
+export { CustomerProfileDto, WorkerProfileDto, profileOrderBy };
