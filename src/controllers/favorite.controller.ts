@@ -2,6 +2,7 @@ import { RequestHandler } from "express";
 import { asyncHandler } from "../middleware/error.middleware";
 import { findUser } from "../servieces/utills";
 import favoriteService from "../servieces/favorite.service";
+import { PaginationQuery } from "../validations/common.validation";
 
 const createFavoriteController: RequestHandler = asyncHandler(
   async (req, res, next) => {
@@ -26,10 +27,14 @@ const deleteFavoriteController: RequestHandler = asyncHandler(
 const getFavoriteWorkersController: RequestHandler = asyncHandler(
   async (req, res, next) => {
     const customerId = req.userId as string;
-    const favoriteWorkers = await favoriteService.getFavoriteWorkers(
-      customerId
-    );
-    const data = favoriteWorkers
+    const { page, pageSize } = req.validateQuery as PaginationQuery;
+    const { favoriteWorkersWithData, totalCount } =
+      await favoriteService.getFavoriteWorkers({
+        customerId,
+        page,
+        pageSize,
+      });
+    const list = favoriteWorkersWithData
       .filter((fav) => fav.worker?.workProfile)
       .map((fav) => {
         const profile = fav.worker.workProfile!;
@@ -49,7 +54,7 @@ const getFavoriteWorkersController: RequestHandler = asyncHandler(
         };
       });
 
-    res.send(data).status(200);
+    res.send({ list, totalCount }).status(200);
   }
 );
 

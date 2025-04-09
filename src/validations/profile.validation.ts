@@ -1,6 +1,7 @@
 import { Area, ServiceType } from "@prisma/client";
 import { RequestHandler } from "express";
 import { z } from "zod";
+import { profileOrderBy } from "../types/profile.type";
 
 const customerProfileSchema = z.object({
   livingArea: z.nativeEnum(Area),
@@ -15,6 +16,25 @@ const workerProfileSchema = z.object({
   services: z.array(z.nativeEnum(ServiceType)),
   serviceAreas: z.array(z.nativeEnum(Area)),
 });
+
+const getWorkerProfilesQuerySchema = z.object({
+  orderBy: z
+    .enum([
+      "mostReview",
+      "highestRated",
+      "mostExperience",
+      "mostConfirmed",
+    ] as const)
+    .optional(),
+  serviceType: z.nativeEnum(ServiceType).optional(),
+  serviceArea: z.nativeEnum(Area).optional(),
+  page: z.number().min(0),
+  pageSize: z.number().min(0),
+});
+
+export type GetWorkerProfilesQuery = z.infer<
+  typeof getWorkerProfilesQuerySchema
+>;
 
 const validateCustomerProfile = (isUpdate: boolean): RequestHandler => {
   return (req, res, next) => {
@@ -87,4 +107,34 @@ const validateWorkerProfile = (isUpdate: boolean): RequestHandler => {
   };
 };
 
-export { validateCustomerProfile, validateWorkerProfile };
+const validateGetWorkerProfilesQuery: RequestHandler = (req, res, next) => {
+  try {
+    const { orderBy, serviceType, serviceArea, page, pageSize } = req.query as {
+      orderBy: profileOrderBy;
+      serviceType: ServiceType;
+      serviceArea: Area;
+      page: string;
+      pageSize: string;
+    };
+    const parsedContext = getWorkerProfilesQuerySchema.safeParse({
+      orderBy,
+      serviceType,
+      serviceArea,
+      page: page ? Number(page) : 1,
+      pageSize: pageSize ? Number(pageSize) : 10,
+    });
+    if (!parsedContext.success) {
+      throw new Error(`400/Validation error: ${parsedContext.error}`);
+    }
+    req.validateQuery = parsedContext.data;
+    next();
+  } catch (e) {
+    next(e);
+  }
+};
+
+export {
+  validateCustomerProfile,
+  validateWorkerProfile,
+  validateGetWorkerProfilesQuery,
+};

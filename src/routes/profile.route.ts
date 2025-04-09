@@ -8,8 +8,9 @@ import {
 import { uploadProfileImage } from "../middleware/upload";
 import {
   validateCustomerProfile,
+  validateGetWorkerProfilesQuery,
   validateWorkerProfile,
-} from "../vaildataions/profile.validation";
+} from "../validations/profile.validation";
 
 const profileRouter = express.Router();
 
@@ -53,12 +54,14 @@ profileRouter.put(
   profile.updateWorkerProfileController
 );
 
-profileRouter.get(
-  "/worker/:workerId",
-  authenticatedOnly,
-  profile.getWorkerProfileController
-);
+//기사 프로필 상세 보기
+profileRouter.get("/worker/:workerId", profile.getWorkerProfileController);
 
-profileRouter.get("/workers", profile.getWorkerProfilesController);
+//기사님 찾기
+profileRouter.get(
+  "/workers",
+  validateGetWorkerProfilesQuery,
+  profile.getWorkerProfilesController
+);
 
 export default profileRouter;

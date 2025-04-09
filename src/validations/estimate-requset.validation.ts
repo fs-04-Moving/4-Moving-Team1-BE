@@ -16,6 +16,8 @@ const estimateRequestQuerySchema = z.object({
   serviceType: z.array(z.nativeEnum(ServiceType)).optional(),
   filter: z.array(z.enum(["area", "assigned"] as const)).optional(),
   search: z.string().optional(),
+  page: z.number().min(0),
+  pageSize: z.number().min(0),
 });
 
 export type EstimateRequestQuery = z.infer<typeof estimateRequestQuerySchema>;
@@ -48,12 +50,15 @@ const validateEstimateRequset: RequestHandler = (req, res, next) => {
 
 const validateEstimateRequsetQuery: RequestHandler = (req, res, next) => {
   try {
-    const { orderBy, serviceType, filter, search } = req.query as {
-      orderBy: EstimateRequestOrderBy;
-      serviceType: string;
-      filter: string;
-      search: string;
-    };
+    const { orderBy, serviceType, filter, search, page, pageSize } =
+      req.query as {
+        orderBy: EstimateRequestOrderBy;
+        serviceType: string;
+        filter: string;
+        search: string;
+        page: string;
+        pageSize: string;
+      };
     const parsedContext = estimateRequestQuerySchema.safeParse({
       orderBy,
       serviceType: serviceType
@@ -61,6 +66,8 @@ const validateEstimateRequsetQuery: RequestHandler = (req, res, next) => {
         : undefined,
       filter: filter ? filter.split(",").map((f) => f.trim()) : undefined,
       search,
+      page: page ? Number(page) : 1,
+      pageSize: pageSize ? Number(pageSize) : 10,
     });
     if (!parsedContext.success) {
       throw new Error(`400/Validation error: ${parsedContext.error}`);

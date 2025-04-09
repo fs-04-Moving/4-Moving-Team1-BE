@@ -1,9 +1,6 @@
 import express from "express";
 import auth from "../controllers/auth.controller";
-import {
-  validateSignIn,
-  validateSignUp,
-} from "../vaildataions/auth.validation";
+import { validateSignIn, validateSignUp } from "../validations/auth.validation";
 
 const authRouter = express.Router();
 

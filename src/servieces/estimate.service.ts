@@ -99,29 +99,45 @@ const priceEstimate = async (
 };
 
 //pending 상태의 견적들 찾기기
-const getPendingEstimates = async (customerId: string) => {
+const getPendingEstimates = async ({
+  customerId,
+  page,
+  pageSize,
+}: {
+  customerId: string;
+  page: number;
+  pageSize: number;
+}) => {
   const now = new Date();
   try {
     // 아이디 찾기
     const { id: estimateRequestId } = await findActiveEstimateRequest(
       customerId
     );
-    const pendingEstimates = await prisma.estimate.findMany({
-      where: { estimateRequestId },
-      include: {
-        worker: {
-          include: {
-            workProfile: true,
-            _count: {
-              select: {
-                receivedReviews: true,
-                workerFavorites: true,
+
+    const [pendingEstimates, totalCount] = await Promise.all([
+      prisma.estimate.findMany({
+        where: { estimateRequestId },
+        include: {
+          worker: {
+            include: {
+              workProfile: true,
+              _count: {
+                select: {
+                  receivedReviews: true,
+                  workerFavorites: true,
+                },
               },
             },
           },
         },
-      },
-    });
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+      }),
+      prisma.estimate.count({
+        where: { estimateRequestId },
+      }),
+    ]);
 
     const workerIds = pendingEstimates.map((estimate) => estimate.workerId);
 
@@ -162,32 +178,45 @@ const getPendingEstimates = async (customerId: string) => {
       };
     });
 
-    return pendingEstimatesWithData;
+    return { pendingEstimatesWithData, totalCount };
   } catch (e) {
     throw e;
   }
 };
 
 //estimateRequestId에 해당하는 견적들 찾기
-const getEstimatesByEstimateRequestId = async (estimateRequestId: string) => {
+const getEstimatesByEstimateRequestId = async ({
+  estimateRequestId,
+  page,
+  pageSize,
+}: {
+  estimateRequestId: string;
+  page: number;
+  pageSize: number;
+}) => {
   const now = new Date();
   try {
-    const estimates = await prisma.estimate.findMany({
-      where: { estimateRequestId },
-      include: {
-        worker: {
-          include: {
-            workProfile: true,
-            _count: {
-              select: {
-                receivedReviews: true,
-                workerFavorites: true,
+    const [estimates, totalCount] = await Promise.all([
+      prisma.estimate.findMany({
+        where: { estimateRequestId },
+        include: {
+          worker: {
+            include: {
+              workProfile: true,
+              _count: {
+                select: {
+                  receivedReviews: true,
+                  workerFavorites: true,
+                },
               },
             },
           },
         },
-      },
-    });
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+      }),
+      prisma.estimate.count({ where: { estimateRequestId } }),
+    ]);
 
     const workerIds = estimates.map((estimate) => estimate.workerId);
 
@@ -208,7 +237,7 @@ const getEstimatesByEstimateRequestId = async (estimateRequestId: string) => {
       }),
     ]);
 
-    const EstimatesWithData = estimates.map((estimate) => {
+    const estimatesWithData = estimates.map((estimate) => {
       const workerId = estimate.workerId;
       const avgStar =
         avgStars.find((review) => review.workerId === workerId)?._avg.star ||
@@ -227,7 +256,7 @@ const getEstimatesByEstimateRequestId = async (estimateRequestId: string) => {
         },
       };
     });
-    return EstimatesWithData;
+    return { estimatesWithData, totalCount };
   } catch (e) {
     throw e;
   }
@@ -286,62 +315,116 @@ const getAssignedEstimate = async (
   }
 };
 
-const getSentEstimates = async (workerId: string) => {
+const getSentEstimates = async ({
+  workerId,
+  page,
+  pageSize,
+}: {
+  workerId: string;
+  page: number;
+  pageSize: number;
+}) => {
   try {
-    const estimates = await prisma.estimate.findMany({
-      where: { workerId },
-      include: { customer: { select: { name: true } } },
-    });
+    const [estimates, totalCount] = await Promise.all([
+      prisma.estimate.findMany({
+        where: { workerId, NOT: { status: "rejected", price: null } },
+        include: { customer: { select: { name: true } } },
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+      }),
+      prisma.estimate.count({
+        where: { workerId, NOT: { status: "rejected", price: null } },
+      }),
+    ]);
+
     if (!estimates) throw new Error("400/estimates not found");
-    return estimates;
+    return { estimates, totalCount };
   } catch (e) {
     throw e;
   }
 };
 
-const getRejectEstimates = async (workerId: string) => {
+const getRejectEstimates = async ({
+  workerId,
+  page,
+  pageSize,
+}: {
+  workerId: string;
+  page: number;
+  pageSize: number;
+}) => {
   try {
-    const estimates = await prisma.estimate.findMany({
-      where: { workerId, status: "rejected" },
-      include: { customer: { select: { name: true } } },
-    });
+    const [estimates, totalCount] = await Promise.all([
+      prisma.estimate.findMany({
+        where: { workerId, status: "rejected" },
+        include: { customer: { select: { name: true } } },
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+      }),
+      prisma.estimate.count({ where: { workerId, status: "rejected" } }),
+    ]);
+
     if (!estimates) throw new Error("400/estimates not found");
-    return estimates;
+    return { estimates, totalCount };
   } catch (e) {
     throw e;
   }
 };
 
-const getReviewableEstimates = async (customerId: string) => {
+const getReviewableEstimates = async ({
+  customerId,
+  page,
+  pageSize,
+}: {
+  customerId: string;
+  page: number;
+  pageSize: number;
+}) => {
   try {
-    const estimates = await prisma.estimate.findMany({
-      where: {
-        customerId,
-        isConfirmed: true,
-        movingDate: { lt: new Date() },
-        review: null,
-      },
-      select: {
-        id: true,
-        workerId: true,
-        serviceType: true,
-        movingDate: true,
-        departureAddress: true,
-        destination: true,
-        price: true,
-        status: true,
-        worker: {
-          select: {
-            workProfile: {
-              select: {
-                nickname: true,
+    const [estimates, totalCount] = await Promise.all([
+      prisma.estimate.findMany({
+        where: {
+          customerId,
+          isConfirmed: true,
+          movingDate: { lt: new Date() },
+          review: null,
+        },
+        select: {
+          id: true,
+          workerId: true,
+          serviceType: true,
+          movingDate: true,
+          departureAddress: true,
+          destination: true,
+          price: true,
+          status: true,
+          worker: {
+            select: {
+              workProfile: {
+                select: {
+                  nickname: true,
+                },
               },
             },
           },
         },
-      },
-    });
-    return estimates;
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+      }),
+      prisma.estimate.count({
+        where: {
+          customerId,
+          isConfirmed: true,
+          movingDate: { lt: new Date() },
+          review: null,
+        },
+      }),
+    ]);
+
+    return {
+      estimates,
+      totalCount,
+    };
   } catch (e) {
     throw e;
   }

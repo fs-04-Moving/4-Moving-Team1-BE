@@ -3,9 +3,9 @@ import { asyncHandler } from "../middleware/error.middleware";
 import estimateService from "../servieces/estimate.service";
 import estimateRequstService from "../servieces/estimate-request.sevice";
 import profileService from "../servieces/profile.service";
-import { findInactiveEstimateRequests } from "../servieces/utills";
 import userService from "../servieces/user.service";
 import { EstimateDto } from "../types/estimate.type";
+import { PaginationQuery } from "../validations/common.validation";
 
 //일반 유저가 지정 견적 생성 (일반 유저가 기사 유저에게 견적 보내기)
 const createAssignedEstimateController: RequestHandler = asyncHandler(
@@ -88,12 +88,15 @@ const priceEstimateController: RequestHandler = asyncHandler(
 const getPendingEstimatesController: RequestHandler = asyncHandler(
   async (req, res, next) => {
     const customerId = req.userId as string;
-
-    const pendingEstimates = await estimateService.getPendingEstimates(
-      customerId
-    );
-    const mergedData = await Promise.all(
-      pendingEstimates.map(async (estimate) => {
+    const { page, pageSize } = req.validateQuery as PaginationQuery;
+    const { pendingEstimatesWithData, totalCount } =
+      await estimateService.getPendingEstimates({
+        customerId,
+        page,
+        pageSize,
+      });
+    const list = await Promise.all(
+      pendingEstimatesWithData.map(async (estimate) => {
         const {
           id,
           price,
@@ -126,18 +129,22 @@ const getPendingEstimatesController: RequestHandler = asyncHandler(
       })
     );
 
-    res.status(200).send(mergedData);
+    res.status(200).send({ list, totalCount });
   }
 );
 //일반 유저 견적 컨트롤러 (받았던 견적 조회할때)
 const getEstimatesController: RequestHandler = asyncHandler(
   async (req, res, next) => {
     const { estimateRequestId } = req.params;
-    const estimates = await estimateService.getEstimatesByEstimateRequestId(
-      estimateRequestId
-    );
-    const mergedData = await Promise.all(
-      estimates.map(async (estimate) => {
+    const { page, pageSize } = req.validateQuery as PaginationQuery;
+    const { estimatesWithData, totalCount } =
+      await estimateService.getEstimatesByEstimateRequestId({
+        estimateRequestId,
+        page,
+        pageSize,
+      });
+    const list = await Promise.all(
+      estimatesWithData.map(async (estimate) => {
         const {
           id,
           price,
@@ -171,7 +178,7 @@ const getEstimatesController: RequestHandler = asyncHandler(
       })
     );
 
-    res.status(200).send(mergedData);
+    res.status(200).send({ list, totalCount });
   }
 );
 //상세 견적
@@ -208,9 +215,14 @@ const getEstimateDetailController: RequestHandler = asyncHandler(
 const getSentEstimatesController: RequestHandler = asyncHandler(
   async (req, res, next) => {
     const workerId = req.userId as string;
-    const estimates = await estimateService.getSentEstimates(workerId);
+    const { page, pageSize } = req.validateQuery as PaginationQuery;
+    const { estimates, totalCount } = await estimateService.getSentEstimates({
+      workerId,
+      page,
+      pageSize,
+    });
 
-    const data = await Promise.all(
+    const list = await Promise.all(
       estimates.map(
         async ({
           id,
@@ -223,6 +235,7 @@ const getSentEstimatesController: RequestHandler = asyncHandler(
           updatedAt,
           status,
           customer,
+          price,
         }) => {
           return {
             id,
@@ -235,21 +248,27 @@ const getSentEstimatesController: RequestHandler = asyncHandler(
             updatedAt,
             status,
             customerName: customer?.name,
+            price,
           };
         }
       )
     );
 
-    res.status(200).send(data);
+    res.status(200).send({ list, totalCount });
   }
 );
 
 const getRejectEstimatesController: RequestHandler = asyncHandler(
   async (req, res, next) => {
     const workerId = req.userId as string;
-    const estimates = await estimateService.getRejectEstimates(workerId);
+    const { page, pageSize } = req.validateQuery as PaginationQuery;
+    const { estimates, totalCount } = await estimateService.getRejectEstimates({
+      workerId,
+      page,
+      pageSize,
+    });
 
-    const data = await Promise.all(
+    const list = await Promise.all(
       estimates.map(
         async ({
           id,
@@ -279,16 +298,22 @@ const getRejectEstimatesController: RequestHandler = asyncHandler(
       )
     );
 
-    res.status(200).send(data);
+    res.status(200).send({ list, totalCount });
   }
 );
 
 const getReviewableEstimatesController: RequestHandler = asyncHandler(
   async (req, res, next) => {
     const customerId = req.userId as string;
-    const estimates = await estimateService.getReviewableEstimates(customerId);
+    const { page, pageSize } = req.validateQuery as PaginationQuery;
+    const { estimates, totalCount } =
+      await estimateService.getReviewableEstimates({
+        customerId,
+        page,
+        pageSize,
+      });
 
-    const data = estimates.map((estimate) => ({
+    const list = estimates.map((estimate) => ({
       id: estimate.id,
       workerId: estimate.workerId,
       serviceType: estimate.serviceType,
@@ -297,10 +322,10 @@ const getReviewableEstimatesController: RequestHandler = asyncHandler(
       destination: estimate.destination,
       price: estimate.price,
       status: estimate.status,
-      workerNickname: estimate.worker?.workProfile?.nickname ,
+      workerNickname: estimate.worker?.workProfile?.nickname,
     }));
 
-    res.send(data).status(200);
+    res.send({ list, totalCount }).status(200);
   }
 );
 

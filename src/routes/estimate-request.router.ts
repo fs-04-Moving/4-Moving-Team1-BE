@@ -8,7 +8,8 @@ import {
 import {
   validateEstimateRequset,
   validateEstimateRequsetQuery,
-} from "../vaildataions/estimate-requset.validation";
+} from "../validations/estimate-requset.validation";
+import { validatePaginationQuery } from "../validations/common.validation";
 
 const estimateRequstRouter = express.Router();
 
@@ -29,11 +30,12 @@ estimateRequstRouter.delete(
   estimateRequest.deleteEstimateRequestController
 );
 
-//받았던 견적페이지에서 내가 보낸 견적적 요청 정보들
+//받았던 견적페이지에서 내가 보낸 견적 요청 정보들
 estimateRequstRouter.get(
   "/",
   authenticatedOnly,
   customerOnly,
+  validatePaginationQuery,
   estimateRequest.getEstimateRequestsController
 );
 

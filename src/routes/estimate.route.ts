@@ -5,6 +5,7 @@ import {
   customerOnly,
   workerOnly,
 } from "../middleware/auth.middleware";
+import { validatePaginationQuery } from "../validations/common.validation";
 
 const estimateRouter = express.Router();
 
@@ -53,6 +54,7 @@ estimateRouter.get(
   "/pending",
   authenticatedOnly,
   customerOnly,
+  validatePaginationQuery,
   estimate.getPendingEstimatesController
 );
 
@@ -60,6 +62,7 @@ estimateRouter.get(
 estimateRouter.get(
   "/received/:estimateRequestId",
   authenticatedOnly,
+  validatePaginationQuery,
   estimate.getEstimatesController
 );
 
@@ -75,6 +78,7 @@ estimateRouter.get(
   "/sent",
   authenticatedOnly,
   workerOnly,
+  validatePaginationQuery,
   estimate.getSentEstimatesController
 );
 // 반려한 요청 조회
@@ -82,6 +86,7 @@ estimateRouter.get(
   "/reject",
   authenticatedOnly,
   workerOnly,
+  validatePaginationQuery,
   estimate.getRejectEstimatesController
 );
 
@@ -90,6 +95,7 @@ estimateRouter.get(
   "/reviewable",
   authenticatedOnly,
   customerOnly,
+  validatePaginationQuery,
   estimate.getReviewableEstimatesController
 );
 

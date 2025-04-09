@@ -2,15 +2,11 @@ import { RequestHandler } from "express";
 import { asyncHandler } from "../middleware/error.middleware";
 import { EstimateRequstDto } from "../types/estimate-request.type";
 import estimateRequstService from "../servieces/estimate-request.sevice";
-import {
-  findActiveEstimateRequests,
-  findInactiveEstimateRequests,
-} from "../servieces/utills";
-import estimateService from "../servieces/estimate.service";
-import userService from "../servieces/user.service";
-import { Area, ServiceType } from "@prisma/client";
-import { profile } from "console";
+import { findInactiveEstimateRequests } from "../servieces/utills";
+import { Area } from "@prisma/client";
 import profileService from "../servieces/profile.service";
+import { EstimateRequestQuery } from "../validations/estimate-requset.validation";
+import { PaginationQuery } from "../validations/common.validation";
 
 // 견적 요청 생성하기
 const createEstimateRequestController: RequestHandler = asyncHandler(
@@ -50,9 +46,13 @@ const deleteEstimateRequestController: RequestHandler = asyncHandler(
 const getEstimateRequestsController: RequestHandler = asyncHandler(
   async (req, res, next) => {
     const customerId = req.userId as string;
-    const inactiveEstimateRequests = await findInactiveEstimateRequests(
-      customerId
-    );
+    const { page, pageSize } = req.validateQuery as PaginationQuery;
+    const { inactiveEstimateRequests, totalCount } =
+      await findInactiveEstimateRequests({
+        customerId,
+        page,
+        pageSize,
+      });
     const estimateRequests = await Promise.all(
       inactiveEstimateRequests.map(async (inactiveEstimateRequest) => {
         const {
@@ -73,17 +73,20 @@ const getEstimateRequestsController: RequestHandler = asyncHandler(
         };
       })
     );
-    res.status(200).send(estimateRequests);
+    res.status(200).send({ list: estimateRequests, totalCount });
   }
 );
 
-// 필터기능 추가할 예정, 고객 이름 추가로 주기, orderBy만 먼저 적용함,
-//적용할 필터 serviceType 배열 , 서비스 가능 지역 , 지정 견적 요청
+//1.모든 estimateReuest를 가져온다.
+//2.estimateReuest include estimate (estimate.workerId === estimateRequest.workId) 인게 있는지 확인한다.
+//3.2에서 있다면 status가 assigned 를 응답값에 추가 없으면 null 추가
+
 const getRequsetEstimateRequestsController: RequestHandler = asyncHandler(
   async (req, res, next) => {
     const workerId = req.userId as string;
 
-    const { orderBy, serviceType, filter, search } = req.validateQuery;
+    const { orderBy, serviceType, filter, search, page, pageSize } =
+      req.validateQuery as EstimateRequestQuery;
 
     const isAssigned = filter?.includes("assigned");
     const isServiceable = filter?.includes("area");
@@ -92,79 +95,17 @@ const getRequsetEstimateRequestsController: RequestHandler = asyncHandler(
     if (isServiceable) {
       serviceArea = await profileService.getWorkerServiceArea(workerId);
     }
-    const estimateRequests = isAssigned
-      ? []
-      : await findActiveEstimateRequests(serviceType, serviceArea, search);
-    const assignedEstimates = await estimateService.getAssignedEstimate(
+    const data = await estimateRequstService.getRecivedEstimateReuests({
+      page,
+      pageSize,
       workerId,
-      false,
+      orderBy,
       serviceType,
       serviceArea,
-      search
-    );
-
-    const assignedCustomerIds = new Set(
-      assignedEstimates.map((estimate) => estimate.customerId)
-    );
-
-    const filteredEstimateRequests = estimateRequests.filter(
-      (req) => !assignedCustomerIds.has(req.customerId)
-    );
-
-    const formattedEstimateRequests = await Promise.all(
-      filteredEstimateRequests.map(async (estimateRequest) => {
-        return {
-          id: estimateRequest.id,
-          customerId: estimateRequest.customerId,
-          serviceType: estimateRequest.serviceType,
-          movingDate: estimateRequest.movingDate,
-          departure: estimateRequest.departureAddress,
-          destination: estimateRequest.destination,
-          createdAt: estimateRequest.createdAt,
-          updatedAt: estimateRequest.updatedAt,
-          status: null,
-          customerName: estimateRequest.user.name,
-        };
-      })
-    );
-
-    const formattedAssignedEstimates = await Promise.all(
-      assignedEstimates.map(async (estimate) => {
-        return {
-          id: estimate.id,
-          customerId: estimate.customerId,
-          serviceType: estimate.serviceType,
-          movingDate: estimate.movingDate,
-          departure: estimate.departureAddress,
-          destination: estimate.destination,
-          createdAt: estimate.createdAt,
-          updatedAt: estimate.updatedAt,
-          status: estimate.status,
-          customerName: estimate.customer?.name,
-        };
-      })
-    );
-
-    const allEstimates = [
-      ...formattedAssignedEstimates,
-      ...formattedEstimateRequests,
-    ];
-
-    const sortedEstimates = allEstimates.sort((a, b) => {
-      if (orderBy === "earliestRequest") {
-        return (
-          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-        );
-      } else if (orderBy === "earliestMove") {
-        return (
-          new Date(a.movingDate).getTime() - new Date(b.movingDate).getTime()
-        );
-      } else {
-        throw new Error("400/orderBy is not correct form");
-      }
+      search,
+      isAssigned,
     });
-
-    res.status(200).send(sortedEstimates);
+    res.status(200).send(data);
   }
 );
 

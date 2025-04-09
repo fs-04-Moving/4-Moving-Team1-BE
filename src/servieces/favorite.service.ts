@@ -30,26 +30,41 @@ const deleteFavorite = async (customerId: string, workerId: string) => {
     throw e;
   }
 };
-const getFavoriteWorkers = async (customerId: string) => {
+const getFavoriteWorkers = async ({
+  customerId,
+  page,
+  pageSize,
+}: {
+  customerId: string;
+  page: number;
+  pageSize: number;
+}) => {
   try {
     const now = new Date();
-    const favoriteWorkers = await prisma.favorite.findMany({
-      where: { customerId },
-      include: {
-        worker: {
-          select: {
-            id: true,
-            workProfile: true,
-            _count: {
-              select: {
-                receivedReviews: true,
-                workerFavorites: true,
+    const [favoriteWorkers, totalCount] = await Promise.all([
+      prisma.favorite.findMany({
+        where: { customerId },
+        include: {
+          worker: {
+            select: {
+              id: true,
+              workProfile: true,
+              _count: {
+                select: {
+                  receivedReviews: true,
+                  workerFavorites: true,
+                },
               },
             },
           },
         },
-      },
-    });
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+      }),
+      prisma.favorite.count({
+        where: { customerId },
+      }),
+    ]);
 
     const workerIds = favoriteWorkers.map((fav) => fav.worker.id);
 
@@ -90,7 +105,7 @@ const getFavoriteWorkers = async (customerId: string) => {
       };
     });
 
-    return favoriteWorkersWithData;
+    return { favoriteWorkersWithData, totalCount };
   } catch (e) {
     throw e;
   }
