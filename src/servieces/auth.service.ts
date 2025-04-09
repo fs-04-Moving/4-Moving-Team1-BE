@@ -2,6 +2,7 @@ import prisma from "../db/prisma/client";
 import { LogInDto, PayloadData, SignUpDto } from "../types/auth.type";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import user from "../controllers/user.controller";
 
 const jwtSecretKey = process.env.JWT_SECRET_KEY;
 
@@ -15,6 +16,8 @@ const createToken = (data: PayloadData) => {
     const payload = {
       sub: data.id,
       email: data.email,
+      role: data.role,
+      hasProfile: data.hasProfile,
     };
 
     const accessToken = jwt.sign(payload, jwtSecretKey, {
@@ -61,10 +64,12 @@ const logIn = async (logInDto: LogInDto) => {
 
       await checkPassword(password, user.encryptedPassword);
 
-      const data = {
+      const data: PayloadData = {
         id: user.id,
         email: user.email,
         name: user.name,
+        role: user.role,
+        hasProfile: user.hasProfile,
       };
 
       const { accessToken, refreshToken } = createToken(data);
@@ -101,10 +106,12 @@ const signUp = async (signUpDto: SignUpDto) => {
         data: { email, name, encryptedPassword, phoneNumber, role },
       });
 
-      const data = {
+      const data: PayloadData = {
         id: newUser.id,
         email: newUser.email,
         name: newUser.name,
+        hasProfile: newUser.hasProfile,
+        role: newUser.role,
       };
       const { accessToken, refreshToken } = createToken(data);
       const { sub } = jwt.verify(accessToken, jwtSecretKey);
@@ -123,7 +130,7 @@ const signUp = async (signUpDto: SignUpDto) => {
 
 // 리프레쉬 토큰 함수
 const refreshToken = async (refreshToken: string) => {
-  const { sub, email, name } = jwt.verify(
+  const { sub, email, name, hasProfile, role } = jwt.verify(
     refreshToken,
     jwtSecretKey
   ) as jwt.JwtPayload;
@@ -134,6 +141,8 @@ const refreshToken = async (refreshToken: string) => {
     id: sub,
     email,
     name,
+    hasProfile,
+    role,
   };
   const { accessToken } = createToken(data);
   return { accessToken };
