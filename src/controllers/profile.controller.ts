@@ -29,7 +29,15 @@ const createCustomerProfileController: RequestHandler = asyncHandler(
     const { accessToken, refreshToken } =
       await profileService.updateUserProfileStatus(customerId); // 유저 프로필 상태 업데이트 (hasProfile :true)
 
-    res.status(200).send({ accessToken, refreshToken });
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      // secure: process.env.NODE_ENV === "production",
+      secure: false,
+      sameSite: "strict",
+      maxAge: 1000 * 60 * 60 * 24 * 7, // 7일
+    });
+
+    res.status(200).send({ accessToken });
   }
 );
 
@@ -68,7 +76,15 @@ const createWorkerProfileController: RequestHandler = asyncHandler(
     const { accessToken, refreshToken } =
       await profileService.updateUserProfileStatus(workerId); // 유저 프로필 상태 업데이트 (hasProfile :true)
 
-    res.status(200).send({ accessToken, refreshToken });
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      // secure: process.env.NODE_ENV === "production",
+      secure: false,
+      sameSite: "strict",
+      maxAge: 1000 * 60 * 60 * 24 * 7, // 7일
+    });
+
+    res.status(200).send({ accessToken });
   }
 );
 
