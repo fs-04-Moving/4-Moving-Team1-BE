@@ -1,5 +1,10 @@
+import { Area, Prisma, ServiceType } from "@prisma/client";
 import prisma from "../db/prisma/client";
-import { CustomerProfileDto, WorkerProfileDto } from "../types/profile.type";
+import {
+  CustomerProfileDto,
+  profileOrderBy,
+  WorkerProfileDto,
+} from "../types/profile.type";
 
 // 유저 프로필 생성
 const createCustomerProfile = async (
@@ -121,23 +126,61 @@ const updateWorkerProfile = async (
 // workerExperience: number;
 // workerConfirmedEstimatesCount: number;
 const getWorkerProfile = async (workerId: string) => {
+  const now = new Date();
   try {
-    const workerProfile = await prisma.workerProfile.findFirst({
-      where: { workerId },
+    const worker = await prisma.user.findFirst({
+      where: { id: workerId },
+      include: {
+        _count: { select: { customerFavorites: true, receivedReviews: true } },
+        workProfile: {
+          select: {
+            profileImage: true,
+            nickname: true,
+            summary: true,
+            experience: true,
+          },
+        },
+      },
     });
-    if (!workerProfile) throw new Error("400/worker profile not exist");
-    const {
-      profileImage: workerProfileImage,
-      nickname: workerNickname,
-      summary: workerSummary,
-      experience: workerExperience,
-    } = workerProfile;
+
+    if (!worker) throw new Error("400/worker not found");
+    if (!worker.workProfile) throw new Error("400/worker profile not found");
+    const avgStar = await prisma.review.aggregate({
+      where: { workerId },
+      _avg: { star: true },
+    });
+
+    const confirmedEstimateCount = await prisma.estimate.count({
+      where: {
+        workerId,
+        isConfirmed: true,
+        movingDate: { lt: now },
+      },
+    });
+
     return {
-      workerProfileImage,
-      workerNickname,
-      workerSummary,
-      workerExperience,
+      workerProfileImage: worker.workProfile.profileImage ?? null,
+      workerSummary: worker.workProfile.summary,
+      workerNickname: worker.workProfile.nickname,
+      workerExperience: worker.workProfile.experience,
+      workerFavoritesCount: worker._count.customerFavorites || 0,
+      workerReviewsCount: worker._count.receivedReviews || 0,
+      workerRating: avgStar._avg.star ?? null,
+      workerConfirmedEstimatesCount: confirmedEstimateCount || 0,
     };
+  } catch (e) {
+    throw e;
+  }
+};
+
+const getWorkerServiceArea = async (workerId: string) => {
+  try {
+    const serviceAreas = await prisma.workerProfile.findFirst({
+      where: { workerId },
+      select: { serviceAreas: true },
+    });
+    if (!serviceAreas) throw new Error("400/worker profile not found");
+    return serviceAreas.serviceAreas;
   } catch (e) {
     throw e;
   }
@@ -156,6 +199,68 @@ const getWorkerProfile = async (workerId: string) => {
 //   }
 // };
 
+const getWorkerProfiles = async (
+  orderBy?: profileOrderBy,
+  service?: ServiceType,
+  area?: Area
+) => {
+  try {
+    let order = "";
+
+    switch (orderBy) {
+      case "mostReview":
+        order = '"reviewCount" DESC';
+        break;
+      case "highestRated":
+        order = '"avgStar" DESC';
+        break;
+      case "mostExperience":
+        order = 'wp."experience" DESC';
+        break;
+      case "mostConfirmed":
+        order = '"confirmedEstimateCount" DESC';
+        break;
+      default:
+        order = '"reviewCount" DESC';
+    }
+
+    const result = await prisma.$queryRawUnsafe(`
+      SELECT 
+        u.id as "workerId",
+        wp."profileImage",
+        wp."experience",
+        wp."nickname",
+        wp."services",
+        wp."serviceAreas",
+        count(distinct r.id)::int as "reviewCount",
+        count(distinct f.id)::int as "favoriteCount",
+        coalesce(avg(r.star), 0)::float as "avgStar",
+        count(distinct CASE 
+          WHEN e."isConfirmed" = true AND e."movingDate" < NOW() 
+          THEN e.id 
+        END)::int as "confirmedEstimateCount"
+      FROM "User" u 
+      LEFT JOIN "WorkerProfile" wp ON u.id = wp."workerId" 
+      LEFT JOIN "Review" r ON u.id = r."workerId" 
+      LEFT JOIN "Favorite" f ON f."workerId" = u.id 
+      LEFT JOIN "Estimate" e ON u.id = e."workerId" 
+      WHERE u.role = 'worker' AND u."hasProfile" = true
+      ${
+        service
+          ? `AND wp."services" @> ARRAY['${service}']::"ServiceType"[]`
+          : ""
+      }
+      ${area ? `AND wp."serviceAreas" @> ARRAY['${area}']::"Area"[]` : ""}
+      GROUP BY u.id, wp."profileImage", wp."experience", wp."nickname", wp."services", wp."serviceAreas"
+      ORDER BY ${order};
+    `);
+
+    return result;
+  } catch (e) {
+    throw e;
+  }
+};
+
 const profileService = {
   createCustomerProfile,
   createWorkerProfile,
@@ -163,6 +268,8 @@ const profileService = {
   updateCustomerProfile,
   updateWorkerProfile,
   getWorkerProfile,
+  getWorkerServiceArea,
+  getWorkerProfiles,
 };
 
 export default profileService;

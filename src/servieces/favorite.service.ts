@@ -32,11 +32,65 @@ const deleteFavorite = async (customerId: string, workerId: string) => {
 };
 const getFavoriteWorkers = async (customerId: string) => {
   try {
-    const FavoriteWorkers = await prisma.favorite.findMany({
+    const now = new Date();
+    const favoriteWorkers = await prisma.favorite.findMany({
       where: { customerId },
-      include: { worker: { select: { workProfile: true } } },
+      include: {
+        worker: {
+          select: {
+            id: true,
+            workProfile: true,
+            _count: {
+              select: {
+                receivedReviews: true,
+                workerFavorites: true,
+              },
+            },
+          },
+        },
+      },
     });
-    return FavoriteWorkers;
+
+    const workerIds = favoriteWorkers.map((fav) => fav.worker.id);
+
+    const [avgStars, confirmedEstimateCounts] = await Promise.all([
+      prisma.review.groupBy({
+        by: ["workerId"],
+        where: { workerId: { in: workerIds } },
+        _avg: { star: true },
+      }),
+      prisma.estimate.groupBy({
+        by: ["workerId"],
+        where: {
+          workerId: { in: workerIds },
+          isConfirmed: true,
+          movingDate: { lt: now },
+        },
+        _count: { _all: true },
+      }),
+    ]);
+
+    const favoriteWorkersWithData = favoriteWorkers.map((fav) => {
+      const workerId = fav.worker.id;
+      const avgStar =
+        avgStars.find((review) => review.workerId === workerId)?._avg.star ||
+        null;
+      const confirmedEstimateCount =
+        confirmedEstimateCounts.find(
+          (estimate) => estimate.workerId === workerId
+        )?._count._all || 0;
+
+      return {
+        ...fav,
+        worker: {
+          ...fav.worker,
+          avgStar,
+          confirmedEstimateCount,
+        },
+      };
+    });
+
+    return favoriteWorkersWithData;
   } catch (e) {
     throw e;
   }

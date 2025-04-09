@@ -1,5 +1,6 @@
-import { EstimateStatus } from "@prisma/client";
+import { Area, EstimateStatus, Prisma, ServiceType } from "@prisma/client";
 import prisma from "../db/prisma/client";
+import user from "../controllers/user.controller";
 
 // 유저가 존재하는지 찾기
 export const findUser = async (userId: string) => {
@@ -43,10 +44,34 @@ export const findInactiveEstimateRequests = async (customerId: string) => {
   }
 };
 
-export const findActiveEstimateRequests = async () => {
+export const findActiveEstimateRequests = async (
+  serviceType?: ServiceType[],
+  serviceArea?: Area[],
+  search?: string
+) => {
   try {
+    const where: Prisma.EstimateRequestWhereInput = {
+      status: "active",
+      ...(serviceType &&
+        serviceType.length > 0 && {
+          serviceType: { in: serviceType },
+        }),
+      ...(serviceArea &&
+        serviceArea.length > 0 && {
+          departureArea: { in: serviceArea },
+        }),
+      ...(search && {
+        user: {
+          name: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+      }),
+    };
+
     const estimateRequest = await prisma.estimateRequest.findMany({
-      where: { status: "active" },
+      where,
       include: { user: { select: { name: true } } },
     });
     if (!estimateRequest)

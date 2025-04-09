@@ -59,4 +59,6 @@ profileRouter.get(
   profile.getWorkerProfileController
 );
 
+profileRouter.get("/workers", profile.getWorkerProfilesController);
+
 export default profileRouter;

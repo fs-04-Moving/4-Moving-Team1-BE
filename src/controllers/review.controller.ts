@@ -1,7 +1,6 @@
 import { RequestHandler } from "express";
 import { asyncHandler } from "../middleware/error.middleware";
 import { ReviewDto } from "../types/review.type";
-import { findEstimate } from "../servieces/utills";
 import estimateService from "../servieces/estimate.service";
 import reviewService from "../servieces/review.serivce";
 
@@ -24,6 +23,30 @@ const createReviewController: RequestHandler = asyncHandler(
   }
 );
 
-const review = { createReviewController };
+const getMyReviewController: RequestHandler = asyncHandler(
+  async (req, res, next) => {
+    const customerId = req.userId as string;
+    const reviews = await reviewService.getMyReview(customerId);
+
+    const data = reviews.map((review) => ({
+      id: review.id,
+      workerId: review.workerId,
+      customerId: review.customerId,
+      star: review.star,
+      createdAt: review.createdAt,
+      content: review.content,
+      estimateId: review.estimateId,
+      serviceType: review.estimate?.serviceType,
+      movingDate: review.estimate?.movingDate,
+      price: review.estimate?.price,
+      status: review.estimate?.status,
+      workerNickname: review.estimate?.worker?.workProfile?.nickname,
+    }));
+
+    res.status(200).send(data);
+  }
+);
+
+const review = { createReviewController, getMyReviewController };
 
 export default review;

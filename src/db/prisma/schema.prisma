@@ -73,17 +73,18 @@ model Favorite {
 }
 
 model EstimateRequest {
-  id          String                @id @default(uuid())
-  customerId  String
-  serviceType ServiceType
-  movingDate  DateTime
-  departure   String
-  destination String
-  createdAt   DateTime              @default(now())
-  updatedAt   DateTime              @default(now())
-  status      EstimateRequestStatus @default(active)
-  estimates   Estimate[]
-  user        User                  @relation(fields: [customerId], references: [id])
+  id               String                @id @default(uuid())
+  customerId       String
+  serviceType      ServiceType
+  movingDate       DateTime
+  departureAddress String //한글로 받아서 
+  departureArea    Area?
+  destination      String
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @default(now())
+  status           EstimateRequestStatus @default(active)
+  estimates        Estimate[]
+  user             User                  @relation(fields: [customerId], references: [id])
 }
 
 model Estimate {
@@ -93,8 +94,9 @@ model Estimate {
   workerId          String
   serviceType       ServiceType
   movingDate        DateTime
-  departure         String
+  departureAddress  String
   destination       String
+  departureArea     Area?
   price             Int?
   isConfirmed       Boolean         @default(false)
   createdAt         DateTime        @default(now())

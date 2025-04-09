@@ -1,6 +1,6 @@
 import { Area, ServiceType } from "@prisma/client";
 import { RequestHandler } from "express";
-import { string, z } from "zod";
+import { z } from "zod";
 
 const customerProfileSchema = z.object({
   livingArea: z.nativeEnum(Area),

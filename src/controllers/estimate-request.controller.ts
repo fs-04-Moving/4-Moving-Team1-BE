@@ -8,18 +8,28 @@ import {
 } from "../servieces/utills";
 import estimateService from "../servieces/estimate.service";
 import userService from "../servieces/user.service";
+import { Area, ServiceType } from "@prisma/client";
+import { profile } from "console";
+import profileService from "../servieces/profile.service";
 
 // 견적 요청 생성하기
 const createEstimateRequestController: RequestHandler = asyncHandler(
   async (req, res, next) => {
-    const { serviceType, departure, destination, movingDate } = req.body;
+    const {
+      serviceType,
+      departureAddress,
+      destination,
+      movingDate,
+      departureArea,
+    } = req.body;
     const customerId = req.userId as string;
     const estimateRequstDto: EstimateRequstDto = {
       customerId,
       serviceType,
-      departure,
+      departureAddress,
       destination,
       movingDate,
+      departureArea,
     };
     // await 서비스 함수 호출
     await estimateRequstService.createEstimateRequest(estimateRequstDto);
@@ -50,7 +60,7 @@ const getEstimateRequestsController: RequestHandler = asyncHandler(
           createdAt,
           serviceType,
           movingDate,
-          departure,
+          departureAddress,
           destination,
         } = inactiveEstimateRequest;
         return {
@@ -59,7 +69,7 @@ const getEstimateRequestsController: RequestHandler = asyncHandler(
           serviceType,
           movingDate,
           destination,
-          departure,
+          departureAddress,
         };
       })
     );
@@ -68,15 +78,29 @@ const getEstimateRequestsController: RequestHandler = asyncHandler(
 );
 
 // 필터기능 추가할 예정, 고객 이름 추가로 주기, orderBy만 먼저 적용함,
+//적용할 필터 serviceType 배열 , 서비스 가능 지역 , 지정 견적 요청
 const getRequsetEstimateRequestsController: RequestHandler = asyncHandler(
   async (req, res, next) => {
     const workerId = req.userId as string;
-    const { orderBy } = req.query;
 
-    const estimateRequests = await findActiveEstimateRequests();
+    const { orderBy, serviceType, filter, search } = req.validateQuery;
+
+    const isAssigned = filter?.includes("assigned");
+    const isServiceable = filter?.includes("area");
+
+    let serviceArea: Array<Area> | undefined = undefined;
+    if (isServiceable) {
+      serviceArea = await profileService.getWorkerServiceArea(workerId);
+    }
+    const estimateRequests = isAssigned
+      ? []
+      : await findActiveEstimateRequests(serviceType, serviceArea, search);
     const assignedEstimates = await estimateService.getAssignedEstimate(
       workerId,
-      false
+      false,
+      serviceType,
+      serviceArea,
+      search
     );
 
     const assignedCustomerIds = new Set(
@@ -94,7 +118,7 @@ const getRequsetEstimateRequestsController: RequestHandler = asyncHandler(
           customerId: estimateRequest.customerId,
           serviceType: estimateRequest.serviceType,
           movingDate: estimateRequest.movingDate,
-          departure: estimateRequest.departure,
+          departure: estimateRequest.departureAddress,
           destination: estimateRequest.destination,
           createdAt: estimateRequest.createdAt,
           updatedAt: estimateRequest.updatedAt,
@@ -111,7 +135,7 @@ const getRequsetEstimateRequestsController: RequestHandler = asyncHandler(
           customerId: estimate.customerId,
           serviceType: estimate.serviceType,
           movingDate: estimate.movingDate,
-          departure: estimate.departure,
+          departure: estimate.departureAddress,
           destination: estimate.destination,
           createdAt: estimate.createdAt,
           updatedAt: estimate.updatedAt,
@@ -127,14 +151,17 @@ const getRequsetEstimateRequestsController: RequestHandler = asyncHandler(
     ];
 
     const sortedEstimates = allEstimates.sort((a, b) => {
-      if (orderBy === "createdAt") {
+      if (orderBy === "earliestRequest") {
         return (
           new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
         );
+      } else if (orderBy === "earliestMove") {
+        return (
+          new Date(a.movingDate).getTime() - new Date(b.movingDate).getTime()
+        );
+      } else {
+        throw new Error("400/orderBy is not correct form");
       }
-      return (
-        new Date(a.movingDate).getTime() - new Date(b.movingDate).getTime()
-      );
     });
 
     res.status(200).send(sortedEstimates);

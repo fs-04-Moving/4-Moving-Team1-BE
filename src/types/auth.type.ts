@@ -4,6 +4,8 @@ type PayloadData = {
   id: string;
   email: string;
   name: string;
+  role: ROLE;
+  hasProfile: boolean;
 };
 
 type LogInDto = {
