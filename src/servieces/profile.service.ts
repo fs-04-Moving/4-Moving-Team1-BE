@@ -217,14 +217,14 @@ const getWorkerProfiles = async ({
   orderBy,
   serviceType,
   serviceArea,
-  page = 1,
-  pageSize = 10,
+  page,
+  pageSize,
 }: {
   orderBy?: profileOrderBy;
   serviceType?: ServiceType;
   serviceArea?: Area;
-  page?: number;
-  pageSize?: number;
+  page: number;
+  pageSize: number;
 }) => {
   try {
     const offset = (page - 1) * pageSize;

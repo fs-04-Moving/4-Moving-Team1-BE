@@ -53,6 +53,23 @@ const getMyReviewController: RequestHandler = asyncHandler(
   }
 );
 
-const review = { createReviewController, getMyReviewController };
+const getWorkerReviewsController: RequestHandler = asyncHandler(
+  async (req, res, next) => {
+    const { workerId } = req.params as { workerId: string };
+    const { page, pageSize } = req.validateQuery as PaginationQuery;
+    const result = await reviewService.getWorkerReviews({
+      workerId,
+      page,
+      pageSize,
+    });
+    res.send(result).status(200);
+  }
+);
+
+const review = {
+  createReviewController,
+  getMyReviewController,
+  getWorkerReviewsController,
+};
 
 export default review;
