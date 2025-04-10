@@ -63,5 +63,49 @@ const getMyReview = async ({
   }
 };
 
-const reviewService = { createReview, getMyReview };
+const getWorkerReviews = async ({
+  page,
+  pageSize,
+  workerId,
+}: {
+  page: number;
+  pageSize: number;
+  workerId: string;
+}) => {
+  const [reviews, group, avgStar] = await Promise.all([
+    prisma.review.findMany({
+      where: { workerId },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+    }),
+    prisma.review.groupBy({
+      by: ["star"],
+      where: { workerId },
+      _count: true,
+    }),
+    prisma.review.aggregate({
+      where: { workerId },
+      _avg: { star: true },
+    }),
+  ]);
+
+  const starCountList = [0, 0, 0, 0, 0];
+  group.forEach((item) => {
+    const star = item.star;
+    starCountList[star - 1] = item._count;
+  });
+
+  const totalCount = starCountList.reduce((a, b) => {
+    return a + b;
+  }, 0);
+
+  return {
+    list: reviews,
+    starCountList,
+    totalCount,
+    rating: avgStar._avg.star,
+  };
+};
+
+const reviewService = { createReview, getMyReview, getWorkerReviews };
 export default reviewService;

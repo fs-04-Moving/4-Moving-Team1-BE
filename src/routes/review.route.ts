@@ -19,6 +19,10 @@ reviewRouter.get(
   review.getMyReviewController
 );
 
-reviewRouter.get("/:workerId");
+reviewRouter.get(
+  "/:workerId",
+  validatePaginationQuery,
+  review.getWorkerReviewsController
+);
 
 export default reviewRouter;
