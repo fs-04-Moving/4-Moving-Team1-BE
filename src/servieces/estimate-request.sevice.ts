@@ -130,6 +130,7 @@ const getRecivedEstimateReuests = async ({
       updatedAt: r.updatedAt,
       customerName: r.user.name,
       status: r.estimates.length !== 0 ? "assigned" : null,
+      estimateId: r.estimates[0]?.id ?? null,
     };
   });
 

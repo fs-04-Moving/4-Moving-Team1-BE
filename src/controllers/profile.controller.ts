@@ -1,12 +1,7 @@
 import { RequestHandler } from "express";
 import { asyncHandler } from "../middleware/error.middleware";
-import {
-  CustomerProfileDto,
-  profileOrderBy,
-  WorkerProfileDto,
-} from "../types/profile.type";
+import { CustomerProfileDto, WorkerProfileDto } from "../types/profile.type";
 import profileService from "../servieces/profile.service";
-import { Area, ServiceType } from "@prisma/client";
 import { GetWorkerProfilesQuery } from "../validations/profile.validation";
 
 // 일반 유저 프로필 생성

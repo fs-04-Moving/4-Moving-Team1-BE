@@ -111,6 +111,14 @@ model Estimate {
   userId            String?
 }
 
+model Notification {
+  id       String   @id @default(uuid())
+  isRead   Boolean
+  message  String
+  createAt DateTime @default(now())
+}
+// type 추가하기
+
 enum ROLE {
   customer
   worker
