@@ -173,14 +173,14 @@ const getWorkerProfile = async (workerId: string) => {
     });
 
     return {
-      workerProfileImage: worker.workProfile.profileImage ?? null,
-      workerSummary: worker.workProfile.summary,
-      workerNickname: worker.workProfile.nickname,
-      workerExperience: worker.workProfile.experience,
-      workerFavoritesCount: worker._count.customerFavorites || 0,
-      workerReviewsCount: worker._count.receivedReviews || 0,
-      workerRating: avgStar._avg.star ?? null,
-      workerConfirmedEstimatesCount: confirmedEstimateCount || 0,
+      profileImage: worker.workProfile.profileImage ?? null,
+      summary: worker.workProfile.summary,
+      nickname: worker.workProfile.nickname,
+      experience: worker.workProfile.experience,
+      favoritesCount: worker._count.customerFavorites || 0,
+      reviewsCount: worker._count.receivedReviews || 0,
+      reviewsAverage: avgStar._avg.star ?? null,
+      confirmedEstimatesCount: confirmedEstimateCount || 0,
     };
   } catch (e) {
     throw e;
@@ -234,10 +234,10 @@ const getWorkerProfiles = async ({
 
     switch (orderBy) {
       case "mostReview":
-        order = '"reviewCount" DESC';
+        order = '"reviewsCount" DESC';
         break;
       case "highestRated":
-        order = '"avgStar" DESC';
+        order = '"reviewsAverage" DESC';
         break;
       case "mostExperience":
         order = 'wp."experience" DESC';
@@ -246,7 +246,7 @@ const getWorkerProfiles = async ({
         order = '"confirmedEstimateCount" DESC';
         break;
       default:
-        order = '"reviewCount" DESC';
+        order = '"reviewsCount" DESC';
     }
 
     const where = `u.role = 'worker' AND u."hasProfile" = true
@@ -269,9 +269,9 @@ const getWorkerProfiles = async ({
         wp."nickname",
         wp."services",
         wp."serviceAreas",
-        count(distinct r.id)::int as "reviewCount",
-        count(distinct f.id)::int as "favoriteCount",
-        coalesce(avg(r.star), 0)::float as "avgStar",
+        count(distinct r.id)::int as "reviewsCount",
+        count(distinct f.id)::int as "favoritesCount",
+        coalesce(avg(r.star), 0)::float as "reviewsAverage",
         count(distinct CASE 
           WHEN e."isConfirmed" = true AND e."movingDate" < NOW() 
           THEN e.id 

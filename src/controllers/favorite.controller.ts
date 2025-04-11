@@ -39,18 +39,18 @@ const getFavoriteWorkersController: RequestHandler = asyncHandler(
       .map((fav) => {
         const profile = fav.worker.workProfile!;
         return {
-          workerId: fav.workerId,
-          workerProfileImage: profile.profileImage,
-          workerNickname: profile.nickname,
-          workerExperience: profile.experience,
-          workerSummary: profile.summary,
-          workerDescription: profile.description,
+          id: fav.workerId,
+          profileImage: profile.profileImage,
+          nickname: profile.nickname,
+          experience: profile.experience,
+          summary: profile.summary,
+          description: profile.description,
           services: profile.services,
           serviceAreas: profile.serviceAreas,
-          workerConfirmedEstimatesCount: fav.worker.confirmedEstimateCount,
-          workerReviewsCount: fav.worker._count.receivedReviews,
-          workerFavoritesCount: fav.worker._count.workerFavorites,
-          workerRating: fav.worker.avgStar,
+          confirmedEstimatesCount: fav.worker.confirmedEstimateCount,
+          reviewsCount: fav.worker._count.receivedReviews,
+          favoritesCount: fav.worker._count.workerFavorites,
+          reviewsAverage: fav.worker.avgStar,
         };
       });
 

@@ -9,7 +9,9 @@ const getUserMeController: RequestHandler = asyncHandler(
     const userId = req.userId as string;
     const userData = await userService.getUserMe(userId);
     const profileImage = await userService.getProfileImage(userId);
-    res.status(200).send({ ...userData, ...profileImage });
+    res
+      .status(200)
+      .send({ ...userData, profileImage: profileImage?.profileImage ?? null });
   }
 );
 
