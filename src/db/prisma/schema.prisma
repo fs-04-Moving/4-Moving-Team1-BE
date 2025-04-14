@@ -14,6 +14,7 @@ model User {
   encryptedPassword   String
   phoneNumber         String?
   hasProfile          Boolean           @default(false)
+  hasRequest          Boolean           @default(false)
   role                ROLE
   estimateRequests    EstimateRequest[]
   customerProfile     CustomerProfile?
@@ -23,7 +24,7 @@ model User {
   estimatesAsWorker   Estimate[]        @relation("estimateWorker")
   estimatesAsCustomer Estimate[]        @relation("estimateCustomer")
   customerFavorites   Favorite[]        @relation("customerFavorites")
-  workerFavorites     Favorite[]        @relation("workerFavorites")
+  workerFavorites     Favorite[]        @relation("workerFavorites")       
 }
 
 model WorkerProfile {

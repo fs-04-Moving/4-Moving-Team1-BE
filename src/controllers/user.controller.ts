@@ -1,6 +1,6 @@
 import { RequestHandler } from "express";
 import { asyncHandler } from "../middleware/error.middleware";
-import userService from "../servieces/user.service";
+import userService from "../services/user.service";
 import { UpdateUserDto } from "../types/auth.type";
 
 // 내정보 가저오기 : 이름 프로필 이미지 , 프로필 생성 여부

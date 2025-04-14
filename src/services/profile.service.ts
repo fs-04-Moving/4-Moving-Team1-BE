@@ -152,6 +152,8 @@ const getWorkerProfile = async (workerId: string) => {
             nickname: true,
             summary: true,
             experience: true,
+            services: true,
+            serviceAreas: true,
           },
         },
       },
@@ -181,6 +183,8 @@ const getWorkerProfile = async (workerId: string) => {
       reviewsCount: worker._count.receivedReviews || 0,
       reviewsAverage: avgStar._avg.star ?? null,
       confirmedEstimatesCount: confirmedEstimateCount || 0,
+      serviceType: worker.workProfile.services,
+      serviceArea: worker.workProfile.serviceAreas,
     };
   } catch (e) {
     throw e;
@@ -219,12 +223,16 @@ const getWorkerProfiles = async ({
   serviceArea,
   page,
   pageSize,
+  search,
+  customerId,
 }: {
   orderBy?: profileOrderBy;
   serviceType?: ServiceType;
   serviceArea?: Area;
   page: number;
   pageSize: number;
+  search?: string;
+  customerId?: string;
 }) => {
   try {
     const offset = (page - 1) * pageSize;
@@ -249,17 +257,30 @@ const getWorkerProfiles = async ({
         order = '"reviewsCount" DESC';
     }
 
-    const where = `u.role = 'worker' AND u."hasProfile" = true
-      ${
-        serviceType
-          ? `AND wp."services" @> ARRAY['${serviceType}']::"ServiceType"[]`
-          : ""
-      }
-      ${
-        serviceArea
-          ? `AND wp."serviceAreas" @> ARRAY['${serviceArea}']::"Area"[]`
-          : ""
-      }`;
+    const where = `
+    u.role = 'worker' AND u."hasProfile" = true
+    ${
+      serviceType
+        ? `AND wp."services" @> ARRAY['${serviceType}']::"ServiceType"[]`
+        : ""
+    }
+    ${
+      serviceArea
+        ? `AND wp."serviceAreas" @> ARRAY['${serviceArea}']::"Area"[]`
+        : ""
+    }
+    ${search ? `AND wp."nickname" ILIKE '%${search}%'` : ""}
+  `;
+
+    const favoriteField = customerId
+      ? `CASE 
+        WHEN EXISTS (
+          SELECT 1 FROM "Favorite" f 
+          WHERE f."workerId" = u.id AND f."customerId" = '${customerId}'
+        ) THEN true
+        ELSE false
+     END as "isFavorite"`
+      : `false as "isFavorite"`;
 
     const list = await prisma.$queryRawUnsafe(`
       SELECT 
@@ -275,7 +296,8 @@ const getWorkerProfiles = async ({
         count(distinct CASE 
           WHEN e."isConfirmed" = true AND e."movingDate" < NOW() 
           THEN e.id 
-        END)::int as "confirmedEstimateCount"
+        END)::int as "confirmedEstimateCount",
+        ${favoriteField}
       FROM "User" u 
       LEFT JOIN "WorkerProfile" wp ON u.id = wp."workerId" 
       LEFT JOIN "Review" r ON u.id = r."workerId" 

@@ -111,8 +111,16 @@ const getFavoriteWorkers = async ({
   }
 };
 
-const checkFavorite = async (customerId: string, workerId: string) => {
+const checkFavorite = async ({
+  customerId,
+  workerId,
+}: {
+  customerId: string | undefined;
+  workerId: string;
+}) => {
   try {
+    if (!customerId) return false;
+
     const existFavorite = await prisma.favorite.findFirst({
       where: { customerId, workerId },
     });

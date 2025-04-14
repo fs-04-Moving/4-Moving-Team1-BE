@@ -1,8 +1,9 @@
 import { RequestHandler } from "express";
 import { asyncHandler } from "../middleware/error.middleware";
 import { CustomerProfileDto, WorkerProfileDto } from "../types/profile.type";
-import profileService from "../servieces/profile.service";
+import profileService from "../services/profile.service";
 import { GetWorkerProfilesQuery } from "../validations/profile.validation";
+import favoriteService from "../services/favorite.service";
 
 // 일반 유저 프로필 생성
 const createCustomerProfileController: RequestHandler = asyncHandler(
@@ -145,22 +146,31 @@ const updateWorkerProfileController: RequestHandler = asyncHandler(
 const getWorkerProfileController: RequestHandler = asyncHandler(
   async (req, res, next) => {
     const { workerId } = req.params;
+    const customerId = req.userId;
     const workerProfile = await profileService.getWorkerProfile(workerId);
-
-    res.status(200).send(workerProfile);
+    const isFavorite = await favoriteService.checkFavorite({
+      customerId,
+      workerId,
+    });
+    res.status(200).send({ ...workerProfile, isFavorite });
   }
 );
 
 const getWorkerProfilesController: RequestHandler = asyncHandler(
   async (req, res, next) => {
-    const { orderBy, serviceType, serviceArea, page, pageSize } =
+    const { orderBy, serviceType, serviceArea, page, pageSize, search } =
       req.validateQuery as GetWorkerProfilesQuery;
+
+    const customerId = req.userId;
+
     const workerProfiles = await profileService.getWorkerProfiles({
       orderBy,
       serviceType,
       serviceArea,
       page,
       pageSize,
+      search,
+      customerId,
     });
 
     res.status(200).send(workerProfiles);
