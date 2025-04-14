@@ -4,10 +4,12 @@ const createFavorite = async (customerId: string, workerId: string) => {
   try {
     const worker = await prisma.user.findFirst({
       where: { id: workerId },
+      select: { id: true },
     });
     if (!worker) throw new Error("400/invalid worker id");
     const customer = await prisma.user.findFirst({
       where: { id: workerId },
+      select: { id: true },
     });
     if (!customer) throw new Error("400/invalid customer id");
     const existFavorite = await prisma.favorite.findFirst({
@@ -23,14 +25,17 @@ const createFavorite = async (customerId: string, workerId: string) => {
     throw e;
   }
 };
+
 const deleteFavorite = async (customerId: string, workerId: string) => {
   try {
     const worker = await prisma.user.findFirst({
       where: { id: workerId },
+      select: { id: true },
     });
     if (!worker) throw new Error("400/invalid worker id");
     const customer = await prisma.user.findFirst({
       where: { id: workerId },
+      select: { id: true },
     });
     if (!customer) throw new Error("400/invalid customer id");
 
