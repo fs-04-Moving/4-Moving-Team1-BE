@@ -13,10 +13,11 @@ import { validatePaginationQuery } from "../../validations/common.validation";
 
 const estimateRequstRouter = express.Router();
 
+estimateRequstRouter.use(authenticatedOnly);
+
 // 일반 유저가 견적 요청하기 생성
 estimateRequstRouter.post(
   "/",
-  authenticatedOnly,
   customerOnly,
   validateEstimateRequset,
   estimateRequest.createEstimateRequestController
@@ -25,7 +26,6 @@ estimateRequstRouter.post(
 // 일반 유저가 견적 요청하기 삭제
 estimateRequstRouter.delete(
   "/",
-  authenticatedOnly,
   customerOnly,
   estimateRequest.deleteEstimateRequestController
 );
@@ -33,7 +33,6 @@ estimateRequstRouter.delete(
 //받았던 견적페이지에서 내가 보낸 견적 요청 정보들
 estimateRequstRouter.get(
   "/",
-  authenticatedOnly,
   customerOnly,
   validatePaginationQuery,
   estimateRequest.getEstimateRequestsController
@@ -42,7 +41,6 @@ estimateRequstRouter.get(
 //기사 유저가 받은 요청 -> 지정 견적 + 견적 요청 +필터 기능 까지.
 estimateRequstRouter.get(
   "/received",
-  authenticatedOnly,
   workerOnly,
   validateEstimateRequsetQuery,
   estimateRequest.getRequsetEstimateRequestsController

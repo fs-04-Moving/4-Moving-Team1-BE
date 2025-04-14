@@ -7,35 +7,20 @@ import {
 import { validatePaginationQuery } from "../../validations/common.validation";
 const favoriteRouter = express.Router();
 
+favoriteRouter.use(authenticatedOnly, customerOnly);
+
 //유저 찜하기
-favoriteRouter.post(
-  "/:workerId",
-  authenticatedOnly,
-  customerOnly,
-  favorite.createFavoriteController
-);
+favoriteRouter.post("/:workerId", favorite.createFavoriteController);
 
 //찜하기 취소
-favoriteRouter.delete(
-  "/:workerId",
-  authenticatedOnly,
-  customerOnly,
-  favorite.deleteFavoriteController
-);
+favoriteRouter.delete("/:workerId", favorite.deleteFavoriteController);
 
 //기사님을 찜한적이 있는지 확인
-favoriteRouter.get(
-  "/:workerId",
-  authenticatedOnly,
-  customerOnly,
-  favorite.checkFavoriteController
-);
+favoriteRouter.get("/:workerId", favorite.checkFavoriteController);
 
 //찜한 기사님 보기
 favoriteRouter.get(
   "/",
-  authenticatedOnly,
-  customerOnly,
   validatePaginationQuery,
   favorite.getFavoriteWorkersController
 );
