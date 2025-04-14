@@ -1,7 +1,7 @@
 import { RequestHandler } from "express";
 import { asyncHandler } from "../middleware/error.middleware";
-import authService from "../servieces/auth.service";
-import userService from "../servieces/user.service";
+import authService from "../services/auth.service";
+import userService from "../services/user.service";
 
 // 로그인 컨트롤러
 const logInController: RequestHandler = asyncHandler(async (req, res, next) => {

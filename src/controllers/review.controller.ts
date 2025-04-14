@@ -1,8 +1,8 @@
 import { RequestHandler } from "express";
 import { asyncHandler } from "../middleware/error.middleware";
 import { ReviewDto } from "../types/review.type";
-import estimateService from "../servieces/estimate.service";
-import reviewService from "../servieces/review.serivce";
+import estimateService from "../services/estimate.service";
+import reviewService from "../services/review.serivce";
 import { PaginationQuery } from "../validations/common.validation";
 
 const createReviewController: RequestHandler = asyncHandler(

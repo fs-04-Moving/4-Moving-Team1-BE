@@ -128,6 +128,7 @@ const getPendingEstimates = async ({
                   workerFavorites: true,
                 },
               },
+              workerFavorites: { where: { customerId } },
             },
           },
         },
@@ -189,10 +190,12 @@ const getEstimatesByEstimateRequestId = async ({
   estimateRequestId,
   page,
   pageSize,
+  customerId,
 }: {
   estimateRequestId: string;
   page: number;
   pageSize: number;
+  customerId: string;
 }) => {
   const now = new Date();
   try {
@@ -209,6 +212,7 @@ const getEstimatesByEstimateRequestId = async ({
                   workerFavorites: true,
                 },
               },
+              workerFavorites: { where: { customerId } },
             },
           },
         },

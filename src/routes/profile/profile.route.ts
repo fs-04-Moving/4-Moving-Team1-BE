@@ -1,16 +1,16 @@
 import express from "express";
-import profile from "../controllers/profile.controller";
+import profile from "../../controllers/profile.controller";
 import {
   authenticatedOnly,
   customerOnly,
   workerOnly,
-} from "../middleware/auth.middleware";
-import { uploadProfileImage } from "../middleware/upload";
+} from "../../middleware/auth.middleware";
+import { uploadProfileImage } from "../../middleware/upload";
 import {
   validateCustomerProfile,
   validateGetWorkerProfilesQuery,
   validateWorkerProfile,
-} from "../validations/profile.validation";
+} from "../../validations/profile.validation";
 
 const profileRouter = express.Router();
 

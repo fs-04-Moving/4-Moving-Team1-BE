@@ -1,12 +1,13 @@
 import { RequestHandler } from "express";
 import { asyncHandler } from "../middleware/error.middleware";
 import { EstimateRequstDto } from "../types/estimate-request.type";
-import estimateRequstService from "../servieces/estimate-request.sevice";
-import { findInactiveEstimateRequests } from "../servieces/utills";
+import estimateRequstService from "../services/estimate-request.sevice";
+import { findInactiveEstimateRequests } from "../services/utills";
 import { Area } from "@prisma/client";
-import profileService from "../servieces/profile.service";
+import profileService from "../services/profile.service";
 import { EstimateRequestQuery } from "../validations/estimate-requset.validation";
 import { PaginationQuery } from "../validations/common.validation";
+import userService from "../services/user.service";
 
 // 견적 요청 생성하기
 const createEstimateRequestController: RequestHandler = asyncHandler(
@@ -29,6 +30,7 @@ const createEstimateRequestController: RequestHandler = asyncHandler(
     };
     // await 서비스 함수 호출
     await estimateRequstService.createEstimateRequest(estimateRequstDto);
+    await userService.updateUserRequestStatus(customerId);
     res.sendStatus(201);
   }
 );

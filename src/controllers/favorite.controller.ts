@@ -1,7 +1,7 @@
 import { RequestHandler } from "express";
 import { asyncHandler } from "../middleware/error.middleware";
-import { findUser } from "../servieces/utills";
-import favoriteService from "../servieces/favorite.service";
+import { findUser } from "../services/utills";
+import favoriteService from "../services/favorite.service";
 import { PaginationQuery } from "../validations/common.validation";
 
 const createFavoriteController: RequestHandler = asyncHandler(
@@ -51,6 +51,7 @@ const getFavoriteWorkersController: RequestHandler = asyncHandler(
           reviewsCount: fav.worker._count.receivedReviews,
           favoritesCount: fav.worker._count.workerFavorites,
           reviewsAverage: fav.worker.avgStar,
+          isFavorite: true,
         };
       });
 
@@ -63,7 +64,10 @@ const checkFavoriteController: RequestHandler = asyncHandler(
     const customerId = req.userId as string;
     const { workerId } = req.params;
     await findUser(workerId);
-    const result = await favoriteService.checkFavorite(customerId, workerId);
+    const result = await favoriteService.checkFavorite({
+      customerId,
+      workerId,
+    });
     res.status(200).send(result);
   }
 );

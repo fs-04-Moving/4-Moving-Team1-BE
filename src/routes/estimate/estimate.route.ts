@@ -1,13 +1,16 @@
 import express from "express";
-import estimate from "../controllers/estimate.controller";
+import estimate from "../../controllers/estimate.controller";
 import {
   authenticatedOnly,
   customerOnly,
   workerOnly,
-} from "../middleware/auth.middleware";
-import { validatePaginationQuery } from "../validations/common.validation";
+} from "../../middleware/auth.middleware";
+import { validatePaginationQuery } from "../../validations/common.validation";
 
 const estimateRouter = express.Router();
+
+// estimateRouter.use("/worker");
+// estimateRouter.use("/customer");
 
 // 일반 유저가 지정견적 생성하기
 estimateRouter.post(
@@ -66,11 +69,20 @@ estimateRouter.get(
   estimate.getEstimatesController
 );
 
-//상세 견적 가져오기
+//상세 견적 가져오기 by worker
 estimateRouter.get(
-  "/detail/:estimateId",
+  "/worker/detail/:estimateId",
   authenticatedOnly,
-  estimate.getEstimateDetailController
+  workerOnly,
+  estimate.getEstimateDetailByWorkerController
+);
+
+//상세 견적 가져오기 by customer
+estimateRouter.get(
+  "/customer/detail/:estimateId",
+  authenticatedOnly,
+  customerOnly,
+  estimate.getEstimateDetailByCustomerController
 );
 
 //보낸 견적 조회

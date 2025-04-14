@@ -1,9 +1,12 @@
 import { RequestHandler } from "express";
 import { asyncHandler } from "../middleware/error.middleware";
-import estimateService from "../servieces/estimate.service";
-import estimateRequstService from "../servieces/estimate-request.sevice";
+import estimateService from "../services/estimate.service";
+import estimateRequstService from "../services/estimate-request.sevice";
 import { EstimateDto } from "../types/estimate.type";
 import { PaginationQuery } from "../validations/common.validation";
+import userService from "../services/user.service";
+import profileService from "../services/profile.service";
+import favoriteService from "../services/favorite.service";
 
 //일반 유저가 지정 견적 생성 (일반 유저가 기사 유저에게 견적 보내기)
 const createAssignedEstimateController: RequestHandler = asyncHandler(
@@ -123,6 +126,7 @@ const getPendingEstimatesController: RequestHandler = asyncHandler(
           workerReviewsCount: worker._count?.receivedReviews,
           workerFavoritesCount: worker._count?.workerFavorites,
           workerRating: worker.avgStar,
+          isFavorite: !!worker.workerFavorites?.length,
         };
       })
     );
@@ -134,12 +138,14 @@ const getPendingEstimatesController: RequestHandler = asyncHandler(
 const getEstimatesController: RequestHandler = asyncHandler(
   async (req, res, next) => {
     const { estimateRequestId } = req.params;
+    const customerId = req.userId as string;
     const { page, pageSize } = req.validateQuery as PaginationQuery;
     const { estimatesWithData, totalCount } =
       await estimateService.getEstimatesByEstimateRequestId({
         estimateRequestId,
         page,
         pageSize,
+        customerId,
       });
     const list = await Promise.all(
       estimatesWithData.map(async (estimate) => {
@@ -172,6 +178,7 @@ const getEstimatesController: RequestHandler = asyncHandler(
           workerReviewsCount: worker._count?.receivedReviews,
           workerFavoritesCount: worker._count?.workerFavorites,
           workerRating: worker.avgStar,
+          isFavorite: !!worker.workerFavorites?.length,
         };
       })
     );
@@ -179,11 +186,48 @@ const getEstimatesController: RequestHandler = asyncHandler(
     res.status(200).send({ list, totalCount });
   }
 );
-//상세 견적
-const getEstimateDetailController: RequestHandler = asyncHandler(
+//상세 견적 by worker
+const getEstimateDetailByWorkerController: RequestHandler = asyncHandler(
   async (req, res, next) => {
     const { estimateId } = req.params;
     const estimate = await estimateService.getEstimateByEstimatetId(estimateId);
+
+    const {
+      id,
+      price,
+      serviceType,
+      status,
+      movingDate,
+      departureAddress,
+      destination,
+      isConfirmed,
+      customerId,
+    } = estimate;
+    const { name } = await userService.getUserMe(customerId);
+
+    const data = {
+      id,
+      price: price ? price : null,
+      serviceType: serviceType,
+      status,
+      movingDate,
+      departureAddress,
+      destination,
+      isConfirmed,
+      customerId,
+      customerName: name,
+    };
+    res.status(200).send(data);
+  }
+);
+
+//상세 견적 by customer
+const getEstimateDetailByCustomerController: RequestHandler = asyncHandler(
+  async (req, res, next) => {
+    const { estimateId } = req.params;
+    const customerId = req.userId;
+    const estimate = await estimateService.getEstimateByEstimatetId(estimateId);
+
     const {
       id,
       price,
@@ -195,6 +239,21 @@ const getEstimateDetailController: RequestHandler = asyncHandler(
       isConfirmed,
       workerId,
     } = estimate;
+
+    const isFavorite = await favoriteService.checkFavorite({
+      customerId,
+      workerId,
+    });
+
+    const {
+      nickname,
+      profileImage,
+      experience,
+      confirmedEstimatesCount,
+      favoritesCount,
+      reviewsAverage,
+      reviewsCount,
+    } = await profileService.getWorkerProfile(workerId);
     const data = {
       id,
       price: price ? price : null,
@@ -205,6 +264,14 @@ const getEstimateDetailController: RequestHandler = asyncHandler(
       destination,
       isConfirmed,
       workerId,
+      workerNickname: nickname,
+      workerProfileImage: profileImage,
+      workerExperience: experience,
+      workerConfirmedEstimatesCount: confirmedEstimatesCount,
+      workerFavoritesCount: favoritesCount,
+      workerRating: reviewsAverage,
+      workerReviewsCount: reviewsCount,
+      isFavorite,
     };
     res.status(200).send(data);
   }
@@ -335,10 +402,11 @@ const estimate = {
   priceEstimateController,
   getPendingEstimatesController,
   getEstimatesController,
-  getEstimateDetailController,
+  getEstimateDetailByWorkerController,
   getSentEstimatesController,
   getRejectEstimatesController,
   getReviewableEstimatesController,
+  getEstimateDetailByCustomerController,
 };
 
 export default estimate;

@@ -11,11 +11,12 @@ const getUserMe = async (userId: string) => {
   try {
     const user = await prisma.user.findFirst({ where: { id: userId } });
     if (!user) throw new Error("400/user not found");
-    const { name, hasProfile, role } = user;
+    const { name, hasProfile, role, hasRequest } = user;
     const userData = {
       name,
       hasProfile,
       role,
+      hasRequest,
     };
     return userData;
   } catch (e) {
@@ -76,5 +77,24 @@ const updateUserInfo = async (updateUserDto: UpdateUserDto) => {
   }
 };
 
-const userService = { getUserMe, getProfileImage, updateUserInfo };
+const updateUserRequestStatus = async (userId: string) => {
+  try {
+    await prisma.user.findFirstOrThrow({
+      where: { id: userId },
+    });
+    await prisma.user.update({
+      where: { id: userId },
+      data: { hasRequest: true },
+    });
+  } catch (e) {
+    throw e;
+  }
+};
+
+const userService = {
+  getUserMe,
+  getProfileImage,
+  updateUserInfo,
+  updateUserRequestStatus,
+};
 export default userService;

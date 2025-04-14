@@ -30,6 +30,7 @@ const getWorkerProfilesQuerySchema = z.object({
   serviceArea: z.nativeEnum(Area).optional(),
   page: z.number().min(0),
   pageSize: z.number().min(0),
+  search: z.string().optional(),
 });
 
 export type GetWorkerProfilesQuery = z.infer<
@@ -109,19 +110,22 @@ const validateWorkerProfile = (isUpdate: boolean): RequestHandler => {
 
 const validateGetWorkerProfilesQuery: RequestHandler = (req, res, next) => {
   try {
-    const { orderBy, serviceType, serviceArea, page, pageSize } = req.query as {
-      orderBy: profileOrderBy;
-      serviceType: ServiceType;
-      serviceArea: Area;
-      page: string;
-      pageSize: string;
-    };
+    const { orderBy, serviceType, serviceArea, page, pageSize, search } =
+      req.query as {
+        orderBy: profileOrderBy;
+        serviceType: ServiceType;
+        serviceArea: Area;
+        page: string;
+        pageSize: string;
+        search: string;
+      };
     const parsedContext = getWorkerProfilesQuerySchema.safeParse({
       orderBy,
       serviceType,
       serviceArea,
       page: page ? Number(page) : 1,
       pageSize: pageSize ? Number(pageSize) : 10,
+      search,
     });
     if (!parsedContext.success) {
       throw new Error(`400/Validation error: ${parsedContext.error}`);

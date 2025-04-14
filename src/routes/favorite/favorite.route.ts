@@ -1,7 +1,10 @@
 import express from "express";
-import favorite from "../controllers/favorite.controller";
-import { authenticatedOnly, customerOnly } from "../middleware/auth.middleware";
-import { validatePaginationQuery } from "../validations/common.validation";
+import favorite from "../../controllers/favorite.controller";
+import {
+  authenticatedOnly,
+  customerOnly,
+} from "../../middleware/auth.middleware";
+import { validatePaginationQuery } from "../../validations/common.validation";
 const favoriteRouter = express.Router();
 
 //유저 찜하기
