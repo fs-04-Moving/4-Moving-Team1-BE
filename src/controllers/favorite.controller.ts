@@ -3,6 +3,7 @@ import { asyncHandler } from "../middleware/error.middleware";
 import { findUser } from "../services/utills";
 import favoriteService from "../services/favorite.service";
 import { PaginationQuery } from "../validations/common.validation";
+import { BASE_URL } from "../app";
 
 const createFavoriteController: RequestHandler = asyncHandler(
   async (req, res, next) => {
@@ -38,7 +39,9 @@ const getFavoriteWorkersController: RequestHandler = asyncHandler(
         const profile = fav.worker.workProfile!;
         return {
           id: fav.workerId,
-          profileImage: profile.profileImage,
+          profileImage: profile.profileImage
+            ? `${BASE_URL}/static/${profile.profileImage.split("/").pop()}`
+            : null,
           nickname: profile.nickname,
           experience: profile.experience,
           summary: profile.summary,

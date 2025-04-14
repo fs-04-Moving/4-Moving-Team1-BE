@@ -5,6 +5,8 @@ import router from "./routes";
 import { errorHandler } from "./middleware/error.middleware";
 import cookieParser from "cookie-parser";
 
+export const BASE_URL = "http://localhost:5050";
+
 const app = express();
 const port = 5050;
 
