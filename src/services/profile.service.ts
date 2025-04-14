@@ -7,6 +7,7 @@ import {
 } from "../types/profile.type";
 import { PayloadData } from "../types/auth.type";
 import { createToken } from "./auth.service";
+import { BASE_URL } from "../app";
 
 // 유저 프로필 생성
 const createCustomerProfile = async (
@@ -175,7 +176,11 @@ const getWorkerProfile = async (workerId: string) => {
     });
 
     return {
-      profileImage: worker.workProfile.profileImage ?? null,
+      profileImage: worker.workProfile.profileImage
+        ? `${BASE_URL}/static/${worker.workProfile.profileImage
+            .split("/")
+            .pop()}`
+        : null,
       summary: worker.workProfile.summary,
       nickname: worker.workProfile.nickname,
       experience: worker.workProfile.experience,
@@ -282,10 +287,15 @@ const getWorkerProfiles = async ({
      END as "isFavorite"`
       : `false as "isFavorite"`;
 
+    const imageUrlPrefix = `${BASE_URL}/static`;
+
     const list = await prisma.$queryRawUnsafe(`
       SELECT 
         u.id as "workerId",
-        wp."profileImage",
+        CASE 
+  WHEN wp."profileImage" IS NULL THEN NULL
+  ELSE CONCAT('${imageUrlPrefix}', '/', split_part(wp."profileImage", '/', array_length(string_to_array(wp."profileImage", '/'), 1)))
+END AS "profileImage",
         wp."experience",
         wp."nickname",
         wp."services",
