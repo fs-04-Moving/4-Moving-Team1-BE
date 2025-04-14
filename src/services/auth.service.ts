@@ -2,7 +2,6 @@ import prisma from "../db/prisma/client";
 import { LogInDto, PayloadData, SignUpDto } from "../types/auth.type";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import user from "../controllers/user.controller";
 
 const jwtSecretKey = process.env.JWT_SECRET_KEY;
 
