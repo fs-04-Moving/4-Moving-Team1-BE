@@ -7,6 +7,7 @@ import { PaginationQuery } from "../validations/common.validation";
 import userService from "../services/user.service";
 import profileService from "../services/profile.service";
 import favoriteService from "../services/favorite.service";
+import { BASE_URL } from "../app";
 
 //일반 유저가 지정 견적 생성 (일반 유저가 기사 유저에게 견적 보내기)
 const createAssignedEstimateController: RequestHandler = asyncHandler(
@@ -118,7 +119,11 @@ const getPendingEstimatesController: RequestHandler = asyncHandler(
           departureAddress,
           destination,
           isConfirmed,
-          workerProfileImage: worker.workProfile?.profileImage,
+          workerProfileImage: worker.workProfile?.profileImage
+            ? `${BASE_URL}/static/${worker.workProfile.profileImage
+                .split("/")
+                .pop()}`
+            : null,
           workerSummary: worker.workProfile?.summary,
           workerNickname: worker.workProfile?.nickname,
           workerExperience: worker.workProfile?.experience,
@@ -170,7 +175,11 @@ const getEstimatesController: RequestHandler = asyncHandler(
           departureAddress,
           destination,
           isConfirmed,
-          workerProfileImage: worker.workProfile?.profileImage,
+          workerProfileImage: worker.workProfile?.profileImage
+            ? `${BASE_URL}/static/${worker.workProfile.profileImage
+                .split("/")
+                .pop()}`
+            : null,
           workerSummary: worker.workProfile?.summary,
           workerNickname: worker.workProfile?.nickname,
           workerExperience: worker.workProfile?.experience,
@@ -265,7 +274,9 @@ const getEstimateDetailByCustomerController: RequestHandler = asyncHandler(
       isConfirmed,
       workerId,
       workerNickname: nickname,
-      workerProfileImage: profileImage,
+      workerProfileImage: profileImage
+        ? `${BASE_URL}/static/${profileImage.split("/").pop()}`
+        : null,
       workerExperience: experience,
       workerConfirmedEstimatesCount: confirmedEstimatesCount,
       workerFavoritesCount: favoritesCount,

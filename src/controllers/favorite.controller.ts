@@ -3,12 +3,12 @@ import { asyncHandler } from "../middleware/error.middleware";
 import { findUser } from "../services/utills";
 import favoriteService from "../services/favorite.service";
 import { PaginationQuery } from "../validations/common.validation";
+import { BASE_URL } from "../app";
 
 const createFavoriteController: RequestHandler = asyncHandler(
   async (req, res, next) => {
     const customerId = req.userId as string;
     const { workerId } = req.params;
-    await findUser(workerId);
     await favoriteService.createFavorite(customerId, workerId);
     res.sendStatus(201);
   }
@@ -18,7 +18,6 @@ const deleteFavoriteController: RequestHandler = asyncHandler(
   async (req, res, next) => {
     const customerId = req.userId as string;
     const { workerId } = req.params;
-    await findUser(workerId);
     await favoriteService.deleteFavorite(customerId, workerId);
     res.sendStatus(204);
   }
@@ -40,7 +39,9 @@ const getFavoriteWorkersController: RequestHandler = asyncHandler(
         const profile = fav.worker.workProfile!;
         return {
           id: fav.workerId,
-          profileImage: profile.profileImage,
+          profileImage: profile.profileImage
+            ? `${BASE_URL}/static/${profile.profileImage.split("/").pop()}`
+            : null,
           nickname: profile.nickname,
           experience: profile.experience,
           summary: profile.summary,

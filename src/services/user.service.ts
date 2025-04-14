@@ -1,10 +1,9 @@
+import { BASE_URL } from "../app";
 import user from "../controllers/user.controller";
 import prisma from "../db/prisma/client";
 import { UpdateUserDto } from "../types/auth.type";
 import { checkPassword } from "./auth.service";
 import bcrypt from "bcrypt";
-
-const BASE_URL = "http://localhost:5050";
 
 // 내정보 가져오는 함수 : 이름 , 프로필 생성 여부
 const getUserMe = async (userId: string) => {
