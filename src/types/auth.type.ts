@@ -1,4 +1,4 @@
-import { ROLE } from "@prisma/client";
+import { ROLE } from '@prisma/client';
 
 type PayloadData = {
   id: string;
@@ -6,6 +6,7 @@ type PayloadData = {
   name: string;
   role: ROLE;
   hasProfile: boolean;
+  profileImage?: string; // 추가(조형민)
 };
 
 type LogInDto = {
@@ -28,4 +29,4 @@ type UpdateUserDto = {
   phoneNumber: string;
 };
 
-export { PayloadData, LogInDto, SignUpDto, UpdateUserDto };
+export { LogInDto, PayloadData, SignUpDto, UpdateUserDto };
