@@ -311,6 +311,7 @@ END AS "profileImage",
         wp."nickname",
         wp."services",
         wp."serviceAreas",
+        wp."summary",
         count(distinct r.id)::int as "reviewsCount",
         count(distinct f.id)::int as "favoritesCount",
         coalesce(avg(r.star), 0)::float as "reviewsAverage",
@@ -325,7 +326,7 @@ END AS "profileImage",
       LEFT JOIN "Favorite" f ON f."workerId" = u.id 
       LEFT JOIN "Estimate" e ON u.id = e."workerId" 
       WHERE ${where}
-      GROUP BY u.id, wp."profileImage", wp."experience", wp."nickname", wp."services", wp."serviceAreas"
+      GROUP BY u.id, wp."profileImage", wp."experience", wp."nickname", wp."services", wp."serviceAreas",wp."summary"
       ORDER BY ${order}
       LIMIT ${limit}
       OFFSET ${offset};
