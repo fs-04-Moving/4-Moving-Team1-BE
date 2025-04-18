@@ -77,14 +77,14 @@ const workerOnly: RequestHandler = async (req, res, next) => {
 
 const authenticatedWithRefresh: RequestHandler = (req, res, next) => {
   const token = req.cookies.refreshToken;
-  if (!token) res.status(401).send("Unauthenticated");
+  if (!token) throw new Error("401/Unauthorizaion");
 
   try {
     const payload = jwt.verify(token, jwtSecretKey) as { sub: string };
     req.userId = payload.sub;
     next();
   } catch (err) {
-    res.status(401).send("Invalid refresh token");
+    next(err);
   }
 };
 
