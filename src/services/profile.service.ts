@@ -1,13 +1,12 @@
-import { Area, Prisma, ServiceType } from "@prisma/client";
+import { Area, ServiceType } from "@prisma/client";
 import prisma from "../db/prisma/client";
 import {
   CustomerProfileDto,
   profileOrderBy,
   WorkerProfileDto,
 } from "../types/profile.type";
-import { PayloadData } from "../types/auth.type";
-import { createToken } from "./auth.service";
 import { BASE_URL } from "../app";
+import { createTokenByUserData } from "./utills";
 
 // 유저 프로필 생성
 const createCustomerProfile = async (
@@ -63,20 +62,13 @@ const updateUserProfileStatus = async (userId: string) => {
     const user = await prisma.user.update({
       where: { id: userId },
       data: { hasProfile: true },
+      include: {
+        workProfile: { select: { profileImage: true } },
+        customerProfile: { select: { profileImage: true } },
+      },
     });
-    const data: PayloadData = {
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      role: user.role,
-      hasProfile: user.hasProfile,
-    };
 
-    const { accessToken, refreshToken } = createToken(data);
-    return {
-      accessToken,
-      refreshToken,
-    };
+    return createTokenByUserData(user);
   } catch (e) {
     throw e;
   }
@@ -100,7 +92,17 @@ const updateCustomerProfile = async (
       where: { customerId },
       data: customerProfileDto,
     });
-    return;
+
+    const user = await prisma.user.findFirst({
+      where: { id: customerId },
+      include: {
+        workProfile: { select: { profileImage: true } },
+        customerProfile: { select: { profileImage: true } },
+      },
+    });
+    if (!user) throw new Error("400/user not found");
+
+    return createTokenByUserData(user);
   } catch (e) {
     throw e;
   }
@@ -125,7 +127,16 @@ const updateWorkerProfile = async (
       data: workerProfileDto,
     });
 
-    return;
+    const user = await prisma.user.findFirst({
+      where: { id: workerId },
+      include: {
+        workProfile: { select: { profileImage: true } },
+        customerProfile: { select: { profileImage: true } },
+      },
+    });
+    if (!user) throw new Error("400/user not found");
+
+    return createTokenByUserData(user);
   } catch (e) {
     throw e;
   }
@@ -300,6 +311,7 @@ END AS "profileImage",
         wp."nickname",
         wp."services",
         wp."serviceAreas",
+        wp."summary",
         count(distinct r.id)::int as "reviewsCount",
         count(distinct f.id)::int as "favoritesCount",
         coalesce(avg(r.star), 0)::float as "reviewsAverage",
@@ -314,7 +326,7 @@ END AS "profileImage",
       LEFT JOIN "Favorite" f ON f."workerId" = u.id 
       LEFT JOIN "Estimate" e ON u.id = e."workerId" 
       WHERE ${where}
-      GROUP BY u.id, wp."profileImage", wp."experience", wp."nickname", wp."services", wp."serviceAreas"
+      GROUP BY u.id, wp."profileImage", wp."experience", wp."nickname", wp."services", wp."serviceAreas",wp."summary"
       ORDER BY ${order}
       LIMIT ${limit}
       OFFSET ${offset};

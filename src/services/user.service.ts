@@ -4,6 +4,7 @@ import prisma from "../db/prisma/client";
 import { UpdateUserDto } from "../types/auth.type";
 import { checkPassword } from "./auth.service";
 import bcrypt from "bcrypt";
+import { createTokenByUserData } from "./utills";
 
 // 내정보 가져오는 함수 : 이름 , 프로필 생성 여부
 const getUserMe = async (userId: string) => {
@@ -59,7 +60,7 @@ const getProfileImage = async (userId: string) => {
 const updateUserInfo = async (updateUserDto: UpdateUserDto) => {
   try {
     const { userId, password, newPassword, ...rest } = updateUserDto;
-    const user = await prisma.user.findFirst({ where: { id: userId } });
+    let user = await prisma.user.findFirst({ where: { id: userId } });
     if (!user) {
       throw new Error("400/user not found");
     }
@@ -67,10 +68,15 @@ const updateUserInfo = async (updateUserDto: UpdateUserDto) => {
     await checkPassword(password, user.encryptedPassword);
     // 비밀번호 생성
     const encryptedPassword = await bcrypt.hash(newPassword, 12);
-    await prisma.user.update({
+    user = await prisma.user.update({
       where: { id: userId },
       data: { ...rest, encryptedPassword },
+      include: {
+        workProfile: { select: { profileImage: true } },
+        customerProfile: { select: { profileImage: true } },
+      },
     });
+    return createTokenByUserData(user);
   } catch (e) {
     throw e;
   }

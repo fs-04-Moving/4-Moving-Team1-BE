@@ -1,4 +1,4 @@
-import { ROLE } from '@prisma/client';
+import { ROLE } from "@prisma/client";
 
 type PayloadData = {
   id: string;
