@@ -4,6 +4,10 @@ import prisma from "../db/prisma/client";
 
 const jwtSecretKey = process.env.JWT_SECRET_KEY;
 
+if (!jwtSecretKey) {
+  throw new Error("jwtSerectKey is not exist");
+}
+
 const authMiddleware: RequestHandler = (req, res, next) => {
   try {
     if (req.url === "/auth/sign-up" || req.url === "/auth/log-in")
@@ -71,4 +75,23 @@ const workerOnly: RequestHandler = async (req, res, next) => {
   }
 };
 
-export { authMiddleware, authenticatedOnly, customerOnly, workerOnly };
+const authenticatedWithRefresh: RequestHandler = (req, res, next) => {
+  const token = req.cookies.refreshToken;
+  if (!token) res.status(401).send("Unauthenticated");
+
+  try {
+    const payload = jwt.verify(token, jwtSecretKey) as { sub: string };
+    req.userId = payload.sub;
+    next();
+  } catch (err) {
+    res.status(401).send("Invalid refresh token");
+  }
+};
+
+export {
+  authMiddleware,
+  authenticatedOnly,
+  customerOnly,
+  workerOnly,
+  authenticatedWithRefresh,
+};

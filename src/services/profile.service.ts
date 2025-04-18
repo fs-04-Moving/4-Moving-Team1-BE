@@ -6,7 +6,7 @@ import {
   WorkerProfileDto,
 } from "../types/profile.type";
 import { BASE_URL } from "../app";
-import { createTokenByUserData } from "./utills";
+import authService from "./auth.service";
 
 // 유저 프로필 생성
 const createCustomerProfile = async (
@@ -68,7 +68,7 @@ const updateUserProfileStatus = async (userId: string) => {
       },
     });
 
-    return createTokenByUserData(user);
+    return authService.createTokenByUserData(user);
   } catch (e) {
     throw e;
   }
@@ -102,7 +102,7 @@ const updateCustomerProfile = async (
     });
     if (!user) throw new Error("400/user not found");
 
-    return createTokenByUserData(user);
+    return authService.createTokenByUserData(user);
   } catch (e) {
     throw e;
   }
@@ -136,7 +136,7 @@ const updateWorkerProfile = async (
     });
     if (!user) throw new Error("400/user not found");
 
-    return createTokenByUserData(user);
+    return authService.createTokenByUserData(user);
   } catch (e) {
     throw e;
   }

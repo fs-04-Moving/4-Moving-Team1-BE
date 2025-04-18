@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import { BASE_URL } from "../app";
 import prisma from "../db/prisma/client";
 import { LogInDto, PayloadData, SignUpDto } from "../types/auth.type";
+import { ROLE } from "@prisma/client";
 
 const jwtSecretKey = process.env.JWT_SECRET_KEY;
 
@@ -155,7 +156,41 @@ const refreshToken = async (refreshToken: string) => {
 };
 
 // 토큰 업데이트
+const createTokenByUserData = (user: {
+  id: string;
+  email: string;
+  name: string;
+  role: ROLE;
+  hasProfile: boolean;
+  customerProfile?: { profileImage?: string | null } | null;
+  workProfile?: { profileImage?: string | null } | null;
+}) => {
+  const profileImage =
+    user.role === "customer"
+      ? typeof user.customerProfile?.profileImage === "string"
+        ? `${BASE_URL}/static/${user.customerProfile.profileImage
+            .split("/")
+            .pop()}`
+        : undefined
+      : user.role === "worker"
+      ? typeof user.workProfile?.profileImage === "string"
+        ? `${BASE_URL}/static/${user.workProfile.profileImage.split("/").pop()}`
+        : undefined
+      : undefined;
 
-const authService = { logIn, signUp, refreshToken };
+  const data: PayloadData = {
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    role: user.role,
+    hasProfile: user.hasProfile,
+    profileImage,
+  };
+
+  const { accessToken, refreshToken } = createToken(data);
+  return { accessToken, refreshToken };
+};
+
+const authService = { logIn, signUp, refreshToken, createTokenByUserData };
 
 export default authService;

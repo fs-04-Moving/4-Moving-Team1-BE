@@ -4,7 +4,6 @@ import {
   EstimateRequestOrderBy,
   EstimateRequstDto,
 } from "../types/estimate-request.type";
-import { findActiveEstimateRequest } from "./utills";
 
 // 견적 요청 생성 함수
 const createEstimateRequest = async (estimateRequstDto: EstimateRequstDto) => {
@@ -142,11 +141,56 @@ const getRecivedEstimateReuests = async ({
   };
 };
 
+const findInactiveEstimateRequests = async ({
+  customerId,
+  page,
+  pageSize,
+}: {
+  customerId: string;
+  page: number;
+  pageSize: number;
+}) => {
+  try {
+    const [inactiveEstimateRequests, totalCount] = await Promise.all([
+      prisma.estimateRequest.findMany({
+        where: { customerId, status: "inactive" },
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+      }),
+      prisma.estimateRequest.count({
+        where: { customerId, status: "inactive" },
+      }),
+    ]);
+    if (!inactiveEstimateRequests)
+      throw new Error("400/acitve Estimate Request not found");
+
+    return { inactiveEstimateRequests, totalCount };
+  } catch (e) {
+    throw e;
+  }
+};
+
+const findActiveEstimateRequest = async (customerId: string) => {
+  try {
+    const estimateRequest = await prisma.estimateRequest.findFirst({
+      where: { customerId, status: "active" },
+    });
+    if (!estimateRequest)
+      throw new Error("400/acitve Estimate Request not found");
+
+    return estimateRequest;
+  } catch (e) {
+    throw e;
+  }
+};
+
 const estimateRequstService = {
   createEstimateRequest,
   deleteEstimateRequest,
   confirmEstimateRequest,
   getRecivedEstimateReuests,
+  findInactiveEstimateRequests,
+  findActiveEstimateRequest,
 };
 
 export default estimateRequstService;

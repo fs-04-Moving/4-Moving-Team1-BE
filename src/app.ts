@@ -20,6 +20,7 @@ app.use(
 app.use(cookieParser());
 app.use("/static", express.static("upload"));
 app.use(router);
+
 app.use(errorHandler);
 
 app.listen(port, () => {

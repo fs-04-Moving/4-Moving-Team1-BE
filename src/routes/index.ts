@@ -7,6 +7,7 @@ import favoriteRouter from "./favorite/favorite.route";
 import authRouter from "./auth/auth.route";
 import reviewRouter from "./review/review.route";
 import userRouter from "./user/user.route";
+import notificationRouter from "./notification/notification.route";
 
 const router = express.Router();
 
@@ -18,5 +19,6 @@ router.use("/estimate-request", estimateRequstRouter);
 router.use("/estimate", estimateRouter);
 router.use("/favorite", favoriteRouter);
 router.use("/review", reviewRouter);
+router.use("/notification", notificationRouter);
 
 export default router;

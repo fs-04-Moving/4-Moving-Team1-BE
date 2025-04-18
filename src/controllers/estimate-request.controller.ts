@@ -2,7 +2,6 @@ import { RequestHandler } from "express";
 import { asyncHandler } from "../middleware/error.middleware";
 import { EstimateRequstDto } from "../types/estimate-request.type";
 import estimateRequstService from "../services/estimate-request.sevice";
-import { findInactiveEstimateRequests } from "../services/utills";
 import { Area } from "@prisma/client";
 import profileService from "../services/profile.service";
 import { EstimateRequestQuery } from "../validations/estimate-requset.validation";
@@ -50,7 +49,7 @@ const getEstimateRequestsController: RequestHandler = asyncHandler(
     const customerId = req.userId as string;
     const { page, pageSize } = req.validateQuery as PaginationQuery;
     const { inactiveEstimateRequests, totalCount } =
-      await findInactiveEstimateRequests({
+      await estimateRequstService.findInactiveEstimateRequests({
         customerId,
         page,
         pageSize,

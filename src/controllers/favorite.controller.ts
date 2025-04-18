@@ -1,9 +1,9 @@
 import { RequestHandler } from "express";
 import { asyncHandler } from "../middleware/error.middleware";
-import { findUser } from "../services/utills";
 import favoriteService from "../services/favorite.service";
 import { PaginationQuery } from "../validations/common.validation";
 import { BASE_URL } from "../app";
+import userService from "../services/user.service";
 
 const createFavoriteController: RequestHandler = asyncHandler(
   async (req, res, next) => {
@@ -64,7 +64,7 @@ const checkFavoriteController: RequestHandler = asyncHandler(
   async (req, res, next) => {
     const customerId = req.userId as string;
     const { workerId } = req.params;
-    await findUser(workerId);
+    await userService.findUser(workerId);
     const result = await favoriteService.checkFavorite({
       customerId,
       workerId,
