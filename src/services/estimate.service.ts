@@ -1,16 +1,18 @@
 import { Area, EstimateStatus, Prisma, ServiceType } from "@prisma/client";
 import prisma from "../db/prisma/client";
-import { findActiveEstimateRequest, findEstimate, findUser } from "./utills";
 import { EstimateDto } from "../types/estimate.type";
+import estimateRequstService from "./estimate-request.sevice";
+import userService from "./user.service";
 
 // 견적 생성 함수
 const createEstimate = async (estimateDto: EstimateDto) => {
   try {
     const { workerId, customerId, status, price } = estimateDto;
 
-    const estimateRequest = await findActiveEstimateRequest(customerId);
+    const estimateRequest =
+      await estimateRequstService.findActiveEstimateRequest(customerId);
 
-    await findUser(workerId);
+    await userService.findUser(workerId);
 
     const {
       id,
@@ -111,9 +113,8 @@ const getPendingEstimates = async ({
   const now = new Date();
   try {
     // 아이디 찾기
-    const { id: estimateRequestId } = await findActiveEstimateRequest(
-      customerId
-    );
+    const { id: estimateRequestId } =
+      await estimateRequstService.findActiveEstimateRequest(customerId);
 
     const [pendingEstimates, totalCount] = await Promise.all([
       prisma.estimate.findMany({
@@ -448,6 +449,25 @@ const getworkerIdByEstimateId = async (estimateId: string) => {
   }
 };
 
+// 기사-유저간의 존재하는 견적 가져오기 함수
+const findEstimate = async (estimateId: string, status?: EstimateStatus) => {
+  try {
+    const where: any = { id: estimateId };
+    if (status) {
+      where.status = status;
+    }
+    const estimate = await prisma.estimate.findFirst({
+      where,
+    });
+    if (!estimate)
+      throw new Error(`400/${status ? status : ""} Estimate not found`);
+
+    return estimate;
+  } catch (e) {
+    throw e;
+  }
+};
+
 const estimateService = {
   createEstimate,
   confirmEstimate,
@@ -461,6 +481,7 @@ const estimateService = {
   getRejectEstimates,
   getReviewableEstimates,
   getworkerIdByEstimateId,
+  findEstimate,
 };
 
 export default estimateService;

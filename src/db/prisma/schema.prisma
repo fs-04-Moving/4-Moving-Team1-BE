@@ -24,7 +24,8 @@ model User {
   estimatesAsWorker   Estimate[]        @relation("estimateWorker")
   estimatesAsCustomer Estimate[]        @relation("estimateCustomer")
   customerFavorites   Favorite[]        @relation("customerFavorites")
-  workerFavorites     Favorite[]        @relation("workerFavorites")       
+  workerFavorites     Favorite[]        @relation("workerFavorites")
+  Notification        Notification[]
 }
 
 model WorkerProfile {
@@ -116,8 +117,11 @@ model Notification {
   id       String   @id @default(uuid())
   isRead   Boolean
   message  String
-  createAt DateTime @default(now())
+  createdAt DateTime @default(now())
+  user     User     @relation(fields: [userId], references: [id])
+  userId   String
 }
+
 // type 추가하기
 
 enum ROLE {

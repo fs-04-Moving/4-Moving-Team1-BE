@@ -1,10 +1,8 @@
 import { BASE_URL } from "../app";
-import user from "../controllers/user.controller";
 import prisma from "../db/prisma/client";
 import { UpdateUserDto } from "../types/auth.type";
-import { checkPassword } from "./auth.service";
+import authService, { checkPassword } from "./auth.service";
 import bcrypt from "bcrypt";
-import { createTokenByUserData } from "./utills";
 
 // 내정보 가져오는 함수 : 이름 , 프로필 생성 여부
 const getUserMe = async (userId: string) => {
@@ -76,7 +74,8 @@ const updateUserInfo = async (updateUserDto: UpdateUserDto) => {
         customerProfile: { select: { profileImage: true } },
       },
     });
-    return createTokenByUserData(user);
+
+    return authService.createTokenByUserData(user);
   } catch (e) {
     throw e;
   }
@@ -96,10 +95,23 @@ const updateUserRequestStatus = async (userId: string) => {
   }
 };
 
+const findUser = async (userId: string) => {
+  try {
+    await prisma.user.findFirst({
+      where: { id: userId },
+      select: { id: true },
+    });
+    if (!userId) throw new Error("400/worker not found");
+  } catch (e) {
+    throw e;
+  }
+};
+
 const userService = {
   getUserMe,
   getProfileImage,
   updateUserInfo,
   updateUserRequestStatus,
+  findUser,
 };
 export default userService;
