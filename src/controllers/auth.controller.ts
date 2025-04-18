@@ -1,6 +1,6 @@
-import { RequestHandler } from 'express';
-import { asyncHandler } from '../middleware/error.middleware';
-import authService from '../services/auth.service';
+import { RequestHandler } from "express";
+import { asyncHandler } from "../middleware/error.middleware";
+import authService from "../services/auth.service";
 
 // 로그인 컨트롤러
 const logInController: RequestHandler = asyncHandler(async (req, res, next) => {
@@ -10,12 +10,12 @@ const logInController: RequestHandler = asyncHandler(async (req, res, next) => {
 
   req.userId = sub;
 
-  res.cookie('refreshToken', refreshToken, {
+  res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
     // secure: process.env.NODE_ENV === "production",
     secure: false,
-    sameSite: 'strict',
-    path: '/',
+    sameSite: "strict",
+    path: "/",
     maxAge: 1000 * 60 * 60 * 24 * 7, // 7일
   });
 
@@ -29,20 +29,6 @@ const signUpController: RequestHandler = asyncHandler(
     const signUpDto = { email, password, name, phoneNumber, role };
     const result = await authService.signUp(signUpDto);
 
-    // 토큰 관련 로직 삭제
-    // const { sub, accessToken, refreshToken } = await authService.signUp(
-    //   signUpDto
-    // );
-    // req.userId = sub;
-
-    // res.cookie("refreshToken", refreshToken, {
-    //   httpOnly: true,
-    //   // secure: process.env.NODE_ENV === "production",
-    //   secure: false,
-    //   sameSite: "strict",
-    //   maxAge: 1000 * 60 * 60 * 24 * 7, // 7일
-    // });
-
     res.status(200).send({ result });
   }
 );
@@ -51,7 +37,7 @@ const signUpController: RequestHandler = asyncHandler(
 const refreshTokenController: RequestHandler = asyncHandler(
   async (req, res, next) => {
     const refreshToken = req.cookies.refreshToken;
-    if (!refreshToken) throw new Error('401/No refresh token');
+    if (!refreshToken) throw new Error("401/No refresh token");
 
     const accessToken = await authService.refreshToken(refreshToken);
 
@@ -60,14 +46,14 @@ const refreshTokenController: RequestHandler = asyncHandler(
 );
 
 const logOutController: RequestHandler = (req, res) => {
-  res.clearCookie('refreshToken', {
+  res.clearCookie("refreshToken", {
     httpOnly: true,
     // secure: process.env.NODE_ENV === "production",
-    sameSite: 'strict',
-    path: '/',
+    sameSite: "strict",
+    path: "/",
   });
 
-  res.status(200).send({ message: '로그아웃 완료' });
+  res.status(200).send({ message: "로그아웃 완료" });
 };
 
 const auth = {

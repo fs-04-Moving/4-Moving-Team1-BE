@@ -1,13 +1,13 @@
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import { BASE_URL } from '../app';
-import prisma from '../db/prisma/client';
-import { LogInDto, PayloadData, SignUpDto } from '../types/auth.type';
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import { BASE_URL } from "../app";
+import prisma from "../db/prisma/client";
+import { LogInDto, PayloadData, SignUpDto } from "../types/auth.type";
 
 const jwtSecretKey = process.env.JWT_SECRET_KEY;
 
 if (!jwtSecretKey) {
-  throw new Error('jwtSerectKey is not exist');
+  throw new Error("jwtSerectKey is not exist");
 }
 
 // 토큰 생성 함수
@@ -21,17 +21,17 @@ export const createToken = (data: PayloadData) => {
       name: data.name, // 추가(조형민)
       ...(data.profileImage && {
         profileImage: `${BASE_URL}/static/${data.profileImage
-          .split('/')
+          .split("/")
           .pop()}`,
       }), // 추가(조형민)
     };
 
     const accessToken = jwt.sign(payload, jwtSecretKey, {
-      expiresIn: '2h',
+      expiresIn: "2h",
     });
 
     const refreshToken = jwt.sign(payload, jwtSecretKey, {
-      expiresIn: '5d',
+      expiresIn: "5d",
     });
 
     return { accessToken, refreshToken };
@@ -51,7 +51,7 @@ export const checkPassword = async (
   try {
     const checkPassword = await bcrypt.compare(password, encryptedPassword);
     if (!checkPassword) {
-      throw new Error('400/Incorrect password');
+      throw new Error("400/Incorrect password");
     }
   } catch (e) {
     throw e;
@@ -63,9 +63,6 @@ const logIn = async (logInDto: LogInDto) => {
   try {
     const result = await prisma.$transaction(async (prisma) => {
       const { email, password, role } = logInDto;
-      // const user = await prisma.user.findUnique({
-      //   where: { email, role },
-      // });
       const user = await prisma.user.findUnique({
         where: { email, role },
         include: {
@@ -73,7 +70,7 @@ const logIn = async (logInDto: LogInDto) => {
           workProfile: true,
         },
       });
-      if (!user) throw new Error('400/유저가 존재하지 않습니다.');
+      if (!user) throw new Error("400/유저가 존재하지 않습니다.");
       const profileImage =
         user.customerProfile?.profileImage ?? user.workProfile?.profileImage;
 
@@ -86,15 +83,15 @@ const logIn = async (logInDto: LogInDto) => {
         role: user.role,
         hasProfile: user.hasProfile,
         profileImage: profileImage
-          ? `${BASE_URL}/static/${profileImage.split('/').pop()}`
+          ? `${BASE_URL}/static/${profileImage.split("/").pop()}`
           : undefined, // 추가(조형민)
       };
 
       const { accessToken, refreshToken } = createToken(data);
       const { sub } = jwt.verify(accessToken, jwtSecretKey);
 
-      if (typeof sub !== 'string') {
-        throw new Error('400/sub is not string');
+      if (typeof sub !== "string") {
+        throw new Error("400/sub is not string");
       }
 
       return {
@@ -119,25 +116,11 @@ const signUp = async (signUpDto: SignUpDto) => {
       const isExistingEmail = await prisma.user.findUnique({
         where: { email },
       });
-      if (isExistingEmail) throw new Error('400/이미 존재하는 이메일입니다.');
+      if (isExistingEmail) throw new Error("400/이미 존재하는 이메일입니다.");
       const newUser = await prisma.user.create({
         data: { email, name, encryptedPassword, phoneNumber, role },
       });
 
-      // 회원가입시 토큰 발급 삭제
-      // const data: PayloadData = {
-      //   id: newUser.id,
-      //   email: newUser.email,
-      //   name: newUser.name,
-      //   hasProfile: newUser.hasProfile,
-      //   role: newUser.role,
-      // };
-      // const { accessToken, refreshToken } = createToken(data);
-      // const { sub } = jwt.verify(accessToken, jwtSecretKey);
-
-      // if (typeof sub !== 'string') {
-      //   throw new Error('400/sub is not string');
-      // }
       return { id: newUser.id, email: newUser.email };
     });
 
@@ -153,8 +136,8 @@ const refreshToken = async (refreshToken: string) => {
     refreshToken,
     jwtSecretKey
   ) as jwt.JwtPayload;
-  if (typeof sub !== 'string') {
-    throw new Error('400/sub is not string');
+  if (typeof sub !== "string") {
+    throw new Error("400/sub is not string");
   }
   const data: PayloadData = {
     id: sub,
@@ -163,8 +146,8 @@ const refreshToken = async (refreshToken: string) => {
     hasProfile,
     role,
     profileImage:
-      typeof profileImage === 'string'
-        ? `${BASE_URL}/static/${profileImage.split('/').pop()}`
+      typeof profileImage === "string"
+        ? `${BASE_URL}/static/${profileImage.split("/").pop()}`
         : undefined,
   };
   const { accessToken } = createToken(data);
