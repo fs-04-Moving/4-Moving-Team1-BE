@@ -52,12 +52,10 @@ const confirmEstimateController: RequestHandler = asyncHandler(
     await estimateRequstService.confirmEstimateRequest(customerId);
 
     const customer = await userService.getUserMe(customerId);
-    const workerNickname = await profileService.getWorkerNickname(
-      estimate.workerId
-    );
+    const worker = await profileService.getWorkerNickname(estimate.workerId);
 
     await notificationService.sendNotification({
-      message: `${workerNickname} 기사님의 견적이 확정되었어요`,
+      message: `${worker.nickname} 기사님의 견적이 확정되었어요`,
       userId: customerId,
     });
 
@@ -85,7 +83,7 @@ const createGeneralEstimateController: RequestHandler = asyncHandler(
       status: "general",
       price,
     };
-    const workerNickname = await profileService.getWorkerNickname(workerId);
+    const worker = await profileService.getWorkerNickname(workerId);
     const estimate = await estimateService.createEstimate(estimateDto);
     const esitmateMessage =
       estimate.serviceType === "homeMove"
@@ -94,7 +92,7 @@ const createGeneralEstimateController: RequestHandler = asyncHandler(
         ? "사무실이사"
         : "소형이사";
     await notificationService.sendNotification({
-      message: `${workerNickname} 기사님의 ${esitmateMessage}견적이 도착했어요`,
+      message: `${worker.nickname} 기사님의 ${esitmateMessage} 견적이 도착했어요`,
       userId: customerId,
     });
     res.sendStatus(201);

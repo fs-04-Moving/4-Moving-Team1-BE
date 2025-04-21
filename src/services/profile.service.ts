@@ -357,10 +357,12 @@ END AS "profileImage",
 
 const getWorkerNickname = async (userId: string) => {
   try {
-    await prisma.workerProfile.findFirst({
-      where: { id: userId },
+    const worker = await prisma.workerProfile.findFirst({
+      where: { workerId: userId },
       select: { nickname: true },
     });
+    if (!worker) throw new Error("400/worker not found");
+    return worker;
   } catch (e) {
     throw e;
   }
