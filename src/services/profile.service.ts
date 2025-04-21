@@ -166,6 +166,7 @@ const getWorkerProfile = async (workerId: string) => {
             experience: true,
             services: true,
             serviceAreas: true,
+            description: true,
           },
         },
       },
