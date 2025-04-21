@@ -12,21 +12,52 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const error_middleware_1 = require("../middlewear/error.middleware");
-const auth_service_1 = __importDefault(require("../servieces/auth.service"));
+const error_middleware_1 = require("../middleware/error.middleware");
+const auth_service_1 = __importDefault(require("../services/auth.service"));
+// 로그인 컨트롤러
 const logInController = (0, error_middleware_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { email, password } = req.body;
-    const logInDto = { email, password };
+    const { email, password, role } = req.body;
+    const logInDto = { email, password, role };
     const { sub, accessToken, refreshToken } = yield auth_service_1.default.logIn(logInDto);
     req.userId = sub;
-    res.status(200).send({ accessToken, refreshToken });
+    res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        // secure: process.env.NODE_ENV === "production",
+        secure: false,
+        sameSite: "strict",
+        path: "/",
+        maxAge: 1000 * 60 * 60 * 24 * 7, // 7일
+    });
+    res.status(200).send({ accessToken });
 }));
+// 회원가입 컨트롤러
 const signUpController = (0, error_middleware_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { email, password, name, phoneNumber } = req.body;
-    const signUpDto = { email, password, name, phoneNumber };
-    const { sub, accessToken, refreshToken } = yield auth_service_1.default.signUp(signUpDto);
-    req.userId = sub;
-    res.status(200).send({ accessToken, refreshToken });
+    const { email, password, name, phoneNumber, role } = req.body;
+    const signUpDto = { email, password, name, phoneNumber, role };
+    const result = yield auth_service_1.default.signUp(signUpDto);
+    res.status(200).send({ result });
 }));
-const auth = { logInController, signUpController };
+// 리프레쉬 토큰 컨트롤러
+const refreshTokenController = (0, error_middleware_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken)
+        throw new Error("401/No refresh token");
+    const accessToken = yield auth_service_1.default.refreshToken(refreshToken);
+    res.status(200).send({ accessToken });
+}));
+const logOutController = (req, res) => {
+    res.clearCookie("refreshToken", {
+        httpOnly: true,
+        // secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        path: "/",
+    });
+    res.status(200).send({ message: "로그아웃 완료" });
+};
+const auth = {
+    logInController,
+    signUpController,
+    refreshTokenController,
+    logOutController,
+};
 exports.default = auth;
