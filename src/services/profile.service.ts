@@ -199,7 +199,7 @@ const getWorkerProfile = async (workerId: string) => {
       favoritesCount: worker._count.customerFavorites || 0,
       reviewsCount: worker._count.receivedReviews || 0,
       reviewsAverage: avgStar._avg.star ?? null,
-      confirmedEstimatesCount: confirmedEstimateCount || 0,
+      confirmedEstimateCount: confirmedEstimateCount || 0,
       serviceType: worker.workProfile.services,
       serviceArea: worker.workProfile.serviceAreas,
     };
