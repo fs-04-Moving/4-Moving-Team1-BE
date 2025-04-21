@@ -33,7 +33,7 @@ const createEstimate = async (estimateDto: EstimateDto) => {
       throw new Error("400/price is required for general estimate");
     }
 
-    await prisma.estimate.create({
+    const newEstimate = await prisma.estimate.create({
       data: {
         estimateRequestId: id,
         customerId,
@@ -47,6 +47,8 @@ const createEstimate = async (estimateDto: EstimateDto) => {
         ...(status === "general" ? { price } : {}),
       },
     });
+
+    return newEstimate;
   } catch (e) {
     throw e;
   }
@@ -57,10 +59,12 @@ const confirmEstimate = async (estimateId: string) => {
   try {
     const { price } = await findEstimate(estimateId);
     if (!price) throw new Error("400/The estimate is not yet priced");
-    await prisma.estimate.update({
+    const estimate = await prisma.estimate.update({
       where: { id: estimateId },
       data: { isConfirmed: true },
+      select: { workerId: true },
     });
+    return estimate;
   } catch (e) {
     throw e;
   }

@@ -355,6 +355,17 @@ END AS "profileImage",
   }
 };
 
+const getWorkerNickname = async (userId: string) => {
+  try {
+    await prisma.workerProfile.findFirst({
+      where: { id: userId },
+      select: { nickname: true },
+    });
+  } catch (e) {
+    throw e;
+  }
+};
+
 const profileService = {
   createCustomerProfile,
   createWorkerProfile,
@@ -364,6 +375,7 @@ const profileService = {
   getWorkerProfile,
   getWorkerServiceArea,
   getWorkerProfiles,
+  getWorkerNickname,
 };
 
 export default profileService;

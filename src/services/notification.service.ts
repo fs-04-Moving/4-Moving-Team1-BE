@@ -1,7 +1,13 @@
 import { clientsByUserId } from "../controllers/notification.controller";
 import prisma from "../db/prisma/client";
 
-const sendNotification = async (message: string, userId: string) => {
+const sendNotification = async ({
+  message,
+  userId,
+}: {
+  message: string;
+  userId: string;
+}) => {
   const newNotification = await prisma.notification.create({
     data: {
       userId,

@@ -8,6 +8,7 @@ import userService from "../services/user.service";
 import profileService from "../services/profile.service";
 import favoriteService from "../services/favorite.service";
 import { BASE_URL } from "../app";
+import notificationService from "../services/notification.service";
 
 //일반 유저가 지정 견적 생성 (일반 유저가 기사 유저에게 견적 보내기)
 const createAssignedEstimateController: RequestHandler = asyncHandler(
@@ -22,12 +23,23 @@ const createAssignedEstimateController: RequestHandler = asyncHandler(
       customerId,
       status: "assigned",
     };
-    await estimateService.createEstimate(estimateDto);
+    const customer = await userService.getUserMe(customerId);
+    const estimate = await estimateService.createEstimate(estimateDto);
+    const esitmateMessage =
+      estimate.serviceType === "homeMove"
+        ? "가정이사"
+        : estimate.serviceType === "officeMove"
+        ? "사무실이사"
+        : "소형이사";
+    await notificationService.sendNotification({
+      message: `${customer.name} 고객님의 ${esitmateMessage}견적이 도착했어요`,
+      userId: workerId,
+    });
     res.sendStatus(201);
   }
 );
 
-//일반 유저가 견적 확정하기 가격확인해야함함
+//일반 유저가 견적 확정하기 가격확인해야함
 const confirmEstimateController: RequestHandler = asyncHandler(
   async (req, res, next) => {
     const { estimateId } = req.params;
@@ -35,9 +47,25 @@ const confirmEstimateController: RequestHandler = asyncHandler(
     if (typeof estimateId !== "string")
       throw new Error("400/workerId is invalid");
     // isConfirmed ->ture로 변경
-    await estimateService.confirmEstimate(estimateId);
+    const estimate = await estimateService.confirmEstimate(estimateId);
     // 유저의 견적 요청 상태값 변경경
     await estimateRequstService.confirmEstimateRequest(customerId);
+
+    const customer = await userService.getUserMe(customerId);
+    const workerNickname = await profileService.getWorkerNickname(
+      estimate.workerId
+    );
+
+    await notificationService.sendNotification({
+      message: `${workerNickname} 기사님의 견적이 확정되었어요`,
+      userId: customerId,
+    });
+
+    await notificationService.sendNotification({
+      message: `${customer.name} 고객님의 견적이 확정되었어요`,
+      userId: estimate.workerId,
+    });
+
     res.sendStatus(204);
   }
 );
@@ -57,7 +85,18 @@ const createGeneralEstimateController: RequestHandler = asyncHandler(
       status: "general",
       price,
     };
-    await estimateService.createEstimate(estimateDto);
+    const workerNickname = await profileService.getWorkerNickname(workerId);
+    const estimate = await estimateService.createEstimate(estimateDto);
+    const esitmateMessage =
+      estimate.serviceType === "homeMove"
+        ? "가정이사"
+        : estimate.serviceType === "officeMove"
+        ? "사무실이사"
+        : "소형이사";
+    await notificationService.sendNotification({
+      message: `${workerNickname} 기사님의 ${esitmateMessage}견적이 도착했어요`,
+      userId: customerId,
+    });
     res.sendStatus(201);
   }
 );
@@ -211,6 +250,7 @@ const getEstimateDetailByWorkerController: RequestHandler = asyncHandler(
       destination,
       isConfirmed,
       customerId,
+      createdAt,
     } = estimate;
     const { name } = await userService.getUserMe(customerId);
 
@@ -225,6 +265,7 @@ const getEstimateDetailByWorkerController: RequestHandler = asyncHandler(
       isConfirmed,
       customerId,
       customerName: name,
+      requestDate: createdAt,
     };
     res.status(200).send(data);
   }
@@ -247,6 +288,7 @@ const getEstimateDetailByCustomerController: RequestHandler = asyncHandler(
       destination,
       isConfirmed,
       workerId,
+      createdAt,
     } = estimate;
 
     const isFavorite = await favoriteService.checkFavorite({
@@ -283,6 +325,7 @@ const getEstimateDetailByCustomerController: RequestHandler = asyncHandler(
       workerRating: reviewsAverage,
       workerReviewsCount: reviewsCount,
       isFavorite,
+      requestDate: createdAt,
     };
     res.status(200).send(data);
   }
