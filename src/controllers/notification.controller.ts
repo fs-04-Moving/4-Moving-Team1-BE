@@ -22,7 +22,7 @@ const notificationController: RequestHandler = async (
   res.write(
     `data: ${JSON.stringify({ notification: latestNotifications })}\n\n`
   );
-  notificationService.sendNotification("테스트해야지1212.", userId);
+  // notificationService.sendNotification("테스트해야지1212.", userId);
 
   clientsByUserId[userId] = res;
 
