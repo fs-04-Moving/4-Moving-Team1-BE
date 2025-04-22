@@ -11,18 +11,13 @@ import userService from "../services/user.service";
 // 견적 요청 생성하기
 const createEstimateRequestController: RequestHandler = asyncHandler(
   async (req, res, next) => {
-    const {
-      serviceType,
-      departureAddress,
-      destination,
-      movingDate,
-      departureArea,
-    } = req.body;
+    const { serviceType, departure, destination, movingDate, departureArea } =
+      req.body;
     const customerId = req.userId as string;
     const estimateRequstDto: EstimateRequstDto = {
       customerId,
       serviceType,
-      departureAddress,
+      departure,
       destination,
       movingDate,
       departureArea,
@@ -61,7 +56,7 @@ const getEstimateRequestsController: RequestHandler = asyncHandler(
           createdAt,
           serviceType,
           movingDate,
-          departureAddress,
+          departure,
           destination,
         } = inactiveEstimateRequest;
         return {
@@ -70,7 +65,7 @@ const getEstimateRequestsController: RequestHandler = asyncHandler(
           serviceType,
           movingDate,
           destination,
-          departureAddress,
+          departure,
         };
       })
     );
