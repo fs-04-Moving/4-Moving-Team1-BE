@@ -86,10 +86,11 @@ const updateUserRequestStatus = async (userId: string) => {
     await prisma.user.findFirstOrThrow({
       where: { id: userId },
     });
-    await prisma.user.update({
+    const user = await prisma.user.update({
       where: { id: userId },
       data: { hasRequest: true },
     });
+    return await authService.createTokenByUserData(user);
   } catch (e) {
     throw e;
   }
