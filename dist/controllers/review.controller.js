@@ -52,7 +52,7 @@ const getMyReviewController = (0, error_middleware_1.asyncHandler)((req, res, ne
             movingDate: (_b = review.estimate) === null || _b === void 0 ? void 0 : _b.movingDate,
             price: (_c = review.estimate) === null || _c === void 0 ? void 0 : _c.price,
             status: (_d = review.estimate) === null || _d === void 0 ? void 0 : _d.status,
-            workerNickname: (_g = (_f = (_e = review.estimate) === null || _e === void 0 ? void 0 : _e.worker) === null || _f === void 0 ? void 0 : _f.workProfile) === null || _g === void 0 ? void 0 : _g.nickname,
+            nickname: (_g = (_f = (_e = review.estimate) === null || _e === void 0 ? void 0 : _e.worker) === null || _f === void 0 ? void 0 : _f.workProfile) === null || _g === void 0 ? void 0 : _g.nickname,
         });
     });
     res.status(200).send({ list, totalCount });

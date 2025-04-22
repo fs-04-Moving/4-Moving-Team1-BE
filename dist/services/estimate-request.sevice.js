@@ -103,7 +103,7 @@ const getRecivedEstimateReuests = (_a) => __awaiter(void 0, [_a], void 0, functi
             customerId: r.customerId,
             serviceType: r.serviceType,
             movingDate: r.movingDate,
-            departure: r.departureAddress,
+            departure: r.departure,
             destination: r.destination,
             createdAt: r.createdAt,
             updatedAt: r.updatedAt,

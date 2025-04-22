@@ -56,7 +56,7 @@ const confirmEstimateController = (0, error_middleware_1.asyncHandler)((req, res
     // 유저의 견적 요청 상태값 변경경
     yield estimate_request_sevice_1.default.confirmEstimateRequest(customerId);
     const customer = yield user_service_1.default.getUserMe(customerId);
-    const worker = yield profile_service_1.default.getWorkerNickname(estimate.workerId);
+    const worker = yield profile_service_1.default.getnickname(estimate.workerId);
     yield notification_service_1.default.sendNotification({
         message: `${worker.nickname} 기사님의 견적이 확정되었어요`,
         userId: customerId,
@@ -81,7 +81,7 @@ const createGeneralEstimateController = (0, error_middleware_1.asyncHandler)((re
         status: "general",
         price,
     };
-    const worker = yield profile_service_1.default.getWorkerNickname(workerId);
+    const worker = yield profile_service_1.default.getnickname(workerId);
     const estimate = yield estimate_service_1.default.createEstimate(estimateDto);
     const esitmateMessage = estimate.serviceType === "homeMove"
         ? "가정이사"
@@ -123,28 +123,28 @@ const getPendingEstimatesController = (0, error_middleware_1.asyncHandler)((req,
     });
     const list = yield Promise.all(pendingEstimatesWithData.map((estimate) => __awaiter(void 0, void 0, void 0, function* () {
         var _a, _b, _c, _d, _e, _f, _g;
-        const { id, price, serviceType, status, movingDate, departureAddress, destination, isConfirmed, worker, } = estimate;
+        const { id, price, serviceType, status, movingDate, departure, destination, isConfirmed, worker, } = estimate;
         return {
             id,
             price: price ? price : null,
             serviceType: serviceType,
             status,
             movingDate,
-            departureAddress,
+            departure,
             destination,
             isConfirmed,
-            workerProfileImage: ((_a = worker.workProfile) === null || _a === void 0 ? void 0 : _a.profileImage)
+            profileImage: ((_a = worker.workProfile) === null || _a === void 0 ? void 0 : _a.profileImage)
                 ? `${app_1.BASE_URL}/static/${worker.workProfile.profileImage
                     .split("/")
                     .pop()}`
                 : null,
-            workerSummary: (_b = worker.workProfile) === null || _b === void 0 ? void 0 : _b.summary,
-            workerNickname: (_c = worker.workProfile) === null || _c === void 0 ? void 0 : _c.nickname,
-            workerExperience: (_d = worker.workProfile) === null || _d === void 0 ? void 0 : _d.experience,
-            workerConfirmedEstimatesCount: worker.confirmedEstimateCount,
-            workerReviewsCount: (_e = worker._count) === null || _e === void 0 ? void 0 : _e.receivedReviews,
-            workerFavoritesCount: (_f = worker._count) === null || _f === void 0 ? void 0 : _f.workerFavorites,
-            workerRating: worker.avgStar,
+            summary: (_b = worker.workProfile) === null || _b === void 0 ? void 0 : _b.summary,
+            nickname: (_c = worker.workProfile) === null || _c === void 0 ? void 0 : _c.nickname,
+            experience: (_d = worker.workProfile) === null || _d === void 0 ? void 0 : _d.experience,
+            confirmedEstimatesCount: worker.confirmedEstimatesCount,
+            reviewsCount: (_e = worker._count) === null || _e === void 0 ? void 0 : _e.receivedReviews,
+            favoritesCount: (_f = worker._count) === null || _f === void 0 ? void 0 : _f.workerFavorites,
+            rating: worker.avgStar,
             isFavorite: !!((_g = worker.workerFavorites) === null || _g === void 0 ? void 0 : _g.length),
         };
     })));
@@ -163,28 +163,28 @@ const getEstimatesController = (0, error_middleware_1.asyncHandler)((req, res, n
     });
     const list = yield Promise.all(estimatesWithData.map((estimate) => __awaiter(void 0, void 0, void 0, function* () {
         var _a, _b, _c, _d, _e, _f, _g;
-        const { id, price, serviceType, status, movingDate, departureAddress, destination, isConfirmed, worker, } = estimate;
+        const { id, price, serviceType, status, movingDate, departure, destination, isConfirmed, worker, } = estimate;
         return {
             id,
             price: price ? price : null,
             serviceType: serviceType,
             status,
             movingDate,
-            departureAddress,
+            departure,
             destination,
             isConfirmed,
-            workerProfileImage: ((_a = worker.workProfile) === null || _a === void 0 ? void 0 : _a.profileImage)
+            profileImage: ((_a = worker.workProfile) === null || _a === void 0 ? void 0 : _a.profileImage)
                 ? `${app_1.BASE_URL}/static/${worker.workProfile.profileImage
                     .split("/")
                     .pop()}`
                 : null,
-            workerSummary: (_b = worker.workProfile) === null || _b === void 0 ? void 0 : _b.summary,
-            workerNickname: (_c = worker.workProfile) === null || _c === void 0 ? void 0 : _c.nickname,
-            workerExperience: (_d = worker.workProfile) === null || _d === void 0 ? void 0 : _d.experience,
-            workerConfirmedEstimatesCount: worker.confirmedEstimateCount,
-            workerReviewsCount: (_e = worker._count) === null || _e === void 0 ? void 0 : _e.receivedReviews,
-            workerFavoritesCount: (_f = worker._count) === null || _f === void 0 ? void 0 : _f.workerFavorites,
-            workerRating: worker.avgStar,
+            summary: (_b = worker.workProfile) === null || _b === void 0 ? void 0 : _b.summary,
+            nickname: (_c = worker.workProfile) === null || _c === void 0 ? void 0 : _c.nickname,
+            experience: (_d = worker.workProfile) === null || _d === void 0 ? void 0 : _d.experience,
+            confirmedEstimatesCount: worker.confirmedEstimatesCount,
+            reviewsCount: (_e = worker._count) === null || _e === void 0 ? void 0 : _e.receivedReviews,
+            favoritesCount: (_f = worker._count) === null || _f === void 0 ? void 0 : _f.workerFavorites,
+            rating: worker.avgStar,
             isFavorite: !!((_g = worker.workerFavorites) === null || _g === void 0 ? void 0 : _g.length),
         };
     })));
@@ -194,7 +194,7 @@ const getEstimatesController = (0, error_middleware_1.asyncHandler)((req, res, n
 const getEstimateDetailByWorkerController = (0, error_middleware_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { estimateId } = req.params;
     const estimate = yield estimate_service_1.default.getEstimateByEstimatetId(estimateId);
-    const { id, price, serviceType, status, movingDate, departureAddress, destination, isConfirmed, customerId, createdAt, } = estimate;
+    const { id, price, serviceType, status, movingDate, departure, destination, isConfirmed, customerId, createdAt, } = estimate;
     const { name } = yield user_service_1.default.getUserMe(customerId);
     const data = {
         id,
@@ -202,7 +202,7 @@ const getEstimateDetailByWorkerController = (0, error_middleware_1.asyncHandler)
         serviceType: serviceType,
         status,
         movingDate,
-        departureAddress,
+        departure,
         destination,
         isConfirmed,
         customerId,
@@ -216,7 +216,7 @@ const getEstimateDetailByCustomerController = (0, error_middleware_1.asyncHandle
     const { estimateId } = req.params;
     const customerId = req.userId;
     const estimate = yield estimate_service_1.default.getEstimateByEstimatetId(estimateId);
-    const { id, price, serviceType, status, movingDate, departureAddress, destination, isConfirmed, workerId, createdAt, } = estimate;
+    const { id, price, serviceType, status, movingDate, departure, destination, isConfirmed, workerId, createdAt, } = estimate;
     const isFavorite = yield favorite_service_1.default.checkFavorite({
         customerId,
         workerId,
@@ -228,19 +228,19 @@ const getEstimateDetailByCustomerController = (0, error_middleware_1.asyncHandle
         serviceType: serviceType,
         status,
         movingDate,
-        departureAddress,
+        departure,
         destination,
         isConfirmed,
         workerId,
-        workerNickname: nickname,
-        workerProfileImage: profileImage
+        nickname: nickname,
+        profileImage: profileImage
             ? `${app_1.BASE_URL}/static/${profileImage.split("/").pop()}`
             : null,
-        workerExperience: experience,
-        workerConfirmedEstimatesCount: confirmedEstimatesCount,
-        workerFavoritesCount: favoritesCount,
-        workerRating: reviewsAverage,
-        workerReviewsCount: reviewsCount,
+        experience: experience,
+        confirmedEstimatesCount: confirmedEstimatesCount,
+        favoritesCount: favoritesCount,
+        rating: reviewsAverage,
+        reviewsCount: reviewsCount,
         isFavorite,
         requestDate: createdAt,
     };
@@ -254,13 +254,13 @@ const getSentEstimatesController = (0, error_middleware_1.asyncHandler)((req, re
         page,
         pageSize,
     });
-    const list = yield Promise.all(estimates.map((_a) => __awaiter(void 0, [_a], void 0, function* ({ id, customerId, serviceType, movingDate, departureAddress, destination, createdAt, updatedAt, status, customer, price, }) {
+    const list = yield Promise.all(estimates.map((_a) => __awaiter(void 0, [_a], void 0, function* ({ id, customerId, serviceType, movingDate, departure, destination, createdAt, updatedAt, status, customer, price, }) {
         return {
             id,
             customerId,
             serviceType,
             movingDate,
-            departureAddress,
+            departure,
             destination,
             createdAt,
             updatedAt,
@@ -279,13 +279,13 @@ const getRejectEstimatesController = (0, error_middleware_1.asyncHandler)((req, 
         page,
         pageSize,
     });
-    const list = yield Promise.all(estimates.map((_a) => __awaiter(void 0, [_a], void 0, function* ({ id, customerId, serviceType, movingDate, departureAddress, destination, createdAt, updatedAt, status, customer, }) {
+    const list = yield Promise.all(estimates.map((_a) => __awaiter(void 0, [_a], void 0, function* ({ id, customerId, serviceType, movingDate, departure, destination, createdAt, updatedAt, status, customer, }) {
         return {
             id,
             customerId,
             serviceType,
             movingDate,
-            departureAddress,
+            departure,
             destination,
             createdAt,
             updatedAt,
@@ -310,11 +310,11 @@ const getReviewableEstimatesController = (0, error_middleware_1.asyncHandler)((r
             workerId: estimate.workerId,
             serviceType: estimate.serviceType,
             movingDate: estimate.movingDate,
-            departure: estimate.departureAddress,
+            departure: estimate.departure,
             destination: estimate.destination,
             price: estimate.price,
             status: estimate.status,
-            workerNickname: (_b = (_a = estimate.worker) === null || _a === void 0 ? void 0 : _a.workProfile) === null || _b === void 0 ? void 0 : _b.nickname,
+            nickname: (_b = (_a = estimate.worker) === null || _a === void 0 ? void 0 : _a.workProfile) === null || _b === void 0 ? void 0 : _b.nickname,
         });
     });
     res.send({ list, totalCount }).status(200);

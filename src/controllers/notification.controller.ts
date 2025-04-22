@@ -16,6 +16,7 @@ const notificationController: RequestHandler = async (
   res.setHeader("Content-Type", "text/event-stream");
   res.setHeader("Cache-Control", "no-cache"); // 캐싱 방지
   res.setHeader("Connection", "keep-alive"); // 연결 유지
+res.setHeader('Access-Control-Allow-Origin', '*');
   res.flushHeaders(); // 헤더를 강제로 전송
 
   const latestNotifications = await notificationService.getNotification(userId);

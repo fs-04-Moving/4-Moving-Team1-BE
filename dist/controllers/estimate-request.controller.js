@@ -18,12 +18,12 @@ const profile_service_1 = __importDefault(require("../services/profile.service")
 const user_service_1 = __importDefault(require("../services/user.service"));
 // 견적 요청 생성하기
 const createEstimateRequestController = (0, error_middleware_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { serviceType, departureAddress, destination, movingDate, departureArea, } = req.body;
+    const { serviceType, departure, destination, movingDate, departureArea } = req.body;
     const customerId = req.userId;
     const estimateRequstDto = {
         customerId,
         serviceType,
-        departureAddress,
+        departure,
         destination,
         movingDate,
         departureArea,
@@ -49,14 +49,14 @@ const getEstimateRequestsController = (0, error_middleware_1.asyncHandler)((req,
         pageSize,
     });
     const estimateRequests = yield Promise.all(inactiveEstimateRequests.map((inactiveEstimateRequest) => __awaiter(void 0, void 0, void 0, function* () {
-        const { id, createdAt, serviceType, movingDate, departureAddress, destination, } = inactiveEstimateRequest;
+        const { id, createdAt, serviceType, movingDate, departure, destination, } = inactiveEstimateRequest;
         return {
             id,
             requestDate: createdAt,
             serviceType,
             movingDate,
             destination,
-            departureAddress,
+            departure,
         };
     })));
     res.status(200).send({ list: estimateRequests, totalCount });

@@ -24,7 +24,7 @@ if (!jwtSecretKey) {
 // 토큰 생성 함수
 const createToken = (data) => {
     try {
-        const payload = Object.assign({ sub: data.id, email: data.email, role: data.role, hasProfile: data.hasProfile, name: data.name }, (data.profileImage && {
+        const payload = Object.assign({ sub: data.id, email: data.email, role: data.role, hasProfile: data.hasProfile, hasRequest: data.hasRequest, name: data.name }, (data.profileImage && {
             profileImage: `${app_1.BASE_URL}/static/${data.profileImage
                 .split("/")
                 .pop()}`,
@@ -81,6 +81,7 @@ const logIn = (logInDto) => __awaiter(void 0, void 0, void 0, function* () {
                 name: user.name,
                 role: user.role,
                 hasProfile: user.hasProfile,
+                hasRequest: user.hasRequest,
                 profileImage: profileImage
                     ? `${app_1.BASE_URL}/static/${profileImage.split("/").pop()}`
                     : undefined, // 추가(조형민)
@@ -126,7 +127,7 @@ const signUp = (signUpDto) => __awaiter(void 0, void 0, void 0, function* () {
 });
 // 리프레쉬 토큰 함수
 const refreshToken = (refreshToken) => __awaiter(void 0, void 0, void 0, function* () {
-    const { sub, email, name, hasProfile, role, profileImage } = jsonwebtoken_1.default.verify(refreshToken, jwtSecretKey);
+    const { sub, email, name, hasProfile, role, profileImage, hasRequest } = jsonwebtoken_1.default.verify(refreshToken, jwtSecretKey);
     if (typeof sub !== "string") {
         throw new Error("400/sub is not string");
     }
@@ -135,6 +136,7 @@ const refreshToken = (refreshToken) => __awaiter(void 0, void 0, void 0, functio
         email,
         name,
         hasProfile,
+        hasRequest,
         role,
         profileImage: typeof profileImage === "string"
             ? `${app_1.BASE_URL}/static/${profileImage.split("/").pop()}`
@@ -164,6 +166,7 @@ const createTokenByUserData = (user) => {
         role: user.role,
         hasProfile: user.hasProfile,
         profileImage,
+        hasRequest: user.hasRequest,
     };
     const { accessToken, refreshToken } = (0, exports.createToken)(data);
     return { accessToken, refreshToken };

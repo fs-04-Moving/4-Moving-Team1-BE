@@ -22,9 +22,8 @@ const logInController = (0, error_middleware_1.asyncHandler)((req, res, next) =>
     req.userId = sub;
     res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
-        // secure: process.env.NODE_ENV === "production",
+        sameSite: 'strict',
         secure: false,
-        sameSite: "strict",
         path: "/",
         maxAge: 1000 * 60 * 60 * 24 * 7, // 7일
     });
@@ -49,7 +48,6 @@ const logOutController = (req, res) => {
     res.clearCookie("refreshToken", {
         httpOnly: true,
         // secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
         path: "/",
     });
     res.status(200).send({ message: "로그아웃 완료" });

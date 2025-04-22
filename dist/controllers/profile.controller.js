@@ -37,7 +37,7 @@ const createCustomerProfileController = (0, error_middleware_1.asyncHandler)((re
         httpOnly: true,
         // secure: process.env.NODE_ENV === "production",
         secure: false,
-        sameSite: "strict",
+        sameSite: "none",
         maxAge: 1000 * 60 * 60 * 24 * 7, // 7일
     });
     res.status(200).send({ accessToken });
@@ -68,7 +68,7 @@ const createWorkerProfileController = (0, error_middleware_1.asyncHandler)((req,
         httpOnly: true,
         // secure: process.env.NODE_ENV === "production",
         secure: false,
-        sameSite: "strict",
+        sameSite: "none",
         maxAge: 1000 * 60 * 60 * 24 * 7, // 7일
     });
     res.status(200).send({ accessToken });
