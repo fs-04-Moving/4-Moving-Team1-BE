@@ -24,8 +24,16 @@ const createEstimateRequestController: RequestHandler = asyncHandler(
     };
     // await 서비스 함수 호출
     await estimateRequstService.createEstimateRequest(estimateRequstDto);
-    await userService.updateUserRequestStatus(customerId);
-    res.sendStatus(201);
+    const { accessToken, refreshToken } =
+      await userService.updateUserRequestStatus(customerId);
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "strict",
+      maxAge: 1000 * 60 * 60 * 24 * 7, // 7일
+    });
+
+    res.status(200).send({ accessToken });
   }
 );
 

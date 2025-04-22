@@ -18,6 +18,11 @@ const logInController: RequestHandler = asyncHandler(async (req, res, next) => {
     path: "/",
     maxAge: 1000 * 60 * 60 * 24 * 7, // 7일
   });
+  // sameSite:none secure:ture
+  // 백엔드랑 프론트엔드 ip
+  // secure:ture -> https // http
+  // 백엔드 도메인입히고 SSL 인증서 받아서
+  //
 
   res.status(200).send({ accessToken });
 });
