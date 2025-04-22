@@ -90,7 +90,7 @@ const getFavoriteWorkers = async ({
 
     const workerIds = favoriteWorkers.map((fav) => fav.worker.id);
 
-    const [avgStars, confirmedEstimateCounts] = await Promise.all([
+    const [avgStars, confirmedEstimatesCounts] = await Promise.all([
       prisma.review.groupBy({
         by: ["workerId"],
         where: { workerId: { in: workerIds } },
@@ -112,8 +112,8 @@ const getFavoriteWorkers = async ({
       const avgStar =
         avgStars.find((review) => review.workerId === workerId)?._avg.star ||
         null;
-      const confirmedEstimateCount =
-        confirmedEstimateCounts.find(
+      const confirmedEstimatesCount =
+        confirmedEstimatesCounts.find(
           (estimate) => estimate.workerId === workerId
         )?._count._all || 0;
 
@@ -122,7 +122,7 @@ const getFavoriteWorkers = async ({
         worker: {
           ...fav.worker,
           avgStar,
-          confirmedEstimateCount,
+          confirmedEstimatesCount,
         },
       };
     });

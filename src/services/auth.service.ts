@@ -19,6 +19,7 @@ export const createToken = (data: PayloadData) => {
       email: data.email,
       role: data.role,
       hasProfile: data.hasProfile,
+      hasRequest: data.hasRequest,
       name: data.name, // 추가(조형민)
       ...(data.profileImage && {
         profileImage: `${BASE_URL}/static/${data.profileImage
@@ -83,6 +84,7 @@ const logIn = async (logInDto: LogInDto) => {
         name: user.name,
         role: user.role,
         hasProfile: user.hasProfile,
+        hasRequest: user.hasRequest,
         profileImage: profileImage
           ? `${BASE_URL}/static/${profileImage.split("/").pop()}`
           : undefined, // 추가(조형민)
@@ -133,10 +135,8 @@ const signUp = async (signUpDto: SignUpDto) => {
 
 // 리프레쉬 토큰 함수
 const refreshToken = async (refreshToken: string) => {
-  const { sub, email, name, hasProfile, role, profileImage } = jwt.verify(
-    refreshToken,
-    jwtSecretKey
-  ) as jwt.JwtPayload;
+  const { sub, email, name, hasProfile, role, profileImage, hasRequest } =
+    jwt.verify(refreshToken, jwtSecretKey) as jwt.JwtPayload;
   if (typeof sub !== "string") {
     throw new Error("400/sub is not string");
   }
@@ -145,6 +145,7 @@ const refreshToken = async (refreshToken: string) => {
     email,
     name,
     hasProfile,
+    hasRequest,
     role,
     profileImage:
       typeof profileImage === "string"
@@ -162,6 +163,7 @@ const createTokenByUserData = (user: {
   name: string;
   role: ROLE;
   hasProfile: boolean;
+  hasRequest: boolean;
   customerProfile?: { profileImage?: string | null } | null;
   workProfile?: { profileImage?: string | null } | null;
 }) => {
@@ -185,6 +187,7 @@ const createTokenByUserData = (user: {
     role: user.role,
     hasProfile: user.hasProfile,
     profileImage,
+    hasRequest: user.hasRequest,
   };
 
   const { accessToken, refreshToken } = createToken(data);

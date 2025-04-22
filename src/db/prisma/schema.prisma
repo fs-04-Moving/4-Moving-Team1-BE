@@ -79,7 +79,7 @@ model EstimateRequest {
   customerId       String
   serviceType      ServiceType
   movingDate       DateTime
-  departureAddress String //한글로 받아서 
+  departure String //한글로 받아서 
   departureArea    Area
   destination      String
   createdAt        DateTime              @default(now())
@@ -96,7 +96,7 @@ model Estimate {
   workerId          String
   serviceType       ServiceType
   movingDate        DateTime
-  departureAddress  String
+  departure  String
   destination       String
   departureArea     Area
   price             Int?

@@ -6,6 +6,7 @@ type PayloadData = {
   name: string;
   role: ROLE;
   hasProfile: boolean;
+  hasRequest: boolean;
   profileImage?: string; // 추가(조형민)
 };
 

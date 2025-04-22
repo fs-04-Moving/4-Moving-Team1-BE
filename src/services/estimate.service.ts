@@ -17,7 +17,7 @@ const createEstimate = async (estimateDto: EstimateDto) => {
     const {
       id,
       serviceType,
-      departureAddress,
+      departure,
       destination,
       movingDate,
       departureArea,
@@ -39,7 +39,7 @@ const createEstimate = async (estimateDto: EstimateDto) => {
         customerId,
         workerId,
         serviceType,
-        departureAddress,
+        departure,
         destination,
         movingDate,
         status,
@@ -147,7 +147,7 @@ const getPendingEstimates = async ({
 
     const workerIds = pendingEstimates.map((estimate) => estimate.workerId);
 
-    const [avgStars, confirmedEstimateCounts] = await Promise.all([
+    const [avgStars, confirmedEstimatesCounts] = await Promise.all([
       prisma.review.groupBy({
         by: ["workerId"],
         where: { workerId: { in: workerIds } },
@@ -169,8 +169,8 @@ const getPendingEstimates = async ({
       const avgStar =
         avgStars.find((review) => review.workerId === workerId)?._avg.star ||
         null;
-      const confirmedEstimateCount =
-        confirmedEstimateCounts.find(
+      const confirmedEstimatesCount =
+        confirmedEstimatesCounts.find(
           (estimate) => estimate.workerId === workerId
         )?._count._all || 0;
 
@@ -179,7 +179,7 @@ const getPendingEstimates = async ({
         worker: {
           ...estimate.worker,
           avgStar,
-          confirmedEstimateCount,
+          confirmedEstimatesCount,
         },
       };
     });
@@ -229,7 +229,7 @@ const getEstimatesByEstimateRequestId = async ({
 
     const workerIds = estimates.map((estimate) => estimate.workerId);
 
-    const [avgStars, confirmedEstimateCounts] = await Promise.all([
+    const [avgStars, confirmedEstimatesCounts] = await Promise.all([
       prisma.review.groupBy({
         by: ["workerId"],
         where: { workerId: { in: workerIds } },
@@ -251,8 +251,8 @@ const getEstimatesByEstimateRequestId = async ({
       const avgStar =
         avgStars.find((review) => review.workerId === workerId)?._avg.star ||
         null;
-      const confirmedEstimateCount =
-        confirmedEstimateCounts.find(
+      const confirmedEstimatesCount =
+        confirmedEstimatesCounts.find(
           (estimate) => estimate.workerId === workerId
         )?._count._all || 0;
 
@@ -261,7 +261,7 @@ const getEstimatesByEstimateRequestId = async ({
         worker: {
           ...estimate.worker,
           avgStar,
-          confirmedEstimateCount,
+          confirmedEstimatesCount,
         },
       };
     });
@@ -403,7 +403,7 @@ const getReviewableEstimates = async ({
           workerId: true,
           serviceType: true,
           movingDate: true,
-          departureAddress: true,
+          departure: true,
           destination: true,
           price: true,
           status: true,

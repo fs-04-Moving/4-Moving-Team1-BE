@@ -4,7 +4,7 @@ type EstimateRequstDto = {
   customerId: string;
   serviceType: ServiceType;
   movingDate: Date;
-  departureAddress: string;
+  departure: string;
   destination: string;
   departureArea: Area;
 };

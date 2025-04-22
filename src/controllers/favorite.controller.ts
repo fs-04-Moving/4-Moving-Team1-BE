@@ -48,7 +48,7 @@ const getFavoriteWorkersController: RequestHandler = asyncHandler(
           description: profile.description,
           services: profile.services,
           serviceAreas: profile.serviceAreas,
-          confirmedEstimateCount: fav.worker.confirmedEstimateCount,
+          confirmedEstimatesCount: fav.worker.confirmedEstimatesCount,
           reviewsCount: fav.worker._count.receivedReviews,
           favoritesCount: fav.worker._count.workerFavorites,
           reviewsAverage: fav.worker.avgStar,

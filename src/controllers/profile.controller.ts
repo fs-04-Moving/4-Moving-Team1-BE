@@ -30,7 +30,7 @@ const createCustomerProfileController: RequestHandler = asyncHandler(
       httpOnly: true,
       // secure: process.env.NODE_ENV === "production",
       secure: false,
-      sameSite: "strict",
+      sameSite: "none",
       maxAge: 1000 * 60 * 60 * 24 * 7, // 7일
     });
 
@@ -77,7 +77,7 @@ const createWorkerProfileController: RequestHandler = asyncHandler(
       httpOnly: true,
       // secure: process.env.NODE_ENV === "production",
       secure: false,
-      sameSite: "strict",
+      sameSite: "none",
       maxAge: 1000 * 60 * 60 * 24 * 7, // 7일
     });
 
