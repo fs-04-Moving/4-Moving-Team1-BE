@@ -143,14 +143,14 @@ const updateWorkerProfile = async (
 };
 
 // 기사 유저의 profile 가져오기
-// workerProfileImage: string;
-// workerSummary: string;
-// workerNickname: string;
-// workerFavoritesCount: number;
-// workerReviewsCount: number;
-// workerRating: number;
-// workerExperience: number;
-// workerConfirmedEstimatesCount: number;
+// profileImage: string;
+// summary: string;
+// nickname: string;
+// favoritesCount: number;
+// reviewsCount: number;
+// rating: number;
+// experience: number;
+// confirmedEstimatesCount: number;
 const getWorkerProfile = async (workerId: string) => {
   const now = new Date();
   try {
@@ -179,7 +179,7 @@ const getWorkerProfile = async (workerId: string) => {
       _avg: { star: true },
     });
 
-    const confirmedEstimateCount = await prisma.estimate.count({
+    const confirmedEstimatesCount = await prisma.estimate.count({
       where: {
         workerId,
         isConfirmed: true,
@@ -199,7 +199,7 @@ const getWorkerProfile = async (workerId: string) => {
       favoritesCount: worker._count.customerFavorites || 0,
       reviewsCount: worker._count.receivedReviews || 0,
       reviewsAverage: avgStar._avg.star ?? null,
-      confirmedEstimateCount: confirmedEstimateCount || 0,
+      confirmedEstimatesCount: confirmedEstimatesCount || 0,
       serviceType: worker.workProfile.services,
       serviceArea: worker.workProfile.serviceAreas,
     };
@@ -268,7 +268,7 @@ const getWorkerProfiles = async ({
         order = 'wp."experience" DESC';
         break;
       case "mostConfirmed":
-        order = '"confirmedEstimateCount" DESC';
+        order = '"confirmedEstimatesCount" DESC';
         break;
       default:
         order = '"reviewsCount" DESC';
@@ -319,7 +319,7 @@ END AS "profileImage",
         count(distinct CASE 
           WHEN e."isConfirmed" = true AND e."movingDate" < NOW() 
           THEN e.id 
-        END)::int as "confirmedEstimateCount",
+        END)::int as "confirmedEstimatesCount",
         ${favoriteField}
       FROM "User" u 
       LEFT JOIN "WorkerProfile" wp ON u.id = wp."workerId" 
@@ -355,7 +355,7 @@ END AS "profileImage",
   }
 };
 
-const getWorkerNickname = async (userId: string) => {
+const getnickname = async (userId: string) => {
   try {
     const worker = await prisma.workerProfile.findFirst({
       where: { workerId: userId },
@@ -377,7 +377,7 @@ const profileService = {
   getWorkerProfile,
   getWorkerServiceArea,
   getWorkerProfiles,
-  getWorkerNickname,
+  getnickname,
 };
 
 export default profileService;

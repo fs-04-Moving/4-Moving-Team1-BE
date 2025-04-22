@@ -46,7 +46,7 @@ const getMyReviewController: RequestHandler = asyncHandler(
       movingDate: review.estimate?.movingDate,
       price: review.estimate?.price,
       status: review.estimate?.status,
-      workerNickname: review.estimate?.worker?.workProfile?.nickname,
+      nickname: review.estimate?.worker?.workProfile?.nickname,
     }));
 
     res.status(200).send({ list, totalCount });

@@ -14,7 +14,7 @@ const logInController: RequestHandler = asyncHandler(async (req, res, next) => {
     httpOnly: true,
     // secure: process.env.NODE_ENV === "production",
     secure: false,
-    sameSite: "strict",
+    sameSite: "none",
     path: "/",
     maxAge: 1000 * 60 * 60 * 24 * 7, // 7일
   });
@@ -49,7 +49,7 @@ const logOutController: RequestHandler = (req, res) => {
   res.clearCookie("refreshToken", {
     httpOnly: true,
     // secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    sameSite: "none",
     path: "/",
   });
 

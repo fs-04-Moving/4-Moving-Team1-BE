@@ -52,7 +52,7 @@ const confirmEstimateController: RequestHandler = asyncHandler(
     await estimateRequstService.confirmEstimateRequest(customerId);
 
     const customer = await userService.getUserMe(customerId);
-    const worker = await profileService.getWorkerNickname(estimate.workerId);
+    const worker = await profileService.getnickname(estimate.workerId);
 
     await notificationService.sendNotification({
       message: `${worker.nickname} 기사님의 견적이 확정되었어요`,
@@ -83,7 +83,7 @@ const createGeneralEstimateController: RequestHandler = asyncHandler(
       status: "general",
       price,
     };
-    const worker = await profileService.getWorkerNickname(workerId);
+    const worker = await profileService.getnickname(workerId);
     const estimate = await estimateService.createEstimate(estimateDto);
     const esitmateMessage =
       estimate.serviceType === "homeMove"
@@ -142,7 +142,7 @@ const getPendingEstimatesController: RequestHandler = asyncHandler(
           serviceType,
           status,
           movingDate,
-          departureAddress,
+          departure,
           destination,
           isConfirmed,
           worker,
@@ -153,21 +153,21 @@ const getPendingEstimatesController: RequestHandler = asyncHandler(
           serviceType: serviceType,
           status,
           movingDate,
-          departureAddress,
+          departure,
           destination,
           isConfirmed,
-          workerProfileImage: worker.workProfile?.profileImage
+          profileImage: worker.workProfile?.profileImage
             ? `${BASE_URL}/static/${worker.workProfile.profileImage
                 .split("/")
                 .pop()}`
             : null,
-          workerSummary: worker.workProfile?.summary,
-          workerNickname: worker.workProfile?.nickname,
-          workerExperience: worker.workProfile?.experience,
-          workerConfirmedEstimateCount: worker.confirmedEstimateCount,
-          workerReviewsCount: worker._count?.receivedReviews,
-          workerFavoritesCount: worker._count?.workerFavorites,
-          workerRating: worker.avgStar,
+          summary: worker.workProfile?.summary,
+          nickname: worker.workProfile?.nickname,
+          experience: worker.workProfile?.experience,
+          confirmedEstimatesCount: worker.confirmedEstimatesCount,
+          reviewsCount: worker._count?.receivedReviews,
+          favoritesCount: worker._count?.workerFavorites,
+          rating: worker.avgStar,
           isFavorite: !!worker.workerFavorites?.length,
         };
       })
@@ -197,7 +197,7 @@ const getEstimatesController: RequestHandler = asyncHandler(
           serviceType,
           status,
           movingDate,
-          departureAddress,
+          departure,
           destination,
           isConfirmed,
           worker,
@@ -209,21 +209,21 @@ const getEstimatesController: RequestHandler = asyncHandler(
           serviceType: serviceType,
           status,
           movingDate,
-          departureAddress,
+          departure,
           destination,
           isConfirmed,
-          workerProfileImage: worker.workProfile?.profileImage
+          profileImage: worker.workProfile?.profileImage
             ? `${BASE_URL}/static/${worker.workProfile.profileImage
                 .split("/")
                 .pop()}`
             : null,
-          workerSummary: worker.workProfile?.summary,
-          workerNickname: worker.workProfile?.nickname,
-          workerExperience: worker.workProfile?.experience,
-          workerConfirmedEstimateCount: worker.confirmedEstimateCount,
-          workerReviewsCount: worker._count?.receivedReviews,
-          workerFavoritesCount: worker._count?.workerFavorites,
-          workerRating: worker.avgStar,
+          summary: worker.workProfile?.summary,
+          nickname: worker.workProfile?.nickname,
+          experience: worker.workProfile?.experience,
+          confirmedEstimatesCount: worker.confirmedEstimatesCount,
+          reviewsCount: worker._count?.receivedReviews,
+          favoritesCount: worker._count?.workerFavorites,
+          rating: worker.avgStar,
           isFavorite: !!worker.workerFavorites?.length,
         };
       })
@@ -244,7 +244,7 @@ const getEstimateDetailByWorkerController: RequestHandler = asyncHandler(
       serviceType,
       status,
       movingDate,
-      departureAddress,
+      departure,
       destination,
       isConfirmed,
       customerId,
@@ -258,7 +258,7 @@ const getEstimateDetailByWorkerController: RequestHandler = asyncHandler(
       serviceType: serviceType,
       status,
       movingDate,
-      departureAddress,
+      departure,
       destination,
       isConfirmed,
       customerId,
@@ -282,7 +282,7 @@ const getEstimateDetailByCustomerController: RequestHandler = asyncHandler(
       serviceType,
       status,
       movingDate,
-      departureAddress,
+      departure,
       destination,
       isConfirmed,
       workerId,
@@ -298,7 +298,7 @@ const getEstimateDetailByCustomerController: RequestHandler = asyncHandler(
       nickname,
       profileImage,
       experience,
-      confirmedEstimateCount,
+      confirmedEstimatesCount,
       favoritesCount,
       reviewsAverage,
       reviewsCount,
@@ -309,19 +309,19 @@ const getEstimateDetailByCustomerController: RequestHandler = asyncHandler(
       serviceType: serviceType,
       status,
       movingDate,
-      departureAddress,
+      departure,
       destination,
       isConfirmed,
       workerId,
-      workerNickname: nickname,
-      workerProfileImage: profileImage
+      nickname: nickname,
+      profileImage: profileImage
         ? `${BASE_URL}/static/${profileImage.split("/").pop()}`
         : null,
-      workerExperience: experience,
-      workerConfirmedEstimateCount: confirmedEstimateCount,
-      workerFavoritesCount: favoritesCount,
-      workerRating: reviewsAverage,
-      workerReviewsCount: reviewsCount,
+      experience: experience,
+      confirmedEstimatesCount: confirmedEstimatesCount,
+      favoritesCount: favoritesCount,
+      rating: reviewsAverage,
+      reviewsCount: reviewsCount,
       isFavorite,
       requestDate: createdAt,
     };
@@ -346,7 +346,7 @@ const getSentEstimatesController: RequestHandler = asyncHandler(
           customerId,
           serviceType,
           movingDate,
-          departureAddress,
+          departure,
           destination,
           createdAt,
           updatedAt,
@@ -359,7 +359,7 @@ const getSentEstimatesController: RequestHandler = asyncHandler(
             customerId,
             serviceType,
             movingDate,
-            departureAddress,
+            departure,
             destination,
             createdAt,
             updatedAt,
@@ -392,7 +392,7 @@ const getRejectEstimatesController: RequestHandler = asyncHandler(
           customerId,
           serviceType,
           movingDate,
-          departureAddress,
+          departure,
           destination,
           createdAt,
           updatedAt,
@@ -404,7 +404,7 @@ const getRejectEstimatesController: RequestHandler = asyncHandler(
             customerId,
             serviceType,
             movingDate,
-            departureAddress,
+            departure,
             destination,
             createdAt,
             updatedAt,
@@ -435,11 +435,11 @@ const getReviewableEstimatesController: RequestHandler = asyncHandler(
       workerId: estimate.workerId,
       serviceType: estimate.serviceType,
       movingDate: estimate.movingDate,
-      departure: estimate.departureAddress,
+      departure: estimate.departure,
       destination: estimate.destination,
       price: estimate.price,
       status: estimate.status,
-      workerNickname: estimate.worker?.workProfile?.nickname,
+      nickname: estimate.worker?.workProfile?.nickname,
     }));
 
     res.send({ list, totalCount }).status(200);

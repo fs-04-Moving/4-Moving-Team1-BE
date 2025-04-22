@@ -6,7 +6,7 @@ import { EstimateRequestOrderBy } from "../types/estimate-request.type";
 export const estimateRequestSchema = z.object({
   serviceType: z.nativeEnum(ServiceType),
   movingDate: z.coerce.date(),
-  departureAddress: z.string().min(1, "Departure is required"),
+  departure: z.string().min(1, "Departure is required"),
   destination: z.string().min(1, "Destination is required"),
   departureArea: z.nativeEnum(Area),
 });
@@ -24,17 +24,12 @@ export type EstimateRequestQuery = z.infer<typeof estimateRequestQuerySchema>;
 
 const validateEstimateRequset: RequestHandler = (req, res, next) => {
   try {
-    const {
-      serviceType,
-      movingDate,
-      departureAddress,
-      destination,
-      departureArea,
-    } = req.body;
+    const { serviceType, movingDate, departure, destination, departureArea } =
+      req.body;
     const parsedContext = estimateRequestSchema.safeParse({
       serviceType,
       movingDate,
-      departureAddress,
+      departure,
       destination,
       departureArea,
     });
