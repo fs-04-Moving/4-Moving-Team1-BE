@@ -25,5 +25,7 @@ app.use(router);
 app.use(errorHandler);
 
 app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+  console.log(
+    `Server running at http://54.180.2.174 prisma: http://54.180.2.174:5555`
+  );
 });
