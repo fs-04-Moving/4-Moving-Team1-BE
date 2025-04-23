@@ -65,13 +65,13 @@ profileRouter.get(
 );
 
 profileRouter.get(
-  "/worker/me",
+  "/me/worker",
   authenticatedOnly,
   profile.getWorkerProfileMeController
 );
 
 profileRouter.get(
-  "/customer/me",
+  "/me/customer",
   authenticatedOnly,
   profile.getCustomerProfileMeController
 );

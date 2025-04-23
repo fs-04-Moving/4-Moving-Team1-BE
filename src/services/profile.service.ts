@@ -391,7 +391,7 @@ const getCustomerProfileMe = async (customerId: string) => {
         customerId,
       },
     });
-    if (!customerProfile) throw new Error("400/worker profile not found");
+    if (!customerProfile) throw new Error("400/customer profile not found");
 
     return customerProfile;
   } catch (e) {
