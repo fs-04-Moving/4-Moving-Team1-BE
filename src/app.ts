@@ -26,6 +26,6 @@ app.use(errorHandler);
 
 app.listen(port, () => {
   console.log(
-    `Server running at http://54.180.2.174 prisma: http://54.180.2.174:5555`
+    `ci/cd 업데이트 완료! Server running at http://54.180.2.174 prisma: http://54.180.2.174:5555`
   );
 });
