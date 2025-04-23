@@ -18,7 +18,7 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          port: ${{ secrets.EC2_PORT }}
+          # port: ${{ secrets.EC2_PORT }}
           script: |
             cd ~/4-Moving-Team1-BE 
             git pull origin develop
