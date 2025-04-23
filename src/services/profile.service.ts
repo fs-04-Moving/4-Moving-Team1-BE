@@ -368,6 +368,37 @@ const getnickname = async (userId: string) => {
   }
 };
 
+const getWorkerProfileMe = async (workerId: string) => {
+  try {
+    const workerProfile = await prisma.workerProfile.findFirst({
+      where: {
+        workerId,
+      },
+    });
+
+    if (!workerProfile) throw new Error("400/worker profile not found");
+
+    return workerProfile;
+  } catch (e) {
+    throw e;
+  }
+};
+
+const getCustomerProfileMe = async (customerId: string) => {
+  try {
+    const customerProfile = await prisma.customerProfile.findFirst({
+      where: {
+        customerId,
+      },
+    });
+    if (!customerProfile) throw new Error("400/worker profile not found");
+
+    return customerProfile;
+  } catch (e) {
+    throw e;
+  }
+};
+
 const profileService = {
   createCustomerProfile,
   createWorkerProfile,
@@ -378,6 +409,8 @@ const profileService = {
   getWorkerServiceArea,
   getWorkerProfiles,
   getnickname,
+  getWorkerProfileMe,
+  getCustomerProfileMe,
 };
 
 export default profileService;

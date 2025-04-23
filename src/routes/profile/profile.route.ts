@@ -64,4 +64,16 @@ profileRouter.get(
   profile.getWorkerProfilesController
 );
 
+profileRouter.get(
+  "/worker/me",
+  authenticatedOnly,
+  profile.getWorkerProfileMeController
+);
+
+profileRouter.get(
+  "/customer/me",
+  authenticatedOnly,
+  profile.getCustomerProfileMeController
+);
+
 export default profileRouter;
