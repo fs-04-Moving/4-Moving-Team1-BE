@@ -177,6 +177,23 @@ const getWorkerProfilesController: RequestHandler = asyncHandler(
   }
 );
 
+const getWorkerProfileMeController: RequestHandler = asyncHandler(
+  async (req, res, next) => {
+    const workerId = req.userId as string;
+
+    const result = await profileService.getWorkerProfileMe(workerId);
+    res.status(200).send(result);
+  }
+);
+
+const getCustomerProfileMeController: RequestHandler = asyncHandler(
+  async (req, res, next) => {
+    const customerId = req.userId as string;
+    const result = await profileService.getCustomerProfileMe(customerId);
+    res.status(200).send(result);
+  }
+);
+
 const profile = {
   createWorkerProfileController,
   createCustomerProfileController,
@@ -184,6 +201,8 @@ const profile = {
   updateWorkerProfileController,
   getWorkerProfileController,
   getWorkerProfilesController,
+  getWorkerProfileMeController,
+  getCustomerProfileMeController,
 };
 
 export default profile;
