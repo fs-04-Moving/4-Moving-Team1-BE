@@ -46,14 +46,14 @@ const updateUserInfoSchema = z
     email: emailSchema,
     name: nameSchema,
     password: passwordSchema,
-    passwordConfirm: passwordSchema,
+    newPasswordConfirm: passwordSchema,
     phoneNumber: phoneNumberSchema,
     newPassword: z
       .string()
       .min(8, { message: "새 비밀번호는 8자 이상이어야 합니다" })
       .regex(passwordRegex, "영문/숫자/특수문자를 모두 포함해야 합니다"),
   })
-  .refine((data) => data.passwordConfirm === data.password, {
+  .refine((data) => data.newPasswordConfirm === data.newPassword, {
     message: "password don't match ",
   })
   .refine((data) => data.newPassword !== data.password, {
@@ -106,14 +106,20 @@ const validateSignIn: RequestHandler = (req, res, next) => {
 
 const validateUpdateUserInfo: RequestHandler = (req, res, next) => {
   try {
-    const { email, name, password, passwordConfirm, phoneNumber, newPassword } =
-      req.body;
+    const {
+      email,
+      name,
+      password,
+      newPasswordConfirm,
+      phoneNumber,
+      newPassword,
+    } = req.body;
 
     const parsedContext = updateUserInfoSchema.safeParse({
       email,
       name,
       password,
-      passwordConfirm,
+      newPasswordConfirm,
       phoneNumber,
       newPassword,
     });
