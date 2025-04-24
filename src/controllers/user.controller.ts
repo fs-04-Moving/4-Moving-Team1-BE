@@ -34,5 +34,17 @@ const updateUserMeController: RequestHandler = asyncHandler(
   }
 );
 
-const user = { getUserMeController, updateUserMeController };
+const getUserInfoController: RequestHandler = asyncHandler(
+  async (req, res, next) => {
+    const userId = req.userId as string;
+    const userInfo = await userService.getUserInfo(userId);
+    res.status(200).send(userInfo);
+  }
+);
+
+const user = {
+  getUserMeController,
+  updateUserMeController,
+  getUserInfoController,
+};
 export default user;
