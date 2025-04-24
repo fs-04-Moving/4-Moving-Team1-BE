@@ -9,7 +9,7 @@ const notificationController: RequestHandler = async (
 ) => {
   const userId = req.userId as string;
   if (!userId) {
-    res.status(400).end();
+    res.status(400).send();
   }
 
   // SSE에서 필요한 타입 설정

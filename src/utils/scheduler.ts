@@ -50,8 +50,8 @@ async function scheduler() {
   const todayEstimates = await prisma.estimateRequest.findMany({
     where: {
       movingDate: {
-        gte: today.add(1, "day").toDate(), // 내일 0시 이상
-        lt: today.add(2, "day").toDate(), // 모레 0시 미만
+        gte: today.add(1, "day").toDate(), // 내일
+        lt: today.add(2, "day").toDate(), // 모레
       },
       status: "confirmed",
     },

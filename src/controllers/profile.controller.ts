@@ -4,6 +4,7 @@ import { CustomerProfileDto, WorkerProfileDto } from "../types/profile.type";
 import profileService from "../services/profile.service";
 import { GetWorkerProfilesQuery } from "../validations/profile.validation";
 import favoriteService from "../services/favorite.service";
+import { BASE_URL } from "../app";
 
 // 일반 유저 프로필 생성
 const createCustomerProfileController: RequestHandler = asyncHandler(
@@ -182,7 +183,15 @@ const getWorkerProfileMeController: RequestHandler = asyncHandler(
     const workerId = req.userId as string;
 
     const result = await profileService.getWorkerProfileMe(workerId);
-    res.status(200).send(result);
+
+    const formattedResult = {
+      ...result,
+      profileImage: result.profileImage
+        ? `${BASE_URL}/static/${result.profileImage.split("/").pop()}`
+        : null,
+    };
+
+    res.status(200).send(formattedResult);
   }
 );
 
@@ -190,7 +199,14 @@ const getCustomerProfileMeController: RequestHandler = asyncHandler(
   async (req, res, next) => {
     const customerId = req.userId as string;
     const result = await profileService.getCustomerProfileMe(customerId);
-    res.status(200).send(result);
+    const formattedResult = {
+      ...result,
+      profileImage: result.profileImage
+        ? `${BASE_URL}/static/${result.profileImage.split("/").pop()}`
+        : null,
+    };
+
+    res.status(200).send(formattedResult);
   }
 );
 
