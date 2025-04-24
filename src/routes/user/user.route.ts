@@ -13,4 +13,6 @@ userRouter.get("/me", user.getUserMeController);
 // 내 정보 수정하기 , 이메일,이름,전화번호,비밀번호 수정
 userRouter.put("/", validateUpdateUserInfo, user.updateUserMeController);
 
+userRouter.get("/info", user.getUserInfoController);
+
 export default userRouter;

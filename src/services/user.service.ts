@@ -1,4 +1,5 @@
 import { BASE_URL } from "../app";
+import user from "../controllers/user.controller";
 import prisma from "../db/prisma/client";
 import { UpdateUserDto } from "../types/auth.type";
 import authService, { checkPassword } from "./auth.service";
@@ -108,11 +109,26 @@ const findUser = async (userId: string) => {
   }
 };
 
+const getUserInfo = async (userId: string) => {
+  try {
+    const user = await prisma.user.findFirst({
+      where: { id: userId },
+      select: { name: true, phoneNumber: true, email: true },
+    });
+    if (!user) throw new Error("400/user not found");
+
+    return user;
+  } catch (e) {
+    throw e;
+  }
+};
+
 const userService = {
   getUserMe,
   getProfileImage,
   updateUserInfo,
   updateUserRequestStatus,
   findUser,
+  getUserInfo,
 };
 export default userService;
