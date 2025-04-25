@@ -46,17 +46,22 @@ const updateUserInfoSchema = z
     email: emailSchema,
     name: nameSchema,
     password: passwordSchema,
-    newPasswordConfirm: passwordSchema,
+    newPasswordConfirm: passwordSchema.optional(),
     phoneNumber: phoneNumberSchema,
     newPassword: z
       .string()
       .min(8, { message: "새 비밀번호는 8자 이상이어야 합니다" })
-      .regex(passwordRegex, "영문/숫자/특수문자를 모두 포함해야 합니다"),
+      .regex(passwordRegex, "영문/숫자/특수문자를 모두 포함해야 합니다")
+      .optional(),
   })
-  .refine((data) => data.newPasswordConfirm === data.newPassword, {
-    message: "password don't match ",
-  })
-  .refine((data) => data.newPassword !== data.password, {
+  .refine(
+    (data) =>
+      data.newPasswordConfirm === data.newPassword,
+    {
+      message: "password don't match ",
+    }
+  )
+  .refine((data) => !data.newPassword || data.newPassword !== data.password, {
     message: "새로운 비밀번호가 현재 비밀번호와 달라야합니다.",
   });
 
