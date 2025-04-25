@@ -59,24 +59,27 @@ const getProfileImage = async (userId: string) => {
 const updateUserInfo = async (updateUserDto: UpdateUserDto) => {
   try {
     const { userId, password, newPassword, ...rest } = updateUserDto;
-    let user = await prisma.user.findFirst({ where: { id: userId } });
+    const user = await prisma.user.findFirst({ where: { id: userId } });
     if (!user) {
       throw new Error("400/user not found");
     }
     // 비밀번호 확인하기
     await checkPassword(password, user.encryptedPassword);
     // 비밀번호 생성
-    const encryptedPassword = await bcrypt.hash(newPassword, 12);
-    user = await prisma.user.update({
-      where: { id: userId },
-      data: { ...rest, encryptedPassword },
-      include: {
-        workProfile: { select: { profileImage: true } },
-        customerProfile: { select: { profileImage: true } },
-      },
-    });
 
-    return authService.createTokenByUserData(user);
+    if (newPassword) {
+      const encryptedPassword = await bcrypt.hash(newPassword, 12);
+      await prisma.user.update({
+        where: { id: userId },
+        data: { ...rest, encryptedPassword },
+        include: {
+          workProfile: { select: { profileImage: true } },
+          customerProfile: { select: { profileImage: true } },
+        },
+      });
+    }
+
+    return;
   } catch (e) {
     throw e;
   }

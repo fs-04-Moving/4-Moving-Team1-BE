@@ -44,7 +44,7 @@ profileRouter.put(
   profile.updateCustomerProfileController
 );
 
-// 기사사 유저가 프로필 수정
+// 기사 유저가 프로필 수정
 profileRouter.put(
   "/worker",
   authenticatedOnly,
