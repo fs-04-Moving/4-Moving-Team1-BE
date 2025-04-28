@@ -20,8 +20,15 @@ const authMiddleware: RequestHandler = (req, res, next) => {
       throw new Error("401/JWT_SECRET is not defined in environment variables");
     }
 
+    // 쿠키로 오는경우
+    if (cookieToken) {
+      const payload = jwt.verify(cookieToken, jwtSecretKey) as { sub: string };
+      console.log("쿠키로 토큰이 왔습니다!");
+      req.userId = payload.sub;
+    }
+
     //헤더로 오는경우
-    if (headerToken) {
+    else if (headerToken) {
       const accessToken = headerToken.split("Bearer ")[1];
       const { sub } = jwt.verify(accessToken, jwtSecretKey);
 
@@ -30,12 +37,6 @@ const authMiddleware: RequestHandler = (req, res, next) => {
       }
       console.log("헤더로 토큰이 왔습니다!");
       req.userId = sub;
-    }
-    // 쿠키로 오는경우
-    if (cookieToken) {
-      const payload = jwt.verify(cookieToken, jwtSecretKey) as { sub: string };
-      console.log("쿠키로 토큰이 왔습니다!");
-      req.userId = payload.sub;
     }
 
     next();
