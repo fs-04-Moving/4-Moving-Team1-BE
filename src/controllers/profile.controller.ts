@@ -29,10 +29,16 @@ const createCustomerProfileController: RequestHandler = asyncHandler(
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      // secure: process.env.NODE_ENV === "production",
       secure: false,
       sameSite: "strict",
       maxAge: 1000 * 60 * 60 * 24 * 7, // 7일
+    });
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "strict",
+      path: "/",
+      maxAge: 1000 * 60 * 60, // 1시간
     });
 
     res.status(200).send({ accessToken });
@@ -76,10 +82,17 @@ const createWorkerProfileController: RequestHandler = asyncHandler(
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      // secure: process.env.NODE_ENV === "production",
       secure: false,
       sameSite: "strict",
       maxAge: 1000 * 60 * 60 * 24 * 7, // 7일
+    });
+
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "strict",
+      path: "/",
+      maxAge: 1000 * 60 * 60, // 1시간
     });
 
     res.status(200).send({ accessToken });

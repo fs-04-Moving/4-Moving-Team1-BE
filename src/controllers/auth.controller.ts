@@ -18,6 +18,15 @@ const logInController: RequestHandler = asyncHandler(async (req, res, next) => {
     path: "/",
     maxAge: 1000 * 60 * 60 * 24 * 7, // 7일
   });
+
+  res.cookie("accessToken", accessToken, {
+    httpOnly: true,
+    // secure: process.env.NODE_ENV === "production",
+    secure: false,
+    sameSite: "strict",
+    path: "/",
+    maxAge: 1000 * 60 * 60, // 1시간
+  });
   // sameSite:none secure:ture
   // 백엔드랑 프론트엔드 ip
   // secure:ture -> https // http
@@ -44,7 +53,7 @@ const refreshTokenController: RequestHandler = asyncHandler(
     const refreshToken = req.cookies.refreshToken;
     if (!refreshToken) throw new Error("401/No refresh token");
 
-    const accessToken = await authService.refreshToken(refreshToken);
+    const { accessToken } = await authService.refreshToken(refreshToken);
 
     res.status(200).send({ accessToken });
   }
