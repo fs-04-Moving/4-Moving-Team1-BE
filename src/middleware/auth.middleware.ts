@@ -13,22 +13,15 @@ const authMiddleware: RequestHandler = (req, res, next) => {
     if (req.url === "/auth/sign-up" || req.url === "/auth/log-in")
       return next();
 
-    const headerToken = req.headers.authorization;
-    const cookieToken = req.cookies.refreshToken;
-
     if (!jwtSecretKey) {
       throw new Error("401/JWT_SECRET is not defined in environment variables");
     }
 
-    // 쿠키로 오는경우
-    if (cookieToken) {
-      const payload = jwt.verify(cookieToken, jwtSecretKey) as { sub: string };
-      console.log("쿠키로 토큰이 왔습니다!");
-      req.userId = payload.sub;
-    }
+    const headerToken = req.headers.authorization;
+    const cookieToken = req.cookies.accessToken;
 
     //헤더로 오는경우
-    else if (headerToken) {
+    if (headerToken) {
       const accessToken = headerToken.split("Bearer ")[1];
       const { sub } = jwt.verify(accessToken, jwtSecretKey);
 
@@ -37,6 +30,12 @@ const authMiddleware: RequestHandler = (req, res, next) => {
       }
       console.log("헤더로 토큰이 왔습니다!");
       req.userId = sub;
+    }
+    // 쿠키로 오는경우
+    else if (cookieToken) {
+      const payload = jwt.verify(cookieToken, jwtSecretKey) as { sub: string };
+      console.log("쿠키로 토큰이 왔습니다!");
+      req.userId = payload.sub;
     }
 
     next();
