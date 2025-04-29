@@ -106,7 +106,7 @@ const getRecivedEstimateReuests = async ({
     where,
     include: {
       estimates: {
-        where: { workerId, status: "assigned" },
+        where: { workerId, NOT: { status: "rejected" } },
         take: 1,
       },
       user: true,
@@ -128,8 +128,9 @@ const getRecivedEstimateReuests = async ({
       createdAt: r.createdAt,
       updatedAt: r.updatedAt,
       customerName: r.user.name,
-      status: r.estimates.length !== 0 ? "assigned" : null,
+      status: r.estimates[0] ? r.estimates[0].status : null,
       estimateId: r.estimates[0]?.id ?? null,
+      price: r.estimates[0] ? r.estimates[0].price : null,
     };
   });
 
