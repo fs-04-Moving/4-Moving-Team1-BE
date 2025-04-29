@@ -79,6 +79,7 @@ const getRecivedEstimateReuests = async ({
 }) => {
   const where: Prisma.EstimateRequestWhereInput = {
     status: "active",
+    movingDate: { gt: new Date() },
     ...(serviceType?.length && { serviceType: { in: serviceType } }),
     ...(serviceArea?.length && { departureArea: { in: serviceArea } }),
     ...(search && {
