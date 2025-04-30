@@ -1,14 +1,14 @@
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
-import { BASE_URL } from "../app";
-import prisma from "../db/prisma/client";
-import { LogInDto, PayloadData, SignUpDto } from "../types/auth.type";
-import { ROLE } from "@prisma/client";
+import { ROLE, User } from '@prisma/client';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import { BASE_URL } from '../app';
+import prisma from '../db/prisma/client';
+import { LogInDto, PayloadData, SignUpDto } from '../types/auth.type';
 
 const jwtSecretKey = process.env.JWT_SECRET_KEY;
 
 if (!jwtSecretKey) {
-  throw new Error("jwtSerectKey is not exist");
+  throw new Error('jwtSerectKey is not exist');
 }
 
 // 토큰 생성 함수
@@ -23,17 +23,17 @@ export const createToken = (data: PayloadData) => {
       name: data.name, // 추가(조형민)
       ...(data.profileImage && {
         profileImage: `${BASE_URL}/static/${data.profileImage
-          .split("/")
+          .split('/')
           .pop()}`,
       }), // 추가(조형민)
     };
 
     const accessToken = jwt.sign(payload, jwtSecretKey, {
-      expiresIn: "2h",
+      expiresIn: '2h',
     });
 
     const refreshToken = jwt.sign(payload, jwtSecretKey, {
-      expiresIn: "5d",
+      expiresIn: '5d',
     });
 
     return { accessToken, refreshToken };
@@ -53,7 +53,7 @@ export const checkPassword = async (
   try {
     const checkPassword = await bcrypt.compare(password, encryptedPassword);
     if (!checkPassword) {
-      throw new Error("400/Incorrect password");
+      throw new Error('400/Incorrect password');
     }
   } catch (e) {
     throw e;
@@ -72,7 +72,7 @@ const logIn = async (logInDto: LogInDto) => {
           workProfile: true,
         },
       });
-      if (!user) throw new Error("400/유저가 존재하지 않습니다.");
+      if (!user) throw new Error('400/유저가 존재하지 않습니다.');
       const profileImage =
         user.customerProfile?.profileImage ?? user.workProfile?.profileImage;
 
@@ -86,15 +86,15 @@ const logIn = async (logInDto: LogInDto) => {
         hasProfile: user.hasProfile,
         hasRequest: user.hasRequest,
         profileImage: profileImage
-          ? `${BASE_URL}/static/${profileImage.split("/").pop()}`
+          ? `${BASE_URL}/static/${profileImage.split('/').pop()}`
           : undefined, // 추가(조형민)
       };
 
       const { accessToken, refreshToken } = createToken(data);
       const { sub } = jwt.verify(accessToken, jwtSecretKey);
 
-      if (typeof sub !== "string") {
-        throw new Error("400/sub is not string");
+      if (typeof sub !== 'string') {
+        throw new Error('400/sub is not string');
       }
 
       return {
@@ -119,7 +119,7 @@ const signUp = async (signUpDto: SignUpDto) => {
       const isExistingEmail = await prisma.user.findUnique({
         where: { email },
       });
-      if (isExistingEmail) throw new Error("400/이미 존재하는 이메일입니다.");
+      if (isExistingEmail) throw new Error('400/이미 존재하는 이메일입니다.');
       const newUser = await prisma.user.create({
         data: { email, name, encryptedPassword, phoneNumber, role },
       });
@@ -137,8 +137,8 @@ const signUp = async (signUpDto: SignUpDto) => {
 const refreshToken = async (refreshToken: string) => {
   const { sub, email, name, hasProfile, role, profileImage, hasRequest } =
     jwt.verify(refreshToken, jwtSecretKey) as jwt.JwtPayload;
-  if (typeof sub !== "string") {
-    throw new Error("400/sub is not string");
+  if (typeof sub !== 'string') {
+    throw new Error('400/sub is not string');
   }
   const data: PayloadData = {
     id: sub,
@@ -148,8 +148,8 @@ const refreshToken = async (refreshToken: string) => {
     hasRequest,
     role,
     profileImage:
-      typeof profileImage === "string"
-        ? `${BASE_URL}/static/${profileImage.split("/").pop()}`
+      typeof profileImage === 'string'
+        ? `${BASE_URL}/static/${profileImage.split('/').pop()}`
         : undefined,
   };
   const { accessToken } = createToken(data);
@@ -168,15 +168,15 @@ const createTokenByUserData = (user: {
   workProfile?: { profileImage?: string | null } | null;
 }) => {
   const profileImage =
-    user.role === "customer"
-      ? typeof user.customerProfile?.profileImage === "string"
+    user.role === 'customer'
+      ? typeof user.customerProfile?.profileImage === 'string'
         ? `${BASE_URL}/static/${user.customerProfile.profileImage
-            .split("/")
+            .split('/')
             .pop()}`
         : undefined
-      : user.role === "worker"
-      ? typeof user.workProfile?.profileImage === "string"
-        ? `${BASE_URL}/static/${user.workProfile.profileImage.split("/").pop()}`
+      : user.role === 'worker'
+      ? typeof user.workProfile?.profileImage === 'string'
+        ? `${BASE_URL}/static/${user.workProfile.profileImage.split('/').pop()}`
         : undefined
       : undefined;
 
@@ -194,6 +194,63 @@ const createTokenByUserData = (user: {
   return { accessToken, refreshToken };
 };
 
-const authService = { logIn, signUp, refreshToken, createTokenByUserData };
+// 소셜 사용자 처리
+const findOrCreateOAuthUser = async ({
+  email,
+  name,
+  profileImage,
+  provider,
+}: {
+  email: string;
+  name: string;
+  profileImage?: string;
+  provider: 'google' | 'kakao' | 'naver';
+}): Promise<User> => {
+  const existingUser = await prisma.user.findUnique({
+    where: { email },
+    include: {
+      customerProfile: true,
+      workProfile: true,
+    },
+  });
+
+  if (existingUser) {
+    return existingUser;
+  }
+
+  // encryptedPassword가 필수이므로 dummy를 만들어서 넣음
+  const dummyPassword = 'social_login_dummy_password';
+  const encryptedPassword = await bcrypt.hash(dummyPassword, 12);
+
+  const newUser = await prisma.user.create({
+    data: {
+      email,
+      name,
+      provider,
+      role: 'customer',
+      hasProfile: false,
+      hasRequest: false,
+      encryptedPassword,
+    },
+    include: {
+      customerProfile: true,
+      workProfile: true,
+    },
+  });
+
+  if (!newUser) {
+    throw new Error('유저 생성 실패');
+  }
+
+  return newUser;
+};
+
+const authService = {
+  logIn,
+  signUp,
+  refreshToken,
+  createTokenByUserData,
+  findOrCreateOAuthUser,
+};
 
 export default authService;
