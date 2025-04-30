@@ -67,6 +67,13 @@ const logOutController: RequestHandler = (req, res) => {
     path: "/",
   });
 
+  res.clearCookie("accessToken", {
+    httpOnly: true,
+    // secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    path: "/",
+  });
+
   res.status(200).send({ message: "로그아웃 완료" });
 };
 
