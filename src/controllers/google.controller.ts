@@ -31,16 +31,6 @@ const googleCallback: RequestHandler = async (req, res, next) => {
       role,
     });
 
-    if (!user) {
-      // 유저 생성 실패 시 프론트로 에러 메시지 전달
-      res.redirect(
-        `http://localhost:3000/auth/callback?error=${encodeURIComponent(
-          '유저 생성 또는 조회에 실패했습니다.'
-        )}`
-      );
-      return;
-    }
-
     const { accessToken, refreshToken } =
       authService.createTokenByUserData(user);
 
