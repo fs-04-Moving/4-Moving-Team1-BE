@@ -16,7 +16,7 @@ export const getGoogleAuthURL = (state?: string) => {
     scope: ['openid', 'email', 'profile'].join(' '),
     state, // role
   };
-  return `${rootUrl}?${qs.stringify(options)}`;
+  return `${rootUrl}?${qs.stringify(options)}`; // qs.stringify: 객체를 쿼리 문자열로(반대는 qs.parse)
 };
 
 export const exchangeCodeForToken = async (code: string) => {
