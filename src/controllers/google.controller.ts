@@ -32,7 +32,12 @@ const googleCallback: RequestHandler = async (req, res, next) => {
     });
 
     if (!user) {
-      res.status(500).send({ message: '유저 생성 또는 조회에 실패했습니다.' });
+      // 유저 생성 실패 시 프론트로 에러 메시지 전달
+      res.redirect(
+        `http://localhost:3000/auth/callback?error=${encodeURIComponent(
+          '유저 생성 또는 조회에 실패했습니다.'
+        )}`
+      );
       return;
     }
 
@@ -57,7 +62,15 @@ const googleCallback: RequestHandler = async (req, res, next) => {
 
     res.redirect('http://localhost:3000/auth/callback'); // 프론트로 이동
   } catch (e) {
-    next(e);
+    // 에러 발생 시 프론트로 메시지 전달
+    const errorMessage =
+      e instanceof Error ? e.message : '알 수 없는 오류가 발생했습니다.';
+    res.redirect(
+      `http://localhost:3000/auth/callback?error=${encodeURIComponent(
+        errorMessage
+      )}`
+    );
+    // next(e);
   }
 };
 

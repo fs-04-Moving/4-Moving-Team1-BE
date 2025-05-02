@@ -216,8 +216,18 @@ const findOrCreateOAuthUser = async ({
     },
   });
 
+  // 기존에 가입된 계정(이메일)일 경우
+  // 기존의 가입 방법을 알려주고 해당 방법으로 로그인하도록 유도
   if (existingUser) {
-    return existingUser;
+    if (existingUser.provider !== provider) {
+      const roleText = role === 'customer' ? '고객' : '기사';
+      const isSignUpByEmail = !existingUser.provider; // 이메일을 통한 회원가입 계정인지 체크
+      const errorMessage = isSignUpByEmail
+        ? `이미 "${existingUser.provider}"을 이용해 "${roleText}"(으)로 가입된 이메일입니다. 해당 방법으로 로그인해주세요.`
+        : `이미 "이메일/패스워드"를 이용해 "${roleText}"(으)로 가입된 이메일입니다. 해당 방법으로 로그인해주세요.`;
+      throw new Error(errorMessage);
+    }
+    return existingUser; // 동일 provider이면 그냥 로그인 처리
   }
 
   // encryptedPassword가 필수이므로 dummy를 만들어서 넣음
