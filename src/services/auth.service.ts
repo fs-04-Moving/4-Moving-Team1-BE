@@ -200,11 +200,13 @@ const findOrCreateOAuthUser = async ({
   name,
   profileImage,
   provider,
+  role = 'customer',
 }: {
   email: string;
   name: string;
   profileImage?: string;
   provider: 'google' | 'kakao' | 'naver';
+  role: ROLE;
 }): Promise<User> => {
   const existingUser = await prisma.user.findUnique({
     where: { email },
@@ -227,7 +229,7 @@ const findOrCreateOAuthUser = async ({
       email,
       name,
       provider,
-      role: 'customer',
+      role,
       hasProfile: false,
       hasRequest: false,
       encryptedPassword,

@@ -6,15 +6,20 @@ import {
   getGoogleAuthURL,
   getGoogleUser,
 } from '../services/google.service';
+import { decodeState, encodeState } from '../utils/oauthState';
 
 const googleLoginRedirect: RequestHandler = (req, res) => {
-  const url = getGoogleAuthURL();
+  const { role } = req.query; // 회원 구분을 위한 role 추가
+  const state = encodeState({ role }); // 안전하게 인코딩
+  const url = getGoogleAuthURL(state);
   res.redirect(url);
 };
 
 const googleCallback: RequestHandler = async (req, res, next) => {
   try {
     const code = req.query.code as string;
+    const state = req.query.state as string;
+    const { role } = decodeState(state); // role 정보를 받아서 디코딩
     const { id_token, access_token } = await exchangeCodeForToken(code);
     const googleUser = await getGoogleUser(id_token, access_token);
 
@@ -23,6 +28,7 @@ const googleCallback: RequestHandler = async (req, res, next) => {
       name: googleUser.name,
       profileImage: googleUser.picture,
       provider: 'google',
+      role,
     });
 
     if (!user) {
