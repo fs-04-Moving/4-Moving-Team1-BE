@@ -6,7 +6,7 @@ import {
   getGoogleAuthURL,
   getGoogleUser,
 } from '../services/google.service';
-import { decodeState, encodeState } from '../utils/oauthState';
+import { decodeState, encodeState } from '../utils/oauth/oauthState';
 
 const googleLoginRedirect: RequestHandler = (req, res) => {
   const { role } = req.query; // 회원 구분을 위한 role 추가
@@ -53,14 +53,28 @@ const googleCallback: RequestHandler = async (req, res, next) => {
     res.redirect('http://localhost:3000/auth/callback'); // 프론트로 이동
   } catch (e) {
     // 에러 발생 시 프론트로 메시지 전달
-    const errorMessage =
-      e instanceof Error ? e.message : '알 수 없는 오류가 발생했습니다.';
-    res.redirect(
-      `http://localhost:3000/auth/callback?error=${encodeURIComponent(
-        errorMessage
-      )}`
+    if (typeof e === 'object' && e && 'errorCode' in e) {
+      const { errorCode, data } = e as {
+        errorCode: string;
+        data?: Record<string, string>;
+      };
+
+      const query = new URLSearchParams({ errorCode, ...data }).toString();
+      return res.redirect(`http://localhost:3000/auth/callback?${query}`);
+    }
+
+    // 예상치 못한 에러
+    return res.redirect(
+      `http://localhost:3000/auth/callback?errorCode=UNKNOWN_ERROR`
     );
-    // next(e);
+
+    // const errorMessage =
+    //   e instanceof Error ? e.message : '알 수 없는 오류가 발생했습니다.';
+    // res.redirect(
+    //   `http://localhost:3000/auth/callback?error=${encodeURIComponent(
+    //     errorMessage
+    //   )}`
+    // );
   }
 };
 

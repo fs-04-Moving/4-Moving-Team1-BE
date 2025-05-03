@@ -5,7 +5,7 @@ import {
   getKakaoAuthURL,
   getKakaoUser,
 } from '../services/kakao.service';
-import { decodeState, encodeState } from '../utils/oauthState';
+import { decodeState, encodeState } from '../utils/oauth/oauthState';
 
 const kakaoLoginRedirect: RequestHandler = (req, res) => {
   const { role } = req.query;
