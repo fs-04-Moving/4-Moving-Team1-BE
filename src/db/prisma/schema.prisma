@@ -16,6 +16,7 @@ model User {
   hasProfile          Boolean           @default(false)
   hasRequest          Boolean           @default(false)
   role                ROLE
+  provider            Provider?         @default(local)
   estimateRequests    EstimateRequest[]
   customerProfile     CustomerProfile?
   receivedReviews     Review[]          @relation("workerReview")
@@ -75,18 +76,18 @@ model Favorite {
 }
 
 model EstimateRequest {
-  id               String                @id @default(uuid())
-  customerId       String
-  serviceType      ServiceType
-  movingDate       DateTime
-  departure        String //한글로 받아서 
-  departureArea    Area
-  destination      String
-  createdAt        DateTime              @default(now())
-  updatedAt        DateTime              @default(now())
-  status           EstimateRequestStatus @default(active)
-  estimates        Estimate[]
-  user             User                  @relation(fields: [customerId], references: [id])
+  id            String                @id @default(uuid())
+  customerId    String
+  serviceType   ServiceType
+  movingDate    DateTime
+  departure     String //한글로 받아서 
+  departureArea Area
+  destination   String
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @default(now())
+  status        EstimateRequestStatus @default(active)
+  estimates     Estimate[]
+  user          User                  @relation(fields: [customerId], references: [id])
 }
 
 model Estimate {
@@ -114,12 +115,12 @@ model Estimate {
 }
 
 model Notification {
-  id       String   @id @default(uuid())
-  isRead   Boolean
-  message  String
+  id        String   @id @default(uuid())
+  isRead    Boolean
+  message   String
   createdAt DateTime @default(now())
-  user     User     @relation(fields: [userId], references: [id])
-  userId   String
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
 }
 
 // type 추가하기
@@ -165,4 +166,11 @@ enum EstimateRequestStatus {
   active
   inactive
   confirmed
+}
+
+enum Provider {
+  google
+  kakao
+  naver
+  local
 }
