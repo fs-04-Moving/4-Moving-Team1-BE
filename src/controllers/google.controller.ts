@@ -1,4 +1,5 @@
 // src/controllers/google.controller.ts
+import { ROLE } from '@prisma/client';
 import { RequestHandler } from 'express';
 import authService from '../services/auth.service';
 import {
@@ -6,20 +7,35 @@ import {
   getGoogleAuthURL,
   getGoogleUser,
 } from '../services/google.service';
-import { decodeState, encodeState } from '../utils/oauth/oauthState';
 
 const googleLoginRedirect: RequestHandler = (req, res) => {
-  const { role } = req.query; // 회원 구분을 위한 role 추가
-  const state = encodeState({ role }); // 안전하게 인코딩
-  const url = getGoogleAuthURL(state);
+  const state = req.query.state as string; // csrfToken, role포함
+  const [csrfToken] = state.split('|');
+  // 백엔드 도메인 기준 쿠키 저장(googleCallback에서 검증할 때 사용)
+  res.cookie('oauth_csrf_token', csrfToken, {
+    httpOnly: true,
+    secure: false,
+    sameSite: 'lax', // !!! strict로 하면 실패했음(외부 리다이렉트 흐름에서는 안 붙는다고?!?!)
+    path: '/',
+    maxAge: 5 * 60 * 1000,
+  });
+
+  const url = getGoogleAuthURL(state); // 구글 로그인 URL로 그대로 전달
   res.redirect(url);
 };
 
 const googleCallback: RequestHandler = async (req, res, next) => {
   try {
     const code = req.query.code as string;
-    const state = req.query.state as string;
-    const { role } = decodeState(state); // role 정보를 받아서 디코딩
+    const state = req.query.state as string; // csrfToken, role포함
+    const [csrfTokenFromState, roleFromState] = state.split('|');
+    const csrfTokenStored = req.cookies['oauth_csrf_token'];
+
+    if (!csrfTokenFromState || csrfTokenFromState !== csrfTokenStored) {
+      return res.redirect(
+        'http://localhost:3000/auth/callback?errorCode=INVALID_OAUTH_STATE'
+      );
+    }
     const { id_token, access_token } = await exchangeCodeForToken(code);
     const googleUser = await getGoogleUser(id_token, access_token);
 
@@ -28,7 +44,7 @@ const googleCallback: RequestHandler = async (req, res, next) => {
       name: googleUser.name,
       profileImage: googleUser.picture,
       provider: 'google',
-      role,
+      role: roleFromState as ROLE,
     });
 
     const { accessToken, refreshToken } =

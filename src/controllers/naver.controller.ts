@@ -1,3 +1,4 @@
+import { ROLE } from '@prisma/client';
 import { RequestHandler } from 'express';
 import authService from '../services/auth.service';
 import {
@@ -5,11 +6,19 @@ import {
   getNaverAuthURL,
   getNaverUser,
 } from '../services/naver.service';
-import { decodeState, encodeState } from '../utils/oauth/oauthState';
 
 const naverLoginRedirect: RequestHandler = (req, res) => {
-  const { role } = req.query;
-  const state = encodeState({ role });
+  const state = req.query.state as string; // csrfToken, role 포함
+  const [csrfToken] = state.split('|');
+
+  res.cookie('oauth_csrf_token', csrfToken, {
+    httpOnly: true,
+    secure: false,
+    sameSite: 'lax',
+    path: '/',
+    maxAge: 5 * 60 * 1000,
+  });
+
   const url = getNaverAuthURL(state);
   res.redirect(url);
 };
@@ -18,7 +27,14 @@ const naverCallback: RequestHandler = async (req, res) => {
   try {
     const code = req.query.code as string;
     const state = req.query.state as string;
-    const { role } = decodeState(state);
+    const [csrfTokenFromState, roleFromState] = state.split('|');
+    const csrfTokenStored = req.cookies['oauth_csrf_token'];
+
+    if (!csrfTokenFromState || csrfTokenFromState !== csrfTokenStored) {
+      return res.redirect(
+        'http://localhost:3000/auth/callback?errorCode=INVALID_OAUTH_STATE'
+      );
+    }
 
     const { access_token } = await exchangeCodeForToken(code, state);
     const naverUser = await getNaverUser(access_token);
@@ -28,7 +44,7 @@ const naverCallback: RequestHandler = async (req, res) => {
       name: naverUser.name,
       profileImage: naverUser.profile_image,
       provider: 'naver',
-      role,
+      role: roleFromState as ROLE,
     });
 
     const { accessToken, refreshToken } =
