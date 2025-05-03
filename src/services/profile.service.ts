@@ -157,7 +157,7 @@ const getWorkerProfile = async (workerId: string) => {
     const worker = await prisma.user.findFirst({
       where: { id: workerId },
       include: {
-        _count: { select: { customerFavorites: true, receivedReviews: true } },
+        _count: { select: { workerFavorites: true, receivedReviews: true } },
         workProfile: {
           select: {
             profileImage: true,
@@ -196,7 +196,7 @@ const getWorkerProfile = async (workerId: string) => {
       summary: worker.workProfile.summary,
       nickname: worker.workProfile.nickname,
       experience: worker.workProfile.experience,
-      favoritesCount: worker._count.customerFavorites || 0,
+      favoritesCount: worker._count.workerFavorites || 0,
       reviewsCount: worker._count.receivedReviews || 0,
       reviewsAverage: avgStar._avg.star ?? null,
       confirmedEstimatesCount: confirmedEstimatesCount || 0,
