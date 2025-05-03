@@ -67,14 +67,6 @@ const googleCallback: RequestHandler = async (req, res, next) => {
     return res.redirect(
       `http://localhost:3000/auth/callback?errorCode=UNKNOWN_ERROR`
     );
-
-    // const errorMessage =
-    //   e instanceof Error ? e.message : '알 수 없는 오류가 발생했습니다.';
-    // res.redirect(
-    //   `http://localhost:3000/auth/callback?error=${encodeURIComponent(
-    //     errorMessage
-    //   )}`
-    // );
   }
 };
 

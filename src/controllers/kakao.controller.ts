@@ -57,10 +57,20 @@ const kakaoCallback: RequestHandler = async (req, res) => {
 
     res.redirect('http://localhost:3000/auth/callback');
   } catch (e) {
-    const message =
-      e instanceof Error ? e.message : '알 수 없는 오류가 발생했습니다.';
-    res.redirect(
-      `http://localhost:3000/auth/callback?error=${encodeURIComponent(message)}`
+    // 에러 발생 시 프론트로 메시지 전달
+    if (typeof e === 'object' && e && 'errorCode' in e) {
+      const { errorCode, data } = e as {
+        errorCode: string;
+        data?: Record<string, string>;
+      };
+
+      const query = new URLSearchParams({ errorCode, ...data }).toString();
+      return res.redirect(`http://localhost:3000/auth/callback?${query}`);
+    }
+
+    // 예상치 못한 에러
+    return res.redirect(
+      `http://localhost:3000/auth/callback?errorCode=UNKNOWN_ERROR`
     );
   }
 };

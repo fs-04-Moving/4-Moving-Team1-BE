@@ -12,8 +12,6 @@ export function validateExistingUser(
 
   // provider가 다르면
   if (user.provider !== provider) {
-    // throw new Error(
-    //   getProviderMismatchMessage(isLocal ? 'local' : user.provider!, user.role)
     // );
     throw {
       errorCode: 'PROVIDER_MISMATCH',
@@ -26,7 +24,6 @@ export function validateExistingUser(
 
   // provider는 같지만 role이 다르면
   if (user.role !== requestedRole) {
-    // throw new Error(getRoleMismatchMessage(provider, user.role, requestedRole));
     throw {
       errorCode: 'ROLE_MISMATCH',
       data: {
