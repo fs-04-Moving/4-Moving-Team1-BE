@@ -175,7 +175,7 @@ const findInactiveEstimateRequests = async ({
 const findActiveEstimateRequest = async (customerId: string) => {
   try {
     const estimateRequest = await prisma.estimateRequest.findFirst({
-      where: { customerId, status: "active" },
+      where: { customerId, NOT: { status: "inactive" } },
     });
     if (!estimateRequest)
       throw new Error("400/acitve Estimate Request not found");
