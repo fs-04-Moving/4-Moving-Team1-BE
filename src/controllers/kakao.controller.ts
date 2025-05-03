@@ -1,3 +1,4 @@
+import { ROLE } from '@prisma/client';
 import { RequestHandler } from 'express';
 import authService from '../services/auth.service';
 import {
@@ -5,11 +6,20 @@ import {
   getKakaoAuthURL,
   getKakaoUser,
 } from '../services/kakao.service';
-import { decodeState, encodeState } from '../utils/oauth/oauthState';
 
 const kakaoLoginRedirect: RequestHandler = (req, res) => {
-  const { role } = req.query;
-  const state = encodeState({ role });
+  const state = req.query.state as string; // csrfToken, role 포함
+  const [csrfToken] = state.split('|');
+
+  // 백엔드 도메인 기준 쿠키 저장 (콜백에서 검증용)
+  res.cookie('oauth_csrf_token', csrfToken, {
+    httpOnly: true,
+    secure: false,
+    sameSite: 'lax',
+    path: '/',
+    maxAge: 5 * 60 * 1000,
+  });
+
   const url = getKakaoAuthURL(state);
   res.redirect(url);
 };
@@ -18,7 +28,14 @@ const kakaoCallback: RequestHandler = async (req, res) => {
   try {
     const code = req.query.code as string;
     const state = req.query.state as string;
-    const { role } = decodeState(state);
+    const [csrfTokenFromState, roleFromState] = state.split('|');
+    const csrfTokenStored = req.cookies['oauth_csrf_token'];
+
+    if (!csrfTokenFromState || csrfTokenFromState !== csrfTokenStored) {
+      return res.redirect(
+        'http://localhost:3000/auth/callback?errorCode=INVALID_OAUTH_STATE'
+      );
+    }
 
     const { access_token } = await exchangeCodeForToken(code);
     const kakaoProfile = await getKakaoUser(access_token);
@@ -33,7 +50,7 @@ const kakaoCallback: RequestHandler = async (req, res) => {
       name,
       profileImage,
       provider: 'kakao',
-      role,
+      role: roleFromState as ROLE,
     });
 
     const { accessToken, refreshToken } =
@@ -57,7 +74,6 @@ const kakaoCallback: RequestHandler = async (req, res) => {
 
     res.redirect('http://localhost:3000/auth/callback');
   } catch (e) {
-    // 에러 발생 시 프론트로 메시지 전달
     if (typeof e === 'object' && e && 'errorCode' in e) {
       const { errorCode, data } = e as {
         errorCode: string;
@@ -68,11 +84,13 @@ const kakaoCallback: RequestHandler = async (req, res) => {
       return res.redirect(`http://localhost:3000/auth/callback?${query}`);
     }
 
-    // 예상치 못한 에러
     return res.redirect(
       `http://localhost:3000/auth/callback?errorCode=UNKNOWN_ERROR`
     );
   }
 };
 
-export default { kakaoLoginRedirect, kakaoCallback };
+export default {
+  kakaoLoginRedirect,
+  kakaoCallback,
+};
