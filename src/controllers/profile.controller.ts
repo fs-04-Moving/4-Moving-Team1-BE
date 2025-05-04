@@ -1,10 +1,10 @@
-import { RequestHandler } from "express";
-import { asyncHandler } from "../middleware/error.middleware";
-import { CustomerProfileDto, WorkerProfileDto } from "../types/profile.type";
-import profileService from "../services/profile.service";
-import { GetWorkerProfilesQuery } from "../validations/profile.validation";
-import favoriteService from "../services/favorite.service";
-import { BASE_URL } from "../app";
+import { RequestHandler } from 'express';
+import { BASE_URL } from '../app';
+import { asyncHandler } from '../middleware/error.middleware';
+import favoriteService from '../services/favorite.service';
+import profileService from '../services/profile.service';
+import { CustomerProfileDto, WorkerProfileDto } from '../types/profile.type';
+import { GetWorkerProfilesQuery } from '../validations/profile.validation';
 
 // 일반 유저 프로필 생성
 const createCustomerProfileController: RequestHandler = asyncHandler(
@@ -27,17 +27,17 @@ const createCustomerProfileController: RequestHandler = asyncHandler(
     const { accessToken, refreshToken } =
       await profileService.updateUserProfileStatus(customerId); // 유저 프로필 상태 업데이트 (hasProfile :true)
 
-    res.cookie("refreshToken", refreshToken, {
+    res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: false,
-      sameSite: "strict",
+      sameSite: 'strict',
       maxAge: 1000 * 60 * 60 * 24 * 7, // 7일
     });
-    res.cookie("accessToken", accessToken, {
+    res.cookie('accessToken', accessToken, {
       httpOnly: true,
       secure: false,
-      sameSite: "strict",
-      path: "/",
+      sameSite: 'strict',
+      path: '/',
       maxAge: 1000 * 60 * 60, // 1시간
     });
 
@@ -80,18 +80,18 @@ const createWorkerProfileController: RequestHandler = asyncHandler(
     const { accessToken, refreshToken } =
       await profileService.updateUserProfileStatus(workerId); // 유저 프로필 상태 업데이트 (hasProfile :true)
 
-    res.cookie("refreshToken", refreshToken, {
+    res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: false,
-      sameSite: "strict",
+      sameSite: 'strict',
       maxAge: 1000 * 60 * 60 * 24 * 7, // 7일
     });
 
-    res.cookie("accessToken", accessToken, {
+    res.cookie('accessToken', accessToken, {
       httpOnly: true,
       secure: false,
-      sameSite: "strict",
-      path: "/",
+      sameSite: 'strict',
+      path: '/',
       maxAge: 1000 * 60 * 60, // 1시간
     });
 
@@ -118,6 +118,23 @@ const updateCustomerProfileController: RequestHandler = asyncHandler(
     };
 
     await profileService.updateCustomerProfile(customerProfileDto); //유저 프로필 수정
+
+    const { accessToken, refreshToken } =
+      await profileService.updateUserProfileStatus(customerId); // 프로필 상태 업데이트 + 토큰 재발급
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'strict',
+      maxAge: 1000 * 60 * 60 * 24 * 7,
+    });
+    res.cookie('accessToken', accessToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'strict',
+      path: '/',
+      maxAge: 1000 * 60 * 60,
+    });
     res.sendStatus(204);
   }
 );
@@ -153,6 +170,24 @@ const updateWorkerProfileController: RequestHandler = asyncHandler(
     };
 
     await profileService.updateWorkerProfile(workerProfileDto); //유저 프로필 생성
+
+    const { accessToken, refreshToken } =
+      await profileService.updateUserProfileStatus(workerId); // 유저 프로필 상태 업데이트 (hasProfile :true)
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'strict',
+      maxAge: 1000 * 60 * 60 * 24 * 7, // 7일
+    });
+
+    res.cookie('accessToken', accessToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'strict',
+      path: '/',
+      maxAge: 1000 * 60 * 60, // 1시간
+    });
     res.sendStatus(204);
   }
 );
@@ -200,7 +235,7 @@ const getWorkerProfileMeController: RequestHandler = asyncHandler(
     const formattedResult = {
       ...result,
       profileImage: result.profileImage
-        ? `${BASE_URL}/static/${result.profileImage.split("/").pop()}`
+        ? `${BASE_URL}/static/${result.profileImage.split('/').pop()}`
         : null,
     };
 
@@ -215,7 +250,7 @@ const getCustomerProfileMeController: RequestHandler = asyncHandler(
     const formattedResult = {
       ...result,
       profileImage: result.profileImage
-        ? `${BASE_URL}/static/${result.profileImage.split("/").pop()}`
+        ? `${BASE_URL}/static/${result.profileImage.split('/').pop()}`
         : null,
     };
 
