@@ -31,6 +31,7 @@ const naverCallback: RequestHandler = async (req, res) => {
     const csrfTokenStored = req.cookies['oauth_csrf_token'];
 
     if (!csrfTokenFromState || csrfTokenFromState !== csrfTokenStored) {
+      res.clearCookie('oauth_csrf_token', { path: '/' }); // 검증 실패 시에도 삭제
       return res.redirect(
         'http://localhost:3000/auth/callback?errorCode=INVALID_OAUTH_STATE'
       );
@@ -65,6 +66,8 @@ const naverCallback: RequestHandler = async (req, res) => {
       path: '/',
       maxAge: 1000 * 60 * 60,
     });
+
+    res.clearCookie('oauth_csrf_token', { path: '/' }); // 성공 후에도 삭제
 
     res.redirect('http://localhost:3000/auth/callback');
   } catch (e) {
