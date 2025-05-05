@@ -67,13 +67,17 @@ const logIn = async (logInDto: LogInDto) => {
     const result = await prisma.$transaction(async (prisma) => {
       const { email, password, role } = logInDto;
       const user = await prisma.user.findUnique({
-        where: { email, role },
+        where: { email },
         include: {
           customerProfile: true,
           workProfile: true,
         },
       });
       if (!user) throw new Error('400/유저가 존재하지 않습니다.');
+
+      // 로그인 시도 전에 provider와 role 검증
+      validateExistingUser(user, 'local', role); // <- 핵심
+
       const profileImage =
         user.customerProfile?.profileImage ?? user.workProfile?.profileImage;
 
@@ -106,6 +110,10 @@ const logIn = async (logInDto: LogInDto) => {
     });
     return result;
   } catch (e) {
+    // 소셜 로그인 시도 후 에러라면 errorCode 포함해서 throw
+    if (typeof e === 'object' && e && 'errorCode' in e) {
+      throw e;
+    }
     throw e;
   }
 };
@@ -117,10 +125,14 @@ const signUp = async (signUpDto: SignUpDto) => {
     const encryptedPassword = await bcrypt.hash(password, 12);
 
     const result = await prisma.$transaction(async (prisma) => {
-      const isExistingEmail = await prisma.user.findUnique({
+      const existingUser = await prisma.user.findUnique({
         where: { email },
       });
-      if (isExistingEmail) throw new Error('400/이미 존재하는 이메일입니다.');
+      if (existingUser) {
+        // 소셜 로그인 사용자일 수 있으므로 provider/role 검증
+        validateExistingUser(existingUser, 'local', role); // <- 핵심
+        throw new Error('400/이미 존재하는 이메일입니다.');
+      }
       const newUser = await prisma.user.create({
         data: { email, name, encryptedPassword, phoneNumber, role },
       });
@@ -130,6 +142,10 @@ const signUp = async (signUpDto: SignUpDto) => {
 
     return result;
   } catch (e) {
+    // 소셜 로그인 시도 후 에러라면 errorCode 포함해서 throw
+    if (typeof e === 'object' && e && 'errorCode' in e) {
+      throw e;
+    }
     throw e;
   }
 };
