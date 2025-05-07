@@ -90,14 +90,33 @@ const getRecivedEstimateReuests = async ({
         },
       },
     }),
-    ...(isAssigned && {
-      estimates: {
-        some: {
-          workerId,
-          status: "assigned",
-        },
-      },
-    }),
+    ...(isAssigned
+      ? {
+          // isAssigned === true: workerId + status: "assigned" 조건 필수
+          estimates: {
+            some: {
+              workerId,
+              status: "assigned",
+            },
+          },
+        }
+      : {
+          // isAssigned === false: estimates가 없거나 status: "assigned"만 있으면 됨
+          OR: [
+            {
+              estimates: {
+                none: {}, // 아예 없음
+              },
+            },
+            {
+              estimates: {
+                some: {
+                  status: "assigned",
+                },
+              },
+            },
+          ],
+        }),
   };
 
   const orderByField: Prisma.EstimateRequestOrderByWithRelationInput =
@@ -107,7 +126,7 @@ const getRecivedEstimateReuests = async ({
     where,
     include: {
       estimates: {
-        where: { workerId, NOT: { status: "rejected" } },
+        where: { workerId, status: "assigned" },
         take: 1,
       },
       user: true,
