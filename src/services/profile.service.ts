@@ -202,6 +202,7 @@ const getWorkerProfile = async (workerId: string) => {
       confirmedEstimatesCount: confirmedEstimatesCount || 0,
       serviceType: worker.workProfile.services,
       serviceArea: worker.workProfile.serviceAreas,
+      description: worker.workProfile.description,
     };
   } catch (e) {
     throw e;

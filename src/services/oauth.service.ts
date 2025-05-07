@@ -1,9 +1,10 @@
-import { ROLE } from '@prisma/client';
-import { Request, Response } from 'express';
-import authService from './auth.service';
+import { ROLE } from "@prisma/client";
+import { Request, Response } from "express";
+import authService from "./auth.service";
+import { CLIENT_URL } from "../app";
 
 interface OAuthProvider {
-  name: 'google' | 'kakao' | 'naver';
+  name: "google" | "kakao" | "naver";
   exchangeCodeForToken: (code: string, state: string) => Promise<any>;
   getUserInfo: (tokens: any) => Promise<any>;
   mapUser: (raw: any) => {
@@ -24,14 +25,14 @@ export async function handleOAuthCallback(
   try {
     const code = req.query.code as string;
     const state = req.query.state as string; // csrfToken, role 포함
-    const [csrfTokenFromState, roleFromState] = state.split('|');
-    const csrfTokenStored = req.cookies['oauth_csrf_token'];
+    const [csrfTokenFromState, roleFromState] = state.split("|");
+    const csrfTokenStored = req.cookies["oauth_csrf_token"];
 
     // CSRF 토큰 검증 실패 시 쿠키 제거 후 리다이렉트
     if (!csrfTokenFromState || csrfTokenFromState !== csrfTokenStored) {
-      res.clearCookie('oauth_csrf_token', { path: '/' }); // 검증 실패 시에도 삭제
+      res.clearCookie("oauth_csrf_token", { path: "/" }); // 검증 실패 시에도 삭제
       return res.redirect(
-        'http://localhost:3000/auth/callback?errorCode=INVALID_OAUTH_STATE'
+        `${CLIENT_URL}/auth/callback?errorCode=INVALID_OAUTH_STATE`
       );
     }
 
@@ -53,38 +54,35 @@ export async function handleOAuthCallback(
     const { accessToken, refreshToken } =
       authService.createTokenByUserData(user);
 
-    res.cookie('refreshToken', refreshToken, {
+    res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: false,
-      sameSite: 'strict',
-      path: '/',
+      sameSite: "strict",
+      path: "/",
       maxAge: 1000 * 60 * 60 * 24 * 7,
     });
 
-    res.cookie('accessToken', accessToken, {
+    res.cookie("accessToken", accessToken, {
       httpOnly: true,
       secure: false,
-      sameSite: 'strict',
-      path: '/',
-      maxAge: 1000 * 60 * 60,
+      sameSite: "strict",
+      path: "/",
     });
 
-    res.clearCookie('oauth_csrf_token', { path: '/' }); // 성공 후에도 삭제
-    res.redirect('http://localhost:3000/auth/callback'); // 프론트로 이동
+    res.clearCookie("oauth_csrf_token", { path: "/" }); // 성공 후에도 삭제
+    res.redirect(`${CLIENT_URL}/auth/callback`); // 프론트로 이동
   } catch (e) {
     // 에러 발생 시 프론트로 errorCode와 provider, role 등 전달
-    if (typeof e === 'object' && e && 'errorCode' in e) {
+    if (typeof e === "object" && e && "errorCode" in e) {
       const { errorCode, data } = e as {
         errorCode: string;
         data?: Record<string, string>;
       };
       const query = new URLSearchParams({ errorCode, ...data }).toString();
-      return res.redirect(`http://localhost:3000/auth/callback?${query}`);
+      return res.redirect(`${CLIENT_URL}/auth/callback?${query}`);
     }
     // 예상치 못한 에러
-    return res.redirect(
-      `http://localhost:3000/auth/callback?errorCode=UNKNOWN_ERROR`
-    );
+    return res.redirect(`${CLIENT_URL}/auth/callback?errorCode=UNKNOWN_ERROR`);
   }
 }
 
@@ -96,14 +94,14 @@ export function handleOAuthRedirect(
   getAuthURL: (state: string) => string,
   res: Response
 ) {
-  const [csrfToken] = state.split('|');
+  const [csrfToken] = state.split("|");
 
   // 백엔드 도메인 기준 쿠키 저장 (콜백에서 검증용)
-  res.cookie('oauth_csrf_token', csrfToken, {
+  res.cookie("oauth_csrf_token", csrfToken, {
     httpOnly: true,
     secure: false, // http 환경에서는 false, https 환경에선 true
-    sameSite: 'lax', // 외부 리다이렉트 흐름에서도 쿠키 전송 허용
-    path: '/',
+    sameSite: "lax", // 외부 리다이렉트 흐름에서도 쿠키 전송 허용
+    path: "/",
     maxAge: 5 * 60 * 1000,
   });
 
