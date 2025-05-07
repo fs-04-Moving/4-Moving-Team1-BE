@@ -14,19 +14,19 @@ model User {
   encryptedPassword   String
   phoneNumber         String?
   hasProfile          Boolean           @default(false)
-  hasRequest          Boolean           @default(false)
   role                ROLE
+  hasRequest          Boolean           @default(false)
   provider            Provider?         @default(local)
-  estimateRequests    EstimateRequest[]
   customerProfile     CustomerProfile?
-  receivedReviews     Review[]          @relation("workerReview")
-  writtenReviews      Review[]          @relation("customerReview")
-  workProfile         WorkerProfile?
-  estimatesAsWorker   Estimate[]        @relation("estimateWorker")
   estimatesAsCustomer Estimate[]        @relation("estimateCustomer")
+  estimatesAsWorker   Estimate[]        @relation("estimateWorker")
+  estimateRequests    EstimateRequest[]
   customerFavorites   Favorite[]        @relation("customerFavorites")
   workerFavorites     Favorite[]        @relation("workerFavorites")
   Notification        Notification[]
+  writtenReviews      Review[]          @relation("customerReview")
+  receivedReviews     Review[]          @relation("workerReview")
+  workProfile         WorkerProfile?
 }
 
 model WorkerProfile {
@@ -51,7 +51,6 @@ model CustomerProfile {
   user         User          @relation(fields: [customerId], references: [id], onDelete: Cascade)
 }
 
-// 견적이랑 추가
 model Review {
   id         String   @id @default(uuid())
   workerId   String
@@ -59,10 +58,10 @@ model Review {
   star       Int
   createdAt  DateTime @default(now())
   content    String
+  estimateId String   @unique
+  customer   User     @relation("customerReview", fields: [customerId], references: [id])
   estimate   Estimate @relation(fields: [estimateId], references: [id])
   worker     User     @relation("workerReview", fields: [workerId], references: [id])
-  customer   User     @relation("customerReview", fields: [customerId], references: [id])
-  estimateId String   @unique
 }
 
 model Favorite {
@@ -78,14 +77,14 @@ model Favorite {
 model EstimateRequest {
   id            String                @id @default(uuid())
   customerId    String
-  serviceType   ServiceType
   movingDate    DateTime
-  departure     String //한글로 받아서 
-  departureArea Area
   destination   String
   createdAt     DateTime              @default(now())
   updatedAt     DateTime              @default(now())
   status        EstimateRequestStatus @default(active)
+  serviceType   ServiceType
+  departureArea Area
+  departure     String
   estimates     Estimate[]
   user          User                  @relation(fields: [customerId], references: [id])
 }
@@ -95,35 +94,33 @@ model Estimate {
   estimateRequestId String
   customerId        String
   workerId          String
-  serviceType       ServiceType
   movingDate        DateTime
-  departure         String
   destination       String
-  departureArea     Area
   price             Int?
-  isConfirmed       Boolean         @default(false)
   createdAt         DateTime        @default(now())
   updatedAt         DateTime        @default(now())
   rejectionMessage  String?
   status            EstimateStatus
   comment           String?
-  estimateRequset   EstimateRequest @relation(fields: [estimateRequestId], references: [id], onDelete: Cascade)
-  review            Review?
-  worker            User?           @relation("estimateWorker", fields: [workerId], references: [id])
-  customer          User?           @relation("estimateCustomer", fields: [customerId], references: [id])
+  serviceType       ServiceType
+  isConfirmed       Boolean         @default(false)
   userId            String?
+  departureArea     Area
+  departure         String
+  customer          User            @relation("estimateCustomer", fields: [customerId], references: [id])
+  estimateRequset   EstimateRequest @relation(fields: [estimateRequestId], references: [id], onDelete: Cascade)
+  worker            User            @relation("estimateWorker", fields: [workerId], references: [id])
+  review            Review?
 }
 
 model Notification {
   id        String   @id @default(uuid())
   isRead    Boolean
   message   String
+  userId    String
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id])
-  userId    String
 }
-
-// type 추가하기
 
 enum ROLE {
   customer

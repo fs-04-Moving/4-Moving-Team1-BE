@@ -25,7 +25,6 @@ const logInController: RequestHandler = asyncHandler(async (req, res, next) => {
     secure: false,
     sameSite: "strict",
     path: "/",
-    maxAge: 1000 * 60 * 60, // 1시간
   });
   // sameSite:none secure:ture
   // 백엔드랑 프론트엔드 ip

@@ -38,7 +38,6 @@ const createCustomerProfileController: RequestHandler = asyncHandler(
       secure: false,
       sameSite: "strict",
       path: "/",
-      maxAge: 1000 * 60 * 60, // 1시간
     });
 
     res.status(200).send({ accessToken });
@@ -92,7 +91,6 @@ const createWorkerProfileController: RequestHandler = asyncHandler(
       secure: false,
       sameSite: "strict",
       path: "/",
-      maxAge: 1000 * 60 * 60, // 1시간
     });
 
     res.status(200).send({ accessToken });

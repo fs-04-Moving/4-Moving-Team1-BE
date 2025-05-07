@@ -10,8 +10,10 @@ const getUserMe = async (userId: string) => {
   try {
     const user = await prisma.user.findFirst({ where: { id: userId } });
     if (!user) throw new Error("400/user not found");
-    const { name, hasProfile, role, hasRequest } = user;
+    const { id, name, hasProfile, role, hasRequest, email } = user;
     const userData = {
+      id,
+      email,
       name,
       hasProfile,
       role,
@@ -116,7 +118,7 @@ const getUserInfo = async (userId: string) => {
   try {
     const user = await prisma.user.findFirst({
       where: { id: userId },
-      select: { name: true, phoneNumber: true, email: true },
+      select: { name: true, phoneNumber: true, email: true, provider: true },
     });
     if (!user) throw new Error("400/user not found");
 
