@@ -1,0 +1,12 @@
+services:
+  backend:
+    build:
+      context: .
+    ports:
+      - '5050:5050'
+      - '5555:5555'
+    env_file:
+      - .env
+    volumes:
+      - .:/app # hot reload 동기화
+      - /app/node_modules # 제외

@@ -4,7 +4,7 @@ import { ROLE, User } from '@prisma/client';
  * 기존 사용자 유효성 검사 */
 export function validateExistingUser(
   user: User,
-  provider: 'google' | 'kakao' | 'naver',
+  provider: 'google' | 'kakao' | 'naver' | 'local',
   requestedRole: ROLE
 ) {
   // 이메일 회원가입 여부
