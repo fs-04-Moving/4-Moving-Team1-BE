@@ -116,7 +116,13 @@ const getRequsetEstimateRequestsController: RequestHandler = asyncHandler(
       search,
       isAssigned,
     });
-    res.status(200).send(data);
+    serviceArea = await profileService.getWorkerServiceArea(workerId);
+    const count = await estimateRequstService.countEstimateRequests({
+      serviceArea,
+      workerId,
+    });
+
+    res.status(200).send({ ...data, ...count });
   }
 );
 
