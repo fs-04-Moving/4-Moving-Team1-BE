@@ -4,6 +4,7 @@ import {
   EstimateRequestOrderBy,
   EstimateRequstDto,
 } from "../types/estimate-request.type";
+import { date } from "zod";
 
 // 견적 요청 생성 함수
 const createEstimateRequest = async (estimateRequstDto: EstimateRequstDto) => {
@@ -164,6 +165,71 @@ const getRecivedEstimateReuests = async ({
   };
 };
 
+const countEstimateRequests = async ({
+  workerId,
+  serviceArea,
+}: {
+  workerId: string;
+  serviceArea: Area[];
+}) => {
+  try {
+    // 몇개인지
+    const serviceTypeRawCounts = await prisma.estimateRequest.groupBy({
+      by: ["serviceType"],
+      where: {
+        status: "active",
+        movingDate: { gt: new Date() },
+      },
+      _count: {
+        _all: true,
+      },
+    });
+
+    const allServiceTypes: ServiceType[] = [
+      "smallMove",
+      "homeMove",
+      "officeMove",
+    ];
+
+    const serviceTypeCounts = allServiceTypes.reduce<Record<string, number>>(
+      (acc, type) => {
+        const found = serviceTypeRawCounts.find(
+          (entry) => entry.serviceType === type
+        );
+        acc[type] = found?._count._all || 0;
+        return acc;
+      },
+      {}
+    );
+
+    const serviceAreaCounts = await prisma.estimateRequest.count({
+      where: {
+        status: "active",
+        movingDate: { gt: new Date() },
+        departureArea: { in: serviceArea },
+      },
+    });
+
+    const assignedCount = await prisma.estimateRequest.count({
+      where: {
+        status: "active",
+        movingDate: { gt: new Date() },
+        estimates: {
+          some: {
+            workerId,
+            status: "assigned",
+            price: null,
+          },
+        },
+      },
+    });
+
+    return { ...serviceTypeCounts, serviceAreaCounts, assignedCount };
+  } catch (e) {
+    throw e;
+  }
+};
+
 const findInactiveEstimateRequests = async ({
   customerId,
   page,
@@ -214,6 +280,7 @@ const estimateRequstService = {
   getRecivedEstimateReuests,
   findInactiveEstimateRequests,
   findActiveEstimateRequest,
+  countEstimateRequests,
 };
 
 export default estimateRequstService;
