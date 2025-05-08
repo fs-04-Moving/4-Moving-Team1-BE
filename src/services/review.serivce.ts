@@ -50,6 +50,7 @@ const getMyReview = async ({
               },
             },
           },
+          customer: { select: { email: true } },
         },
         skip: (page - 1) * pageSize,
         take: pageSize,
@@ -77,6 +78,7 @@ const getWorkerReviews = async ({
       where: { workerId },
       skip: (page - 1) * pageSize,
       take: pageSize,
+      include: { customer: { select: { email: true } } },
     }),
     prisma.review.groupBy({
       by: ["star"],
@@ -89,6 +91,12 @@ const getWorkerReviews = async ({
     }),
   ]);
 
+  const formattedReviews = reviews.map((review) => ({
+    ...review,
+    customerEmail: review.customer.email,
+    customer: undefined,
+  }));
+
   const starCountList = [0, 0, 0, 0, 0];
   group.forEach((item) => {
     const star = item.star;
@@ -100,7 +108,7 @@ const getWorkerReviews = async ({
   }, 0);
 
   return {
-    list: reviews,
+    list: formattedReviews,
     starCountList,
     totalCount,
     rating: avgStar._avg.star,
