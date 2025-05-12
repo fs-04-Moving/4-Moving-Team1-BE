@@ -101,7 +101,7 @@ const createWorkerProfileController: RequestHandler = asyncHandler(
 const updateCustomerProfileController: RequestHandler = asyncHandler(
   async (req, res, next) => {
     const { livingArea, services } = req.body;
-    let profileImage = null;
+    let profileImage;
     if (req.file) {
       profileImage = req.file.path;
     }
@@ -148,7 +148,7 @@ const updateWorkerProfileController: RequestHandler = asyncHandler(
       serviceAreas,
     } = req.body;
 
-    let profileImage = null;
+    let profileImage;
     if (req.file) {
       profileImage = req.file.path;
     }

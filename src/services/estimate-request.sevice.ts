@@ -179,6 +179,21 @@ const countEstimateRequests = async ({
       where: {
         status: "active",
         movingDate: { gt: new Date() },
+        OR: [
+          {
+            estimates: {
+              none: {}, // 아예 없음
+            },
+          },
+          {
+            estimates: {
+              some: {
+                status: "assigned",
+                price: null,
+              },
+            },
+          },
+        ],
       },
       _count: {
         _all: true,
@@ -207,6 +222,21 @@ const countEstimateRequests = async ({
         status: "active",
         movingDate: { gt: new Date() },
         departureArea: { in: serviceArea },
+        OR: [
+          {
+            estimates: {
+              none: {}, // 아예 없음
+            },
+          },
+          {
+            estimates: {
+              some: {
+                status: "assigned",
+                price: null,
+              },
+            },
+          },
+        ],
       },
     });
 
