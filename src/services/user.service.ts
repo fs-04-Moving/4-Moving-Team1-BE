@@ -12,7 +12,7 @@ const getUserMe = async (userId: string) => {
     if (!user) throw new Error("400/user not found");
     const { id, name, hasProfile, role, hasRequest, email } = user;
     const userData = {
-      id,
+      sub: id,
       email,
       name,
       hasProfile,
