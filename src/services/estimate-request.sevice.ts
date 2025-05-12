@@ -217,7 +217,7 @@ const countEstimateRequests = async ({
       {}
     );
 
-    const serviceAreaCounts = await prisma.estimateRequest.count({
+    const serviceAreaCount = await prisma.estimateRequest.count({
       where: {
         status: "active",
         movingDate: { gt: new Date() },
@@ -254,7 +254,7 @@ const countEstimateRequests = async ({
       },
     });
 
-    return { ...serviceTypeCounts, serviceAreaCounts, assignedCount };
+    return { ...serviceTypeCounts, serviceAreaCount, assignedCount };
   } catch (e) {
     throw e;
   }

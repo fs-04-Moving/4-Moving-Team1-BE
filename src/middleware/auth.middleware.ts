@@ -10,7 +10,11 @@ if (!jwtSecretKey) {
 
 const authMiddleware: RequestHandler = (req, res, next) => {
   try {
-    if (req.url === "/auth/sign-up" || req.url === "/auth/log-in")
+    if (
+      req.url === "/auth/sign-up" ||
+      req.url === "/auth/log-in" ||
+      req.url === "/auth/refresh-token"
+    )
       return next();
 
     if (!jwtSecretKey) {
