@@ -1,4 +1,4 @@
-import { ROLE } from "@prisma/client";
+import { Provider, ROLE } from "@prisma/client";
 
 type PayloadData = {
   id: string;
@@ -28,6 +28,7 @@ type UpdateUserDto = {
   newPassword: string;
   name: string;
   phoneNumber: string;
+  provider?: Provider;
 };
 
 export { LogInDto, PayloadData, SignUpDto, UpdateUserDto };

@@ -60,20 +60,38 @@ const getProfileImage = async (userId: string) => {
 //유저 정보 업데이트하는 함수
 const updateUserInfo = async (updateUserDto: UpdateUserDto) => {
   try {
-    const { userId, password, newPassword, ...rest } = updateUserDto;
+    const {
+      userId,
+      password,
+      newPassword,
+      provider = "local",
+      ...rest
+    } = updateUserDto;
     const user = await prisma.user.findFirst({ where: { id: userId } });
     if (!user) {
       throw new Error("400/user not found");
     }
     // 비밀번호 확인하기
-    await checkPassword(password, user.encryptedPassword);
-    // 비밀번호 생성
 
+    if (provider === "local") {
+      await checkPassword(password, user.encryptedPassword);
+    }
+
+    // 비밀번호 생성
     if (newPassword) {
       const encryptedPassword = await bcrypt.hash(newPassword, 12);
       await prisma.user.update({
         where: { id: userId },
         data: { ...rest, encryptedPassword },
+        include: {
+          workProfile: { select: { profileImage: true } },
+          customerProfile: { select: { profileImage: true } },
+        },
+      });
+    } else {
+      await prisma.user.update({
+        where: { id: userId },
+        data: { ...rest },
         include: {
           workProfile: { select: { profileImage: true } },
           customerProfile: { select: { profileImage: true } },

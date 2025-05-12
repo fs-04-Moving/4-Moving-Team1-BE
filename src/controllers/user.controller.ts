@@ -19,7 +19,8 @@ const getUserMeController: RequestHandler = asyncHandler(
 const updateUserMeController: RequestHandler = asyncHandler(
   async (req, res, next) => {
     const userId = req.userId as string;
-    const { email, password, newPassword, name, phoneNumber } = req.body;
+    const { email, password, newPassword, name, phoneNumber, provider } =
+      req.body;
     const updateUserDto: UpdateUserDto = {
       userId,
       email,
@@ -27,6 +28,7 @@ const updateUserMeController: RequestHandler = asyncHandler(
       newPassword,
       name,
       phoneNumber,
+      provider,
     };
     await userService.updateUserInfo(updateUserDto);
 

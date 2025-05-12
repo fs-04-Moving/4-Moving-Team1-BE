@@ -1,4 +1,4 @@
-import { ROLE } from "@prisma/client";
+import { Provider, ROLE } from "@prisma/client";
 import { RequestHandler } from "express";
 import { z } from "zod";
 
@@ -45,22 +45,21 @@ const updateUserInfoSchema = z
   .object({
     email: emailSchema,
     name: nameSchema,
-    password: passwordSchema,
+    password: passwordSchema.optional(),
     newPasswordConfirm: passwordSchema.optional(),
     phoneNumber: phoneNumberSchema,
+    provider: z
+      .nativeEnum(Provider, { message: "Invalid provider" })
+      .optional(),
     newPassword: z
       .string()
       .min(8, { message: "새 비밀번호는 8자 이상이어야 합니다" })
       .regex(passwordRegex, "영문/숫자/특수문자를 모두 포함해야 합니다")
       .optional(),
   })
-  .refine(
-    (data) =>
-      data.newPasswordConfirm === data.newPassword,
-    {
-      message: "password don't match ",
-    }
-  )
+  .refine((data) => data.newPasswordConfirm === data.newPassword, {
+    message: "password don't match ",
+  })
   .refine((data) => !data.newPassword || data.newPassword !== data.password, {
     message: "새로운 비밀번호가 현재 비밀번호와 달라야합니다.",
   });
@@ -118,6 +117,7 @@ const validateUpdateUserInfo: RequestHandler = (req, res, next) => {
       newPasswordConfirm,
       phoneNumber,
       newPassword,
+      provider,
     } = req.body;
 
     const parsedContext = updateUserInfoSchema.safeParse({
@@ -127,6 +127,7 @@ const validateUpdateUserInfo: RequestHandler = (req, res, next) => {
       newPasswordConfirm,
       phoneNumber,
       newPassword,
+      provider,
     });
 
     if (!parsedContext.success) {
