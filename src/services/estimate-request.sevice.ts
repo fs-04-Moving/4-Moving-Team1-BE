@@ -206,7 +206,7 @@ const countEstimateRequests = async ({
       "officeMove",
     ];
 
-    const serviceTypeCounts = allServiceTypes.reduce<Record<string, number>>(
+    const serviceTypeCount = allServiceTypes.reduce<Record<string, number>>(
       (acc, type) => {
         const found = serviceTypeRawCounts.find(
           (entry) => entry.serviceType === type
@@ -254,7 +254,7 @@ const countEstimateRequests = async ({
       },
     });
 
-    return { ...serviceTypeCounts, serviceAreaCount, assignedCount };
+    return { ...serviceTypeCount, serviceAreaCount, assignedCount };
   } catch (e) {
     throw e;
   }
