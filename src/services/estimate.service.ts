@@ -336,13 +336,19 @@ const getSentEstimates = async ({
   try {
     const [estimates, totalCount] = await Promise.all([
       prisma.estimate.findMany({
-        where: { workerId, NOT: { status: "rejected", price: null } },
+        where: {
+          workerId,
+          AND: [{ status: { not: "rejected" } }, { price: { not: null } }],
+        },
         include: { customer: { select: { name: true } } },
         skip: (page - 1) * pageSize,
         take: pageSize,
       }),
       prisma.estimate.count({
-        where: { workerId, NOT: { status: "rejected", price: null } },
+        where: {
+          workerId,
+          AND: [{ status: { not: "rejected" } }, { price: { not: null } }],
+        },
       }),
     ]);
 

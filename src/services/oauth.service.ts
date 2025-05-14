@@ -25,9 +25,11 @@ export async function handleOAuthCallback(
   try {
     const code = req.query.code as string;
     const state = req.query.state as string; // csrfToken, role 포함
+    console.log("콜백:", state);
     const [csrfTokenFromState, roleFromState] = state.split("|");
+    console.log("cookie:", req.cookies);
     const csrfTokenStored = req.cookies["oauth_csrf_token"];
-
+    console.log("stored:", csrfTokenStored);
     // CSRF 토큰 검증 실패 시 쿠키 제거 후 리다이렉트
     if (!csrfTokenFromState || csrfTokenFromState !== csrfTokenStored) {
       res.clearCookie("oauth_csrf_token", { path: "/" }); // 검증 실패 시에도 삭제
