@@ -23,7 +23,6 @@ const logInController: RequestHandler = asyncHandler(async (req, res, next) => {
 
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
-      // secure: process.env.NODE_ENV === "production",
       secure: false,
       sameSite: "strict",
       path: "/",

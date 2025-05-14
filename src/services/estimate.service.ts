@@ -24,7 +24,7 @@ const createEstimate = async (estimateDto: EstimateDto) => {
     } = estimateRequest;
 
     const estimate = await prisma.estimate.findFirst({
-      where: { customerId, workerId },
+      where: { estimateRequestId: id },
     });
 
     if (estimate) throw new Error("400/estimate already exist");
@@ -336,19 +336,13 @@ const getSentEstimates = async ({
   try {
     const [estimates, totalCount] = await Promise.all([
       prisma.estimate.findMany({
-        where: {
-          workerId,
-          AND: [{ status: { not: "rejected" } }, { price: { not: null } }],
-        },
+        where: { workerId, status: { not: "rejected" }, price: { not: null } },
         include: { customer: { select: { name: true } } },
         skip: (page - 1) * pageSize,
         take: pageSize,
       }),
       prisma.estimate.count({
-        where: {
-          workerId,
-          AND: [{ status: { not: "rejected" } }, { price: { not: null } }],
-        },
+        where: { workerId, status: { not: "rejected" }, price: { not: null } },
       }),
     ]);
 
