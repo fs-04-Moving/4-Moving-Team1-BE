@@ -13,7 +13,9 @@ const authMiddleware: RequestHandler = (req, res, next) => {
     if (
       req.url === "/auth/sign-up" ||
       req.url === "/auth/log-in" ||
-      req.url === "/auth/refresh-token"
+      req.url === "/auth/refresh-token" ||
+      req.url === "/kakao/callback" ||
+      req.url === "/kakao"
     )
       return next();
 

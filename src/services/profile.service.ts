@@ -274,7 +274,7 @@ const getWorkerProfiles = async ({
       default:
         order = '"reviewsCount" DESC';
     }
-
+    const orderClause = `${order}, u.id ASC`;
     const where = `
     u.role = 'worker' AND u."hasProfile" = true
     ${
@@ -329,7 +329,7 @@ END AS "profileImage",
       LEFT JOIN "Estimate" e ON u.id = e."workerId" 
       WHERE ${where}
       GROUP BY u.id, wp."profileImage", wp."experience", wp."nickname", wp."services", wp."serviceAreas",wp."summary"
-      ORDER BY ${order}
+      ORDER BY ${orderClause}
       LIMIT ${limit}
       OFFSET ${offset};
     `);
