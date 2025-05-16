@@ -107,7 +107,7 @@ const getRecivedEstimateReuests = async ({
           OR: [
             {
               estimates: {
-                none: {}, // 아예 없음
+                none: { workerId }, // 아예 없음
               },
             },
             {
@@ -182,7 +182,9 @@ const countEstimateRequests = async ({
         OR: [
           {
             estimates: {
-              none: {}, // 아예 없음
+              none: {
+                workerId,
+              }, // 아예 없음
             },
           },
           {
@@ -225,7 +227,7 @@ const countEstimateRequests = async ({
         OR: [
           {
             estimates: {
-              none: {}, // 아예 없음
+              none: { workerId }, // 아예 없음
             },
           },
           {
@@ -292,6 +294,20 @@ const findInactiveEstimateRequests = async ({
 const findActiveEstimateRequest = async (customerId: string) => {
   try {
     const estimateRequest = await prisma.estimateRequest.findFirst({
+      where: { customerId, status: "active" },
+    });
+    if (!estimateRequest)
+      throw new Error("400/acitve Estimate Request not found");
+
+    return estimateRequest;
+  } catch (e) {
+    throw e;
+  }
+};
+
+const findpendingEstimateRequest = async (customerId: string) => {
+  try {
+    const estimateRequest = await prisma.estimateRequest.findFirst({
       where: { customerId, NOT: { status: "inactive" } },
     });
     if (!estimateRequest)
@@ -311,6 +327,7 @@ const estimateRequstService = {
   findInactiveEstimateRequests,
   findActiveEstimateRequest,
   countEstimateRequests,
+  findpendingEstimateRequest,
 };
 
 export default estimateRequstService;

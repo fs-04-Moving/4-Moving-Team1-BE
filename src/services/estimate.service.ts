@@ -24,7 +24,7 @@ const createEstimate = async (estimateDto: EstimateDto) => {
     } = estimateRequest;
 
     const estimate = await prisma.estimate.findFirst({
-      where: { estimateRequestId: id },
+      where: { estimateRequestId: id, workerId, customerId },
     });
 
     if (estimate) throw new Error("400/estimate already exist");
@@ -118,7 +118,7 @@ const getPendingEstimates = async ({
   try {
     // 아이디 찾기
     const { id: estimateRequestId } =
-      await estimateRequstService.findActiveEstimateRequest(customerId);
+      await estimateRequstService.findpendingEstimateRequest(customerId);
 
     const [pendingEstimates, totalCount] = await Promise.all([
       prisma.estimate.findMany({
