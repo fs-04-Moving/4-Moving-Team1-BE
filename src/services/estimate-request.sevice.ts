@@ -123,7 +123,7 @@ const getRecivedEstimateReuests = async ({
   };
 
   const orderByField: Prisma.EstimateRequestOrderByWithRelationInput =
-    orderBy === "earliestMove" ? { movingDate: "asc" } : { createdAt: "asc" };
+    orderBy === "earliestMove" ? { movingDate: "asc" } : { createdAt: "desc" };
 
   const requests = await prisma.estimateRequest.findMany({
     where,

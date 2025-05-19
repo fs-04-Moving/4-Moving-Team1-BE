@@ -16,7 +16,7 @@ const notificationController: RequestHandler = async (
   res.setHeader("Content-Type", "text/event-stream");
   res.setHeader("Cache-Control", "no-cache"); // 캐싱 방지
   res.setHeader("Connection", "keep-alive"); // 연결 유지
-  res.setHeader("Access-Control-Allow-Origin", `https://movings.kro.kr`);
+  res.setHeader("Access-Control-Allow-Origin", "https://movings.kro.kr");
   res.setHeader("Access-Control-Allow-Credentials", "true");
   res.flushHeaders(); // 헤더를 강제로 전송
 
@@ -24,7 +24,6 @@ const notificationController: RequestHandler = async (
   res.write(
     `data: ${JSON.stringify({ notification: latestNotifications })}\n\n`
   );
-
   clientsByUserId[userId] = res;
 
   req.on("close", () => {
