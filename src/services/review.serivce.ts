@@ -55,6 +55,7 @@ const getMyReview = async ({
         },
         skip: (page - 1) * pageSize,
         take: pageSize,
+        orderBy: { createdAt: "desc" },
       }),
       prisma.review.count({ where: { customerId } }),
     ]);
@@ -80,6 +81,7 @@ const getWorkerReviews = async ({
       skip: (page - 1) * pageSize,
       take: pageSize,
       include: { customer: { select: { email: true } } },
+      orderBy: { createdAt: "desc" },
     }),
     prisma.review.groupBy({
       by: ["star"],

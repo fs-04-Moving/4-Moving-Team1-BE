@@ -1,8 +1,0 @@
-type workerData = {
-  driverId: string;
-  estimateId: string;
-  serviceType: ServiceType;
-  movingDate: Date;
-};
-
-const [workerData, setWorkerData] = useState<workerData | null>(null);
