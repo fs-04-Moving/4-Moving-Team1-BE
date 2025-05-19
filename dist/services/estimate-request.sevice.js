@@ -66,21 +66,42 @@ const confirmEstimateRequest = (customerId) => __awaiter(void 0, void 0, void 0,
     });
 });
 const getRecivedEstimateReuests = (_a) => __awaiter(void 0, [_a], void 0, function* ({ workerId, page = 1, pageSize = 10, serviceType, serviceArea, search, orderBy = "earliestRequest", isAssigned = false, }) {
-    const where = Object.assign(Object.assign(Object.assign(Object.assign({ status: "active" }, ((serviceType === null || serviceType === void 0 ? void 0 : serviceType.length) && { serviceType: { in: serviceType } })), ((serviceArea === null || serviceArea === void 0 ? void 0 : serviceArea.length) && { departureArea: { in: serviceArea } })), (search && {
+    const where = Object.assign(Object.assign(Object.assign(Object.assign({ status: "active", movingDate: { gt: new Date() } }, ((serviceType === null || serviceType === void 0 ? void 0 : serviceType.length) && { serviceType: { in: serviceType } })), ((serviceArea === null || serviceArea === void 0 ? void 0 : serviceArea.length) && { departureArea: { in: serviceArea } })), (search && {
         user: {
             name: {
                 contains: search,
                 mode: "insensitive",
             },
         },
-    })), (isAssigned && {
-        estimates: {
-            some: {
-                workerId,
-                status: "assigned",
+    })), (isAssigned
+        ? {
+            // isAssigned === true: workerId + status: "assigned" 조건 필수
+            estimates: {
+                some: {
+                    workerId,
+                    status: "assigned",
+                    price: null,
+                },
             },
-        },
-    }));
+        }
+        : {
+            // isAssigned === false: estimates가 없거나 status: "assigned"만 있으면 됨
+            OR: [
+                {
+                    estimates: {
+                        none: { workerId }, // 아예 없음
+                    },
+                },
+                {
+                    estimates: {
+                        some: {
+                            status: "assigned",
+                            price: null,
+                        },
+                    },
+                },
+            ],
+        }));
     const orderByField = orderBy === "earliestMove" ? { movingDate: "asc" } : { createdAt: "asc" };
     const requests = yield client_1.default.estimateRequest.findMany({
         where,
@@ -103,13 +124,14 @@ const getRecivedEstimateReuests = (_a) => __awaiter(void 0, [_a], void 0, functi
             customerId: r.customerId,
             serviceType: r.serviceType,
             movingDate: r.movingDate,
-            departure: r.departureAddress,
+            departure: r.departure,
             destination: r.destination,
             createdAt: r.createdAt,
             updatedAt: r.updatedAt,
             customerName: r.user.name,
-            status: r.estimates.length !== 0 ? "assigned" : null,
+            status: r.estimates[0] ? r.estimates[0].status : null,
             estimateId: (_b = (_a = r.estimates[0]) === null || _a === void 0 ? void 0 : _a.id) !== null && _b !== void 0 ? _b : null,
+            price: r.estimates[0] ? r.estimates[0].price : null,
         };
     });
     const totalCount = yield client_1.default.estimateRequest.count({ where });
@@ -117,6 +139,87 @@ const getRecivedEstimateReuests = (_a) => __awaiter(void 0, [_a], void 0, functi
         list: formatted,
         totalCount,
     };
+});
+const countEstimateRequests = (_a) => __awaiter(void 0, [_a], void 0, function* ({ workerId, serviceArea, }) {
+    try {
+        // 몇개인지
+        const serviceTypeRawCounts = yield client_1.default.estimateRequest.groupBy({
+            by: ["serviceType"],
+            where: {
+                status: "active",
+                movingDate: { gt: new Date() },
+                OR: [
+                    {
+                        estimates: {
+                            none: {
+                                workerId,
+                            }, // 아예 없음
+                        },
+                    },
+                    {
+                        estimates: {
+                            some: {
+                                status: "assigned",
+                                price: null,
+                            },
+                        },
+                    },
+                ],
+            },
+            _count: {
+                _all: true,
+            },
+        });
+        const allServiceTypes = [
+            "smallMove",
+            "homeMove",
+            "officeMove",
+        ];
+        const serviceTypeCount = allServiceTypes.reduce((acc, type) => {
+            const found = serviceTypeRawCounts.find((entry) => entry.serviceType === type);
+            acc[type] = (found === null || found === void 0 ? void 0 : found._count._all) || 0;
+            return acc;
+        }, {});
+        const serviceAreaCount = yield client_1.default.estimateRequest.count({
+            where: {
+                status: "active",
+                movingDate: { gt: new Date() },
+                departureArea: { in: serviceArea },
+                OR: [
+                    {
+                        estimates: {
+                            none: { workerId }, // 아예 없음
+                        },
+                    },
+                    {
+                        estimates: {
+                            some: {
+                                status: "assigned",
+                                price: null,
+                            },
+                        },
+                    },
+                ],
+            },
+        });
+        const assignedCount = yield client_1.default.estimateRequest.count({
+            where: {
+                status: "active",
+                movingDate: { gt: new Date() },
+                estimates: {
+                    some: {
+                        workerId,
+                        status: "assigned",
+                        price: null,
+                    },
+                },
+            },
+        });
+        return Object.assign(Object.assign({}, serviceTypeCount), { serviceAreaCount, assignedCount });
+    }
+    catch (e) {
+        throw e;
+    }
 });
 const findInactiveEstimateRequests = (_a) => __awaiter(void 0, [_a], void 0, function* ({ customerId, page, pageSize, }) {
     try {
@@ -151,6 +254,19 @@ const findActiveEstimateRequest = (customerId) => __awaiter(void 0, void 0, void
         throw e;
     }
 });
+const findpendingEstimateRequest = (customerId) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const estimateRequest = yield client_1.default.estimateRequest.findFirst({
+            where: { customerId, NOT: { status: "inactive" } },
+        });
+        if (!estimateRequest)
+            throw new Error("400/acitve Estimate Request not found");
+        return estimateRequest;
+    }
+    catch (e) {
+        throw e;
+    }
+});
 const estimateRequstService = {
     createEstimateRequest,
     deleteEstimateRequest,
@@ -158,5 +274,7 @@ const estimateRequstService = {
     getRecivedEstimateReuests,
     findInactiveEstimateRequests,
     findActiveEstimateRequest,
+    countEstimateRequests,
+    findpendingEstimateRequest,
 };
 exports.default = estimateRequstService;

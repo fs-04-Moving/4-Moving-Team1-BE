@@ -60,14 +60,14 @@ async function scheduler() {
 
   for (const estimateRequest of todayEstimates) {
     // 유저에게 메시지 보내기
-    notificationService.sendNotification({
+    notificationService.createNotification({
       message: `내일은 ${formatLocation(
         estimateRequest.departure
       )} → ${formatLocation(estimateRequest.destination)} 이사 예정일이에요. `,
       userId: estimateRequest.customerId,
     });
     //기사에게 메시지 보내기
-    notificationService.sendNotification({
+    notificationService.createNotification({
       message: `내일은 ${formatLocation(
         estimateRequest.departure
       )} → ${formatLocation(estimateRequest.destination)} 이사 예정일이에요. `,

@@ -21,21 +21,33 @@ if (!jwtSecretKey) {
 }
 const authMiddleware = (req, res, next) => {
     try {
-        if (req.url === "/auth/sign-up" || req.url === "/auth/log-in")
+        if (req.url === "/auth/sign-up" ||
+            req.url === "/auth/log-in" ||
+            req.url === "/auth/refresh-token" ||
+            req.url === "/kakao/callback" ||
+            req.url === "/kakao")
             return next();
-        const token = req.headers.authorization;
-        if (!token) {
-            return next();
-        }
-        const accessToken = token.split("Bearer ")[1];
         if (!jwtSecretKey) {
             throw new Error("401/JWT_SECRET is not defined in environment variables");
         }
-        const { sub } = jsonwebtoken_1.default.verify(accessToken, jwtSecretKey);
-        if (typeof sub !== "string") {
-            throw new Error("400/sub is not string");
+        const headerToken = req.headers.authorization;
+        const cookieToken = req.cookies.accessToken;
+        //헤더로 오는경우
+        if (headerToken) {
+            const accessToken = headerToken.split("Bearer ")[1];
+            const { sub } = jsonwebtoken_1.default.verify(accessToken, jwtSecretKey);
+            if (typeof sub !== "string") {
+                throw new Error("400/sub is not string");
+            }
+            console.log("헤더로 토큰이 왔습니다!");
+            req.userId = sub;
         }
-        req.userId = sub;
+        // 쿠키로 오는경우
+        else if (cookieToken) {
+            const payload = jsonwebtoken_1.default.verify(cookieToken, jwtSecretKey);
+            console.log("쿠키로 토큰이 왔습니다!");
+            req.userId = payload.sub;
+        }
         next();
     }
     catch (e) {

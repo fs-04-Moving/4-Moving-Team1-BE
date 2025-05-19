@@ -27,7 +27,7 @@ const getUserMeController = (0, error_middleware_1.asyncHandler)((req, res, next
 // 유저 정보 업데이트 : 이름 , 이메일 , 전화번호, 비밀번호
 const updateUserMeController = (0, error_middleware_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const userId = req.userId;
-    const { email, password, newPassword, name, phoneNumber } = req.body;
+    const { email, password, newPassword, name, phoneNumber, provider } = req.body;
     const updateUserDto = {
         userId,
         email,
@@ -35,9 +35,19 @@ const updateUserMeController = (0, error_middleware_1.asyncHandler)((req, res, n
         newPassword,
         name,
         phoneNumber,
+        provider,
     };
     yield user_service_1.default.updateUserInfo(updateUserDto);
     res.sendStatus(204);
 }));
-const user = { getUserMeController, updateUserMeController };
+const getUserInfoController = (0, error_middleware_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const userId = req.userId;
+    const userInfo = yield user_service_1.default.getUserInfo(userId);
+    res.status(200).send(userInfo);
+}));
+const user = {
+    getUserMeController,
+    updateUserMeController,
+    getUserInfoController,
+};
 exports.default = user;

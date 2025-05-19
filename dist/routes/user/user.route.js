@@ -13,4 +13,5 @@ userRouter.use(auth_middleware_1.authenticatedOnly);
 userRouter.get("/me", user_controller_1.default.getUserMeController);
 // 내 정보 수정하기 , 이메일,이름,전화번호,비밀번호 수정
 userRouter.put("/", auth_validation_1.validateUpdateUserInfo, user_controller_1.default.updateUserMeController);
+userRouter.get("/info", user_controller_1.default.getUserInfoController);
 exports.default = userRouter;

@@ -46,15 +46,18 @@ const getMyReview = (_a) => __awaiter(void 0, [_a], void 0, function* ({ custome
                                     workProfile: {
                                         select: {
                                             nickname: true,
+                                            profileImage: true,
                                         },
                                     },
                                 },
                             },
                         },
                     },
+                    customer: { select: { email: true } },
                 },
                 skip: (page - 1) * pageSize,
                 take: pageSize,
+                orderBy: { createdAt: "desc" },
             }),
             client_1.default.review.count({ where: { customerId } }),
         ]);
@@ -70,6 +73,8 @@ const getWorkerReviews = (_a) => __awaiter(void 0, [_a], void 0, function* ({ pa
             where: { workerId },
             skip: (page - 1) * pageSize,
             take: pageSize,
+            include: { customer: { select: { email: true } } },
+            orderBy: { createdAt: "desc" },
         }),
         client_1.default.review.groupBy({
             by: ["star"],
@@ -81,6 +86,7 @@ const getWorkerReviews = (_a) => __awaiter(void 0, [_a], void 0, function* ({ pa
             _avg: { star: true },
         }),
     ]);
+    const formattedReviews = reviews.map((review) => (Object.assign(Object.assign({}, review), { customerEmail: review.customer.email, customer: undefined })));
     const starCountList = [0, 0, 0, 0, 0];
     group.forEach((item) => {
         const star = item.star;
@@ -90,7 +96,7 @@ const getWorkerReviews = (_a) => __awaiter(void 0, [_a], void 0, function* ({ pa
         return a + b;
     }, 0);
     return {
-        list: reviews,
+        list: formattedReviews,
         starCountList,
         totalCount,
         rating: avgStar._avg.star,

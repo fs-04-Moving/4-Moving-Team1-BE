@@ -18,20 +18,32 @@ const profile_service_1 = __importDefault(require("../services/profile.service")
 const user_service_1 = __importDefault(require("../services/user.service"));
 // 견적 요청 생성하기
 const createEstimateRequestController = (0, error_middleware_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { serviceType, departureAddress, destination, movingDate, departureArea, } = req.body;
+    const { serviceType, departure, destination, movingDate, departureArea } = req.body;
     const customerId = req.userId;
     const estimateRequstDto = {
         customerId,
         serviceType,
-        departureAddress,
+        departure,
         destination,
         movingDate,
         departureArea,
     };
     // await 서비스 함수 호출
     yield estimate_request_sevice_1.default.createEstimateRequest(estimateRequstDto);
-    yield user_service_1.default.updateUserRequestStatus(customerId);
-    res.sendStatus(201);
+    const { accessToken, refreshToken } = yield user_service_1.default.updateUserRequestStatus(customerId);
+    res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: false,
+        sameSite: "strict",
+        maxAge: 1000 * 60 * 60 * 24 * 7, // 7일
+    });
+    res.cookie("accessToken", accessToken, {
+        httpOnly: true,
+        secure: false,
+        sameSite: "strict",
+        path: "/",
+    });
+    res.status(200).send({ accessToken });
 }));
 // 견적 요청 삭제하기
 const deleteEstimateRequestController = (0, error_middleware_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
@@ -49,14 +61,14 @@ const getEstimateRequestsController = (0, error_middleware_1.asyncHandler)((req,
         pageSize,
     });
     const estimateRequests = yield Promise.all(inactiveEstimateRequests.map((inactiveEstimateRequest) => __awaiter(void 0, void 0, void 0, function* () {
-        const { id, createdAt, serviceType, movingDate, departureAddress, destination, } = inactiveEstimateRequest;
+        const { id, createdAt, serviceType, movingDate, departure, destination, } = inactiveEstimateRequest;
         return {
             id,
             requestDate: createdAt,
             serviceType,
             movingDate,
             destination,
-            departureAddress,
+            departure,
         };
     })));
     res.status(200).send({ list: estimateRequests, totalCount });
@@ -83,7 +95,12 @@ const getRequsetEstimateRequestsController = (0, error_middleware_1.asyncHandler
         search,
         isAssigned,
     });
-    res.status(200).send(data);
+    serviceArea = yield profile_service_1.default.getWorkerServiceArea(workerId);
+    const count = yield estimate_request_sevice_1.default.countEstimateRequests({
+        serviceArea,
+        workerId,
+    });
+    res.status(200).send(Object.assign(Object.assign({}, data), count));
 }));
 const estimateRequest = {
     createEstimateRequestController,

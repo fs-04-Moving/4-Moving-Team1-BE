@@ -6,7 +6,7 @@ const zod_1 = require("zod");
 exports.estimateRequestSchema = zod_1.z.object({
     serviceType: zod_1.z.nativeEnum(client_1.ServiceType),
     movingDate: zod_1.z.coerce.date(),
-    departureAddress: zod_1.z.string().min(1, "Departure is required"),
+    departure: zod_1.z.string().min(1, "Departure is required"),
     destination: zod_1.z.string().min(1, "Destination is required"),
     departureArea: zod_1.z.nativeEnum(client_1.Area),
 });
@@ -20,11 +20,11 @@ const estimateRequestQuerySchema = zod_1.z.object({
 });
 const validateEstimateRequset = (req, res, next) => {
     try {
-        const { serviceType, movingDate, departureAddress, destination, departureArea, } = req.body;
+        const { serviceType, movingDate, departure, destination, departureArea } = req.body;
         const parsedContext = exports.estimateRequestSchema.safeParse({
             serviceType,
             movingDate,
-            departureAddress,
+            departure,
             destination,
             departureArea,
         });
