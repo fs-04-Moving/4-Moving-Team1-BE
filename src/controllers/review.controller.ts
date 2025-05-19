@@ -40,6 +40,7 @@ const getMyReviewController: RequestHandler = asyncHandler(
       const profileImage = review.estimate.worker.workProfile?.profileImage
         ? `${BASE_URL}/static/${review.estimate.worker.workProfile.profileImage}`
         : null;
+
       return {
         id: review.id,
         workerId: review.workerId,
@@ -53,7 +54,7 @@ const getMyReviewController: RequestHandler = asyncHandler(
         price: review.estimate?.price,
         status: review.estimate?.status,
         nickname: review.estimate?.worker?.workProfile?.nickname,
-        profile: profileImage,
+        profileImage: profileImage,
       };
     });
 
