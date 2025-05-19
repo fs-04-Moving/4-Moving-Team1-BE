@@ -1,6 +1,9 @@
 name: Daily Estimate Status Update
 
 on:
+  push:
+    branches:
+      - develop
   schedule:
     - cron: "0 0 * * *" # 매일 KST 오전 9시 실행
 
