@@ -15,19 +15,17 @@ const logInController: RequestHandler = asyncHandler(async (req, res, next) => {
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: true, // prod에서는 true로 변경
+      secure: false, // prod에서는 true로 변경
       sameSite: "strict",
       path: "/",
       maxAge: 1000 * 60 * 60 * 24 * 7, // 7일
-      domain: ".movings.kro.kr",
     });
 
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
-      secure: true,
+      secure: false,
       sameSite: "strict",
       path: "/",
-      domain: ".movings.kro.kr",
     });
     // sameSite:none secure:ture
     // 백엔드랑 프론트엔드 ip
@@ -87,18 +85,16 @@ const refreshTokenController: RequestHandler = asyncHandler(
 const logOutController: RequestHandler = (req, res) => {
   res.clearCookie("refreshToken", {
     httpOnly: true,
-    secure: true,
+    secure: false,
     sameSite: "strict",
     path: "/",
-    domain: ".movings.kro.kr",
   });
 
   res.clearCookie("accessToken", {
     httpOnly: true,
-    secure: true,
+    secure: false,
     sameSite: "strict",
     path: "/",
-    domain: ".movings.kro.kr",
   });
 
   res.status(200).send({ message: "로그아웃 완료" });

@@ -5,8 +5,8 @@ import express from "express";
 import { errorHandler } from "./middleware/error.middleware";
 import router from "./routes";
 
-// export const BASE_URL = 'http://localhost:5050';
-export const BASE_URL = "http://54.180.2.174";
+export const BASE_URL = "http://localhost:5050";
+// export const BASE_URL = "http://54.180.2.174";
 export const CLIENT_URL = process.env.CLIENT_URL;
 const app = express();
 const port = 5050;
@@ -14,7 +14,7 @@ const port = 5050;
 app.use(express.json());
 app.use(
   cors({
-    origin: ['https://movings.kro.kr'],
+    origin: ["http://localhost:3000"],
     credentials: true,
   })
 );

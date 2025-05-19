@@ -29,17 +29,15 @@ const createEstimateRequestController: RequestHandler = asyncHandler(
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: true,
+      secure: false,
       sameSite: "strict",
       maxAge: 1000 * 60 * 60 * 24 * 7, // 7일
-      domain: ".movings.kro.kr",
     });
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
-      secure: true,
+      secure: false,
       sameSite: "strict",
       path: "/",
-      domain: ".movings.kro.kr",
     });
 
     res.status(200).send({ accessToken });
