@@ -10,7 +10,7 @@ const createEstimate = async (estimateDto: EstimateDto) => {
     const { workerId, customerId, status, price } = estimateDto;
 
     const estimateRequest =
-      await estimateRequstService.findActiveEstimateRequest(customerId);
+      await estimateRequstService.findpendingEstimateRequest(customerId);
 
     await userService.findUser(workerId);
 
