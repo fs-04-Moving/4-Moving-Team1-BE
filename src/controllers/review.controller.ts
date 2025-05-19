@@ -4,6 +4,8 @@ import { ReviewDto } from "../types/review.type";
 import estimateService from "../services/estimate.service";
 import reviewService from "../services/review.serivce";
 import { PaginationQuery } from "../validations/common.validation";
+import { profile } from "console";
+import { BASE_URL } from "../app";
 
 const createReviewController: RequestHandler = asyncHandler(
   async (req, res, next) => {
@@ -34,20 +36,27 @@ const getMyReviewController: RequestHandler = asyncHandler(
       pageSize,
     });
 
-    const list = reviews.map((review) => ({
-      id: review.id,
-      workerId: review.workerId,
-      customerId: review.customerId,
-      star: review.star,
-      createdAt: review.createdAt,
-      content: review.content,
-      estimateId: review.estimateId,
-      serviceType: review.estimate?.serviceType,
-      movingDate: review.estimate?.movingDate,
-      price: review.estimate?.price,
-      status: review.estimate?.status,
-      nickname: review.estimate?.worker?.workProfile?.nickname,
-    }));
+    const list = reviews.map((review) => {
+      const profileImage = review.estimate.worker.workProfile?.profileImage
+        ? `${BASE_URL}/static/${review.estimate.worker.workProfile.profileImage}`
+        : null;
+
+      return {
+        id: review.id,
+        workerId: review.workerId,
+        customerId: review.customerId,
+        star: review.star,
+        createdAt: review.createdAt,
+        content: review.content,
+        estimateId: review.estimateId,
+        serviceType: review.estimate?.serviceType,
+        movingDate: review.estimate?.movingDate,
+        price: review.estimate?.price,
+        status: review.estimate?.status,
+        nickname: review.estimate?.worker?.workProfile?.nickname,
+        profileImage: profileImage,
+      };
+    });
 
     res.status(200).send({ list, totalCount });
   }

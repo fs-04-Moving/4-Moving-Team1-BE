@@ -118,7 +118,7 @@ const getPendingEstimates = async ({
   try {
     // 아이디 찾기
     const { id: estimateRequestId } =
-      await estimateRequstService.findpendingEstimateRequest(customerId);
+      await estimateRequstService.findActiveEstimateRequest(customerId);
 
     const [pendingEstimates, totalCount] = await Promise.all([
       prisma.estimate.findMany({
@@ -412,6 +412,7 @@ const getReviewableEstimates = async ({
               workProfile: {
                 select: {
                   nickname: true,
+                  profileImage: true,
                 },
               },
             },

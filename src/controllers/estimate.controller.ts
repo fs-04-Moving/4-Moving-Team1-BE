@@ -430,17 +430,23 @@ const getReviewableEstimatesController: RequestHandler = asyncHandler(
         pageSize,
       });
 
-    const list = estimates.map((estimate) => ({
-      id: estimate.id,
-      workerId: estimate.workerId,
-      serviceType: estimate.serviceType,
-      movingDate: estimate.movingDate,
-      departure: estimate.departure,
-      destination: estimate.destination,
-      price: estimate.price,
-      status: estimate.status,
-      nickname: estimate.worker?.workProfile?.nickname,
-    }));
+    const list = estimates.map((estimate) => {
+      const profileImage = estimate.worker.workProfile?.profileImage
+        ? `${BASE_URL}/static/${estimate.worker.workProfile.profileImage}`
+        : null;
+      return {
+        id: estimate.id,
+        workerId: estimate.workerId,
+        serviceType: estimate.serviceType,
+        movingDate: estimate.movingDate,
+        departure: estimate.departure,
+        destination: estimate.destination,
+        price: estimate.price,
+        status: estimate.status,
+        nickname: estimate.worker?.workProfile?.nickname,
+        profileImage,
+      };
+    });
 
     res.send({ list, totalCount }).status(200);
   }
