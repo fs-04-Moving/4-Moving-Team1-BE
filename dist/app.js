@@ -17,7 +17,7 @@ const app = (0, express_1.default)();
 const port = 5050;
 app.use(express_1.default.json());
 app.use((0, cors_1.default)({
-    origin: exports.CLIENT_URL,
+    origin: ['https://movings.kro.kr'],
     credentials: true,
 }));
 app.use((0, cookie_parser_1.default)());

@@ -23,14 +23,14 @@ const logInController = (0, error_middleware_1.asyncHandler)((req, res, next) =>
         req.userId = sub;
         res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
-            secure: false, // prod에서는 true로 변경
+            secure: true, // prod에서는 true로 변경
             sameSite: "strict",
             path: "/",
             maxAge: 1000 * 60 * 60 * 24 * 7, // 7일
         });
         res.cookie("accessToken", accessToken, {
             httpOnly: true,
-            secure: false,
+            secure: true,
             sameSite: "strict",
             path: "/",
         });
@@ -78,13 +78,13 @@ const refreshTokenController = (0, error_middleware_1.asyncHandler)((req, res, n
 const logOutController = (req, res) => {
     res.clearCookie("refreshToken", {
         httpOnly: true,
-        // secure: process.env.NODE_ENV === "production",
+        secure: true,
         sameSite: "strict",
         path: "/",
     });
     res.clearCookie("accessToken", {
         httpOnly: true,
-        // secure: process.env.NODE_ENV === "production",
+        secure: true,
         sameSite: "strict",
         path: "/",
     });

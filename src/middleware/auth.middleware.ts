@@ -40,7 +40,7 @@ const authMiddleware: RequestHandler = (req, res, next) => {
     // 쿠키로 오는경우
     else if (cookieToken) {
       const payload = jwt.verify(cookieToken, jwtSecretKey) as { sub: string };
-      console.log("쿠키로 토큰이 왔습니다!");
+      console.log("쿠키로 토큰이 왔습니다!:", cookieToken);
       req.userId = payload.sub;
     }
 
