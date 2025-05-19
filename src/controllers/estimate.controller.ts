@@ -398,6 +398,7 @@ const getRejectEstimatesController: RequestHandler = asyncHandler(
           updatedAt,
           status,
           customer,
+          rejectionMessage,
         }) => {
           return {
             id,
@@ -410,6 +411,7 @@ const getRejectEstimatesController: RequestHandler = asyncHandler(
             updatedAt,
             status,
             customerName: customer?.name,
+            rejectedMessage: rejectionMessage,
           };
         }
       )
