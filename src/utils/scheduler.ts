@@ -2,6 +2,7 @@ import prisma from "../db/prisma/client";
 import dayjs from "dayjs";
 import notificationService from "../services/notification.service";
 
+// 스케줄러 테스트
 const today = dayjs().startOf("day");
 
 function formatLocation(address: string): string {
