@@ -44,6 +44,7 @@ const getMyReview = async ({
                   workProfile: {
                     select: {
                       nickname: true,
+                      profileImage: true,
                     },
                   },
                 },
