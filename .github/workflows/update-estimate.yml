@@ -1,34 +1,23 @@
 name: Daily Estimate Status Update
 
 on:
-  push:
-    branches:
-      - develop
   schedule:
     - cron: "0 0 * * *" # 매일 KST 오전 9시 실행
 
 jobs:
-  update-estimates:
+  run-scheduler:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+      - name: Run Scheduler on EC2
+        uses: appleboy/ssh-action@v1.0.3
         with:
-          node-version: "18"
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build TypeScript
-        run: npx tsc
-
-      - name: Run daily update script
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
-        run: |
-          node dist/utils/scheduler.js
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd ~/4-Moving-Team1-BE
+            git pull origin develop
+            npm run build
+            npm ci
+            node dist/utils/scheduler.js

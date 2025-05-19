@@ -1,8 +1,7 @@
-import { PrismaClient } from "@prisma/client";
+import prisma from "../db/prisma/client";
 import dayjs from "dayjs";
 import notificationService from "../services/notification.service";
 
-const prisma = new PrismaClient();
 const today = dayjs().startOf("day");
 
 function formatLocation(address: string): string {
