@@ -1,4 +1,4 @@
-import express, { Request, RequestHandler, Response } from "express";
+import { Request, RequestHandler, Response } from "express";
 import notificationService from "../services/notification.service";
 import { CLIENT_URL } from "../app";
 
