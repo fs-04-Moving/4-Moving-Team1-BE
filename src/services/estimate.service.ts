@@ -412,6 +412,7 @@ const getReviewableEstimates = async ({
               workProfile: {
                 select: {
                   nickname: true,
+                  profileImage: true,
                 },
               },
             },
