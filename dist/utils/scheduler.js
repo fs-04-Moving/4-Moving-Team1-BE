@@ -12,10 +12,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const client_1 = require("@prisma/client");
+const client_1 = __importDefault(require("../db/prisma/client"));
 const dayjs_1 = __importDefault(require("dayjs"));
 const notification_service_1 = __importDefault(require("../services/notification.service"));
-const prisma = new client_1.PrismaClient();
+// 스케줄러 테스트
 const today = (0, dayjs_1.default)().startOf("day");
 function formatLocation(address) {
     const parts = address.split(" ").filter(Boolean);
@@ -33,7 +33,7 @@ function formatLocation(address) {
 function scheduler() {
     return __awaiter(this, void 0, void 0, function* () {
         //날짜가 지난거
-        const outOfDateEstimateRequests = yield prisma.estimateRequest.findMany({
+        const outOfDateEstimateRequests = yield client_1.default.estimateRequest.findMany({
             where: {
                 movingDate: { lt: today.toDate() },
                 status: { not: "inactive" },
@@ -41,19 +41,19 @@ function scheduler() {
         });
         // 업데이트
         for (const estimateRequest of outOfDateEstimateRequests) {
-            yield prisma.$transaction([
-                prisma.estimateRequest.update({
+            yield client_1.default.$transaction([
+                client_1.default.estimateRequest.update({
                     where: { id: estimateRequest.id },
                     data: { status: "inactive" },
                 }),
-                prisma.user.update({
+                client_1.default.user.update({
                     where: { id: estimateRequest.customerId },
                     data: { hasRequest: false },
                 }),
             ]);
         }
         //날짜가 내일이고 확정난거
-        const todayEstimates = yield prisma.estimateRequest.findMany({
+        const todayEstimates = yield client_1.default.estimateRequest.findMany({
             where: {
                 movingDate: {
                     gte: today.add(1, "day").toDate(), // 내일
@@ -75,7 +75,7 @@ function scheduler() {
                 userId: estimateRequest.estimates[0].workerId,
             });
         }
-        yield prisma.$disconnect();
+        yield client_1.default.$disconnect();
     });
 }
 scheduler().catch((e) => {

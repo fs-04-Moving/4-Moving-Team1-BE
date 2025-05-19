@@ -14,7 +14,7 @@ const port = 5050;
 app.use(express.json());
 app.use(
   cors({
-    origin: CLIENT_URL,
+    origin: ['https://movings.kro.kr'],
     credentials: true,
   })
 );

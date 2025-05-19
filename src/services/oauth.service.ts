@@ -62,6 +62,7 @@ export async function handleOAuthCallback(
       sameSite: "strict",
       path: "/",
       maxAge: 1000 * 60 * 60 * 24 * 7,
+      domain: ".movings.kro.kr",
     });
 
     res.cookie("accessToken", accessToken, {
@@ -69,6 +70,7 @@ export async function handleOAuthCallback(
       secure: true,
       sameSite: "strict",
       path: "/",
+      domain: ".movings.kro.kr",
     });
 
     res.clearCookie("oauth_csrf_token", { path: "/" }); // 성공 후에도 삭제
@@ -105,6 +107,7 @@ export function handleOAuthRedirect(
     sameSite: "lax", // 외부 리다이렉트 흐름에서도 쿠키 전송 허용
     path: "/",
     maxAge: 5 * 60 * 1000,
+    domain: ".movings.kro.kr",
   });
 
   const url = getAuthURL(state); // 소셜 로그인 URL 생성

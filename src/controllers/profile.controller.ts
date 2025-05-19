@@ -29,15 +29,17 @@ const createCustomerProfileController: RequestHandler = asyncHandler(
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: false,
+      secure: true,
       sameSite: "strict",
       maxAge: 1000 * 60 * 60 * 24 * 7, // 7일
+      domain: ".movings.kro.kr",
     });
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
-      secure: false,
+      secure: true,
       sameSite: "strict",
       path: "/",
+      domain: ".movings.kro.kr",
     });
 
     res.status(200).send({ accessToken });
@@ -81,16 +83,18 @@ const createWorkerProfileController: RequestHandler = asyncHandler(
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: false,
+      secure: true,
       sameSite: "strict",
       maxAge: 1000 * 60 * 60 * 24 * 7, // 7일
+      domain: ".movings.kro.kr",
     });
 
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
-      secure: false,
+      secure: true,
       sameSite: "strict",
       path: "/",
+      domain: ".movings.kro.kr",
     });
 
     res.status(200).send({ accessToken });
@@ -122,15 +126,17 @@ const updateCustomerProfileController: RequestHandler = asyncHandler(
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: false,
+      secure: true,
       sameSite: "strict",
       maxAge: 1000 * 60 * 60 * 24 * 7,
+      domain: ".movings.kro.kr",
     });
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
-      secure: false,
+      secure: true,
       sameSite: "strict",
       path: "/",
+      domain: ".movings.kro.kr",
     });
     res.sendStatus(204);
   }
@@ -173,16 +179,18 @@ const updateWorkerProfileController: RequestHandler = asyncHandler(
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: false,
+      secure: true,
       sameSite: "strict",
       maxAge: 1000 * 60 * 60 * 24 * 7, // 7일
+      domain: ".movings.kro.kr",
     });
 
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
-      secure: false,
+      secure: true,
       sameSite: "strict",
       path: "/",
+      domain: ".movings.kro.kr",
     });
     res.sendStatus(204);
   }
