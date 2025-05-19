@@ -1,8 +1,7 @@
 import { Request, RequestHandler, Response } from "express";
 import notificationService from "../services/notification.service";
 import { CLIENT_URL } from "../app";
-
-export const clientsByUserId: Record<string, Response> = {};
+import { clientsByUserId } from "../utils/notificaiotnClients";
 
 const notificationController: RequestHandler = async (
   req: Request,
@@ -25,10 +24,6 @@ const notificationController: RequestHandler = async (
   res.write(
     `data: ${JSON.stringify({ notification: latestNotifications })}\n\n`
   );
-  // notificationService.sendNotification({
-  //   message: "테스트해야지1212.",
-  //   userId,
-  // });
 
   clientsByUserId[userId] = res;
 

@@ -97,7 +97,7 @@ const getFavoriteWorkers = (_a) => __awaiter(void 0, [_a], void 0, function* ({ 
             }),
         ]);
         const workerIds = favoriteWorkers.map((fav) => fav.worker.id);
-        const [avgStars, confirmedEstimateCounts] = yield Promise.all([
+        const [avgStars, confirmedEstimatesCounts] = yield Promise.all([
             client_1.default.review.groupBy({
                 by: ["workerId"],
                 where: { workerId: { in: workerIds } },
@@ -118,9 +118,9 @@ const getFavoriteWorkers = (_a) => __awaiter(void 0, [_a], void 0, function* ({ 
             const workerId = fav.worker.id;
             const avgStar = ((_a = avgStars.find((review) => review.workerId === workerId)) === null || _a === void 0 ? void 0 : _a._avg.star) ||
                 null;
-            const confirmedEstimateCount = ((_b = confirmedEstimateCounts.find((estimate) => estimate.workerId === workerId)) === null || _b === void 0 ? void 0 : _b._count._all) || 0;
+            const confirmedEstimatesCount = ((_b = confirmedEstimatesCounts.find((estimate) => estimate.workerId === workerId)) === null || _b === void 0 ? void 0 : _b._count._all) || 0;
             return Object.assign(Object.assign({}, fav), { worker: Object.assign(Object.assign({}, fav.worker), { avgStar,
-                    confirmedEstimateCount }) });
+                    confirmedEstimatesCount }) });
         });
         return { favoriteWorkersWithData, totalCount };
     }

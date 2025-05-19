@@ -12,8 +12,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const notification_controller_1 = require("../controllers/notification.controller");
 const client_1 = __importDefault(require("../db/prisma/client"));
+const notificaiotnClients_1 = require("../utils/notificaiotnClients");
 const sendNotification = (_a) => __awaiter(void 0, [_a], void 0, function* ({ message, userId, }) {
     const newNotification = yield client_1.default.notification.create({
         data: {
@@ -28,8 +28,8 @@ const sendNotification = (_a) => __awaiter(void 0, [_a], void 0, function* ({ me
         isRead: newNotification.isRead,
         createdAt: newNotification.createdAt,
     };
-    if (notification_controller_1.clientsByUserId[userId]) {
-        notification_controller_1.clientsByUserId[userId].write(`data: ${JSON.stringify({ notification })}\n\n`);
+    if (notificaiotnClients_1.clientsByUserId[userId]) {
+        notificaiotnClients_1.clientsByUserId[userId].write(`data: ${JSON.stringify({ notification })}\n\n`);
     }
 });
 const getNotification = (userId) => __awaiter(void 0, void 0, void 0, function* () {
@@ -46,5 +46,18 @@ const getNotification = (userId) => __awaiter(void 0, void 0, void 0, function* 
     });
     return notifications;
 });
-const notificationService = { sendNotification, getNotification };
+const createNotification = (_a) => __awaiter(void 0, [_a], void 0, function* ({ message, userId, }) {
+    yield client_1.default.notification.create({
+        data: {
+            userId,
+            message,
+            isRead: false,
+        },
+    });
+});
+const notificationService = {
+    sendNotification,
+    getNotification,
+    createNotification,
+};
 exports.default = notificationService;

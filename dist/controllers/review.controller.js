@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const error_middleware_1 = require("../middleware/error.middleware");
 const estimate_service_1 = __importDefault(require("../services/estimate.service"));
 const review_serivce_1 = __importDefault(require("../services/review.serivce"));
+const app_1 = require("../app");
 const createReviewController = (0, error_middleware_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { estimateId } = req.params;
     const customerId = req.userId;
@@ -39,8 +40,11 @@ const getMyReviewController = (0, error_middleware_1.asyncHandler)((req, res, ne
         pageSize,
     });
     const list = reviews.map((review) => {
-        var _a, _b, _c, _d, _e, _f, _g;
-        return ({
+        var _a, _b, _c, _d, _e, _f, _g, _h;
+        const profileImage = ((_a = review.estimate.worker.workProfile) === null || _a === void 0 ? void 0 : _a.profileImage)
+            ? `${app_1.BASE_URL}/static/${review.estimate.worker.workProfile.profileImage}`
+            : null;
+        return {
             id: review.id,
             workerId: review.workerId,
             customerId: review.customerId,
@@ -48,12 +52,13 @@ const getMyReviewController = (0, error_middleware_1.asyncHandler)((req, res, ne
             createdAt: review.createdAt,
             content: review.content,
             estimateId: review.estimateId,
-            serviceType: (_a = review.estimate) === null || _a === void 0 ? void 0 : _a.serviceType,
-            movingDate: (_b = review.estimate) === null || _b === void 0 ? void 0 : _b.movingDate,
-            price: (_c = review.estimate) === null || _c === void 0 ? void 0 : _c.price,
-            status: (_d = review.estimate) === null || _d === void 0 ? void 0 : _d.status,
-            workerNickname: (_g = (_f = (_e = review.estimate) === null || _e === void 0 ? void 0 : _e.worker) === null || _f === void 0 ? void 0 : _f.workProfile) === null || _g === void 0 ? void 0 : _g.nickname,
-        });
+            serviceType: (_b = review.estimate) === null || _b === void 0 ? void 0 : _b.serviceType,
+            movingDate: (_c = review.estimate) === null || _c === void 0 ? void 0 : _c.movingDate,
+            price: (_d = review.estimate) === null || _d === void 0 ? void 0 : _d.price,
+            status: (_e = review.estimate) === null || _e === void 0 ? void 0 : _e.status,
+            nickname: (_h = (_g = (_f = review.estimate) === null || _f === void 0 ? void 0 : _f.worker) === null || _g === void 0 ? void 0 : _g.workProfile) === null || _h === void 0 ? void 0 : _h.nickname,
+            profileImage: profileImage,
+        };
     });
     res.status(200).send({ list, totalCount });
 }));

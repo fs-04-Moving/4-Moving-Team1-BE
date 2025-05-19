@@ -40,18 +40,22 @@ const updateUserInfoSchema = zod_1.z
     .object({
     email: emailSchema,
     name: nameSchema,
-    password: passwordSchema,
-    passwordConfirm: passwordSchema,
+    password: passwordSchema.optional(),
+    newPasswordConfirm: passwordSchema.optional(),
     phoneNumber: phoneNumberSchema,
+    provider: zod_1.z
+        .nativeEnum(client_1.Provider, { message: "Invalid provider" })
+        .optional(),
     newPassword: zod_1.z
         .string()
         .min(8, { message: "새 비밀번호는 8자 이상이어야 합니다" })
-        .regex(passwordRegex, "영문/숫자/특수문자를 모두 포함해야 합니다"),
+        .regex(passwordRegex, "영문/숫자/특수문자를 모두 포함해야 합니다")
+        .optional(),
 })
-    .refine((data) => data.passwordConfirm === data.password, {
+    .refine((data) => data.newPasswordConfirm === data.newPassword, {
     message: "password don't match ",
 })
-    .refine((data) => data.newPassword !== data.password, {
+    .refine((data) => !data.newPassword || data.newPassword !== data.password, {
     message: "새로운 비밀번호가 현재 비밀번호와 달라야합니다.",
 });
 const validateSignUp = (req, res, next) => {
@@ -97,14 +101,15 @@ const validateSignIn = (req, res, next) => {
 exports.validateSignIn = validateSignIn;
 const validateUpdateUserInfo = (req, res, next) => {
     try {
-        const { email, name, password, passwordConfirm, phoneNumber, newPassword } = req.body;
+        const { email, name, password, newPasswordConfirm, phoneNumber, newPassword, provider, } = req.body;
         const parsedContext = updateUserInfoSchema.safeParse({
             email,
             name,
             password,
-            passwordConfirm,
+            newPasswordConfirm,
             phoneNumber,
             newPassword,
+            provider,
         });
         if (!parsedContext.success) {
             throw new Error(`400/Validation error: ${parsedContext.error}`);

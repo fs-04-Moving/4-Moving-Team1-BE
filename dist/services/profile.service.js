@@ -136,14 +136,14 @@ const updateWorkerProfile = (workerProfileDto) => __awaiter(void 0, void 0, void
     }
 });
 // 기사 유저의 profile 가져오기
-// workerProfileImage: string;
-// workerSummary: string;
-// workerNickname: string;
-// workerFavoritesCount: number;
-// workerReviewsCount: number;
-// workerRating: number;
-// workerExperience: number;
-// workerConfirmedEstimatesCount: number;
+// profileImage: string;
+// summary: string;
+// nickname: string;
+// favoritesCount: number;
+// reviewsCount: number;
+// rating: number;
+// experience: number;
+// confirmedEstimatesCount: number;
 const getWorkerProfile = (workerId) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const now = new Date();
@@ -151,7 +151,7 @@ const getWorkerProfile = (workerId) => __awaiter(void 0, void 0, void 0, functio
         const worker = yield client_1.default.user.findFirst({
             where: { id: workerId },
             include: {
-                _count: { select: { customerFavorites: true, receivedReviews: true } },
+                _count: { select: { workerFavorites: true, receivedReviews: true } },
                 workProfile: {
                     select: {
                         profileImage: true,
@@ -173,7 +173,7 @@ const getWorkerProfile = (workerId) => __awaiter(void 0, void 0, void 0, functio
             where: { workerId },
             _avg: { star: true },
         });
-        const confirmedEstimateCount = yield client_1.default.estimate.count({
+        const confirmedEstimatesCount = yield client_1.default.estimate.count({
             where: {
                 workerId,
                 isConfirmed: true,
@@ -189,12 +189,13 @@ const getWorkerProfile = (workerId) => __awaiter(void 0, void 0, void 0, functio
             summary: worker.workProfile.summary,
             nickname: worker.workProfile.nickname,
             experience: worker.workProfile.experience,
-            favoritesCount: worker._count.customerFavorites || 0,
+            favoritesCount: worker._count.workerFavorites || 0,
             reviewsCount: worker._count.receivedReviews || 0,
             reviewsAverage: (_a = avgStar._avg.star) !== null && _a !== void 0 ? _a : null,
-            confirmedEstimatesCount: confirmedEstimateCount || 0,
+            confirmedEstimatesCount: confirmedEstimatesCount || 0,
             serviceType: worker.workProfile.services,
             serviceArea: worker.workProfile.serviceAreas,
+            description: worker.workProfile.description,
         };
     }
     catch (e) {
@@ -244,11 +245,12 @@ const getWorkerProfiles = (_a) => __awaiter(void 0, [_a], void 0, function* ({ o
                 order = 'wp."experience" DESC';
                 break;
             case "mostConfirmed":
-                order = '"confirmedEstimateCount" DESC';
+                order = '"confirmedEstimatesCount" DESC';
                 break;
             default:
                 order = '"reviewsCount" DESC';
         }
+        const orderClause = `${order}, u.id ASC`;
         const where = `
     u.role = 'worker' AND u."hasProfile" = true
     ${serviceType
@@ -287,7 +289,7 @@ END AS "profileImage",
         count(distinct CASE 
           WHEN e."isConfirmed" = true AND e."movingDate" < NOW() 
           THEN e.id 
-        END)::int as "confirmedEstimateCount",
+        END)::int as "confirmedEstimatesCount",
         ${favoriteField}
       FROM "User" u 
       LEFT JOIN "WorkerProfile" wp ON u.id = wp."workerId" 
@@ -296,7 +298,7 @@ END AS "profileImage",
       LEFT JOIN "Estimate" e ON u.id = e."workerId" 
       WHERE ${where}
       GROUP BY u.id, wp."profileImage", wp."experience", wp."nickname", wp."services", wp."serviceAreas",wp."summary"
-      ORDER BY ${order}
+      ORDER BY ${orderClause}
       LIMIT ${limit}
       OFFSET ${offset};
     `);
@@ -320,7 +322,7 @@ END AS "profileImage",
         throw e;
     }
 });
-const getWorkerNickname = (userId) => __awaiter(void 0, void 0, void 0, function* () {
+const getnickname = (userId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const worker = yield client_1.default.workerProfile.findFirst({
             where: { workerId: userId },
@@ -329,6 +331,36 @@ const getWorkerNickname = (userId) => __awaiter(void 0, void 0, void 0, function
         if (!worker)
             throw new Error("400/worker not found");
         return worker;
+    }
+    catch (e) {
+        throw e;
+    }
+});
+const getWorkerProfileMe = (workerId) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const workerProfile = yield client_1.default.workerProfile.findFirst({
+            where: {
+                workerId,
+            },
+        });
+        if (!workerProfile)
+            throw new Error("400/worker profile not found");
+        return workerProfile;
+    }
+    catch (e) {
+        throw e;
+    }
+});
+const getCustomerProfileMe = (customerId) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const customerProfile = yield client_1.default.customerProfile.findFirst({
+            where: {
+                customerId,
+            },
+        });
+        if (!customerProfile)
+            throw new Error("400/customer profile not found");
+        return customerProfile;
     }
     catch (e) {
         throw e;
@@ -343,6 +375,8 @@ const profileService = {
     getWorkerProfile,
     getWorkerServiceArea,
     getWorkerProfiles,
-    getWorkerNickname,
+    getnickname,
+    getWorkerProfileMe,
+    getCustomerProfileMe,
 };
 exports.default = profileService;

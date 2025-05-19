@@ -66,8 +66,10 @@ const getUserMe = (userId) => __awaiter(void 0, void 0, void 0, function* () {
         const user = yield client_1.default.user.findFirst({ where: { id: userId } });
         if (!user)
             throw new Error("400/user not found");
-        const { name, hasProfile, role, hasRequest } = user;
+        const { id, name, hasProfile, role, hasRequest, email } = user;
         const userData = {
+            sub: id,
+            email,
             name,
             hasProfile,
             role,
@@ -114,24 +116,38 @@ const getProfileImage = (userId) => __awaiter(void 0, void 0, void 0, function* 
 //유저 정보 업데이트하는 함수
 const updateUserInfo = (updateUserDto) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { userId, password, newPassword } = updateUserDto, rest = __rest(updateUserDto, ["userId", "password", "newPassword"]);
-        let user = yield client_1.default.user.findFirst({ where: { id: userId } });
+        const { userId, password, newPassword, provider = "local" } = updateUserDto, rest = __rest(updateUserDto, ["userId", "password", "newPassword", "provider"]);
+        const user = yield client_1.default.user.findFirst({ where: { id: userId } });
         if (!user) {
             throw new Error("400/user not found");
         }
         // 비밀번호 확인하기
-        yield (0, auth_service_1.checkPassword)(password, user.encryptedPassword);
+        if (provider === "local") {
+            yield (0, auth_service_1.checkPassword)(password, user.encryptedPassword);
+        }
         // 비밀번호 생성
-        const encryptedPassword = yield bcrypt_1.default.hash(newPassword, 12);
-        user = yield client_1.default.user.update({
-            where: { id: userId },
-            data: Object.assign(Object.assign({}, rest), { encryptedPassword }),
-            include: {
-                workProfile: { select: { profileImage: true } },
-                customerProfile: { select: { profileImage: true } },
-            },
-        });
-        return auth_service_1.default.createTokenByUserData(user);
+        if (newPassword) {
+            const encryptedPassword = yield bcrypt_1.default.hash(newPassword, 12);
+            yield client_1.default.user.update({
+                where: { id: userId },
+                data: Object.assign(Object.assign({}, rest), { encryptedPassword }),
+                include: {
+                    workProfile: { select: { profileImage: true } },
+                    customerProfile: { select: { profileImage: true } },
+                },
+            });
+        }
+        else {
+            yield client_1.default.user.update({
+                where: { id: userId },
+                data: Object.assign({}, rest),
+                include: {
+                    workProfile: { select: { profileImage: true } },
+                    customerProfile: { select: { profileImage: true } },
+                },
+            });
+        }
+        return;
     }
     catch (e) {
         throw e;
@@ -142,10 +158,11 @@ const updateUserRequestStatus = (userId) => __awaiter(void 0, void 0, void 0, fu
         yield client_1.default.user.findFirstOrThrow({
             where: { id: userId },
         });
-        yield client_1.default.user.update({
+        const user = yield client_1.default.user.update({
             where: { id: userId },
             data: { hasRequest: true },
         });
+        return yield auth_service_1.default.createTokenByUserData(user);
     }
     catch (e) {
         throw e;
@@ -164,11 +181,26 @@ const findUser = (userId) => __awaiter(void 0, void 0, void 0, function* () {
         throw e;
     }
 });
+const getUserInfo = (userId) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const user = yield client_1.default.user.findFirst({
+            where: { id: userId },
+            select: { name: true, phoneNumber: true, email: true, provider: true },
+        });
+        if (!user)
+            throw new Error("400/user not found");
+        return user;
+    }
+    catch (e) {
+        throw e;
+    }
+});
 const userService = {
     getUserMe,
     getProfileImage,
     updateUserInfo,
     updateUserRequestStatus,
     findUser,
+    getUserInfo,
 };
 exports.default = userService;

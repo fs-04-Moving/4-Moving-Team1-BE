@@ -1,5 +1,5 @@
-import { clientsByUserId } from "../controllers/notification.controller";
 import prisma from "../db/prisma/client";
+import { clientsByUserId } from "../utils/notificaiotnClients";
 
 const sendNotification = async ({
   message,

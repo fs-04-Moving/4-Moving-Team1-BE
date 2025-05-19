@@ -15,10 +15,12 @@ profileRouter.post("/customer", auth_middleware_1.authenticatedOnly, auth_middle
 profileRouter.post("/worker", auth_middleware_1.authenticatedOnly, auth_middleware_1.workerOnly, upload_1.uploadProfileImage, (0, profile_validation_1.validateWorkerProfile)(false), profile_controller_1.default.createWorkerProfileController);
 // 일반 유저가 프로필 수정
 profileRouter.put("/customer", auth_middleware_1.authenticatedOnly, auth_middleware_1.customerOnly, upload_1.uploadProfileImage, (0, profile_validation_1.validateCustomerProfile)(true), profile_controller_1.default.updateCustomerProfileController);
-// 기사사 유저가 프로필 수정
+// 기사 유저가 프로필 수정
 profileRouter.put("/worker", auth_middleware_1.authenticatedOnly, auth_middleware_1.workerOnly, upload_1.uploadProfileImage, (0, profile_validation_1.validateWorkerProfile)(true), profile_controller_1.default.updateWorkerProfileController);
 //기사 프로필 상세 보기
 profileRouter.get("/worker/:workerId", profile_controller_1.default.getWorkerProfileController);
 //기사님 찾기
 profileRouter.get("/workers", profile_validation_1.validateGetWorkerProfilesQuery, profile_controller_1.default.getWorkerProfilesController);
+profileRouter.get("/me/worker", auth_middleware_1.authenticatedOnly, profile_controller_1.default.getWorkerProfileMeController);
+profileRouter.get("/me/customer", auth_middleware_1.authenticatedOnly, profile_controller_1.default.getCustomerProfileMeController);
 exports.default = profileRouter;

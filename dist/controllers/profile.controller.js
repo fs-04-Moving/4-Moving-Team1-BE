@@ -12,9 +12,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const app_1 = require("../app");
 const error_middleware_1 = require("../middleware/error.middleware");
-const profile_service_1 = __importDefault(require("../services/profile.service"));
 const favorite_service_1 = __importDefault(require("../services/favorite.service"));
+const profile_service_1 = __importDefault(require("../services/profile.service"));
 // 일반 유저 프로필 생성
 const createCustomerProfileController = (0, error_middleware_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { livingArea, services } = req.body;
@@ -35,10 +36,15 @@ const createCustomerProfileController = (0, error_middleware_1.asyncHandler)((re
     const { accessToken, refreshToken } = yield profile_service_1.default.updateUserProfileStatus(customerId); // 유저 프로필 상태 업데이트 (hasProfile :true)
     res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
-        // secure: process.env.NODE_ENV === "production",
         secure: false,
         sameSite: "strict",
         maxAge: 1000 * 60 * 60 * 24 * 7, // 7일
+    });
+    res.cookie("accessToken", accessToken, {
+        httpOnly: true,
+        secure: false,
+        sameSite: "strict",
+        path: "/",
     });
     res.status(200).send({ accessToken });
 }));
@@ -66,17 +72,22 @@ const createWorkerProfileController = (0, error_middleware_1.asyncHandler)((req,
     const { accessToken, refreshToken } = yield profile_service_1.default.updateUserProfileStatus(workerId); // 유저 프로필 상태 업데이트 (hasProfile :true)
     res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
-        // secure: process.env.NODE_ENV === "production",
         secure: false,
         sameSite: "strict",
         maxAge: 1000 * 60 * 60 * 24 * 7, // 7일
+    });
+    res.cookie("accessToken", accessToken, {
+        httpOnly: true,
+        secure: false,
+        sameSite: "strict",
+        path: "/",
     });
     res.status(200).send({ accessToken });
 }));
 // 일반 유저 프로필 수정
 const updateCustomerProfileController = (0, error_middleware_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { livingArea, services } = req.body;
-    let profileImage = null;
+    let profileImage;
     if (req.file) {
         profileImage = req.file.path;
     }
@@ -90,12 +101,25 @@ const updateCustomerProfileController = (0, error_middleware_1.asyncHandler)((re
         customerId,
     };
     yield profile_service_1.default.updateCustomerProfile(customerProfileDto); //유저 프로필 수정
+    const { accessToken, refreshToken } = yield profile_service_1.default.updateUserProfileStatus(customerId); // 프로필 상태 업데이트 + 토큰 재발급
+    res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: false,
+        sameSite: "strict",
+        maxAge: 1000 * 60 * 60 * 24 * 7,
+    });
+    res.cookie("accessToken", accessToken, {
+        httpOnly: true,
+        secure: false,
+        sameSite: "strict",
+        path: "/",
+    });
     res.sendStatus(204);
 }));
 // 기사 유저 프로필 수정
 const updateWorkerProfileController = (0, error_middleware_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { nickname, experience, summary, description, services, serviceAreas, } = req.body;
-    let profileImage = null;
+    let profileImage;
     if (req.file) {
         profileImage = req.file.path;
     }
@@ -113,6 +137,19 @@ const updateWorkerProfileController = (0, error_middleware_1.asyncHandler)((req,
         workerId,
     };
     yield profile_service_1.default.updateWorkerProfile(workerProfileDto); //유저 프로필 생성
+    const { accessToken, refreshToken } = yield profile_service_1.default.updateUserProfileStatus(workerId); // 유저 프로필 상태 업데이트 (hasProfile :true)
+    res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: false,
+        sameSite: "strict",
+        maxAge: 1000 * 60 * 60 * 24 * 7, // 7일
+    });
+    res.cookie("accessToken", accessToken, {
+        httpOnly: true,
+        secure: false,
+        sameSite: "strict",
+        path: "/",
+    });
     res.sendStatus(204);
 }));
 // 기사님 프로필 정보 가져오기
@@ -140,6 +177,22 @@ const getWorkerProfilesController = (0, error_middleware_1.asyncHandler)((req, r
     });
     res.status(200).send(workerProfiles);
 }));
+const getWorkerProfileMeController = (0, error_middleware_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const workerId = req.userId;
+    const result = yield profile_service_1.default.getWorkerProfileMe(workerId);
+    const formattedResult = Object.assign(Object.assign({}, result), { profileImage: result.profileImage
+            ? `${app_1.BASE_URL}/static/${result.profileImage.split("/").pop()}`
+            : null });
+    res.status(200).send(formattedResult);
+}));
+const getCustomerProfileMeController = (0, error_middleware_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const customerId = req.userId;
+    const result = yield profile_service_1.default.getCustomerProfileMe(customerId);
+    const formattedResult = Object.assign(Object.assign({}, result), { profileImage: result.profileImage
+            ? `${app_1.BASE_URL}/static/${result.profileImage.split("/").pop()}`
+            : null });
+    res.status(200).send(formattedResult);
+}));
 const profile = {
     createWorkerProfileController,
     createCustomerProfileController,
@@ -147,5 +200,7 @@ const profile = {
     updateWorkerProfileController,
     getWorkerProfileController,
     getWorkerProfilesController,
+    getWorkerProfileMeController,
+    getCustomerProfileMeController,
 };
 exports.default = profile;

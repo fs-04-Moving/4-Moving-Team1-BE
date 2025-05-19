@@ -19,11 +19,11 @@ const user_service_1 = __importDefault(require("./user.service"));
 const createEstimate = (estimateDto) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { workerId, customerId, status, price } = estimateDto;
-        const estimateRequest = yield estimate_request_sevice_1.default.findActiveEstimateRequest(customerId);
+        const estimateRequest = yield estimate_request_sevice_1.default.findpendingEstimateRequest(customerId);
         yield user_service_1.default.findUser(workerId);
-        const { id, serviceType, departureAddress, destination, movingDate, departureArea, } = estimateRequest;
+        const { id, serviceType, departure, destination, movingDate, departureArea, } = estimateRequest;
         const estimate = yield client_1.default.estimate.findFirst({
-            where: { customerId, workerId },
+            where: { estimateRequestId: id, workerId, customerId },
         });
         if (estimate)
             throw new Error("400/estimate already exist");
@@ -34,7 +34,7 @@ const createEstimate = (estimateDto) => __awaiter(void 0, void 0, void 0, functi
             data: Object.assign({ estimateRequestId: id, customerId,
                 workerId,
                 serviceType,
-                departureAddress,
+                departure,
                 destination,
                 movingDate,
                 status,
@@ -128,7 +128,7 @@ const getPendingEstimates = (_a) => __awaiter(void 0, [_a], void 0, function* ({
             }),
         ]);
         const workerIds = pendingEstimates.map((estimate) => estimate.workerId);
-        const [avgStars, confirmedEstimateCounts] = yield Promise.all([
+        const [avgStars, confirmedEstimatesCounts] = yield Promise.all([
             client_1.default.review.groupBy({
                 by: ["workerId"],
                 where: { workerId: { in: workerIds } },
@@ -149,9 +149,9 @@ const getPendingEstimates = (_a) => __awaiter(void 0, [_a], void 0, function* ({
             const workerId = estimate.workerId;
             const avgStar = ((_a = avgStars.find((review) => review.workerId === workerId)) === null || _a === void 0 ? void 0 : _a._avg.star) ||
                 null;
-            const confirmedEstimateCount = ((_b = confirmedEstimateCounts.find((estimate) => estimate.workerId === workerId)) === null || _b === void 0 ? void 0 : _b._count._all) || 0;
+            const confirmedEstimatesCount = ((_b = confirmedEstimatesCounts.find((estimate) => estimate.workerId === workerId)) === null || _b === void 0 ? void 0 : _b._count._all) || 0;
             return Object.assign(Object.assign({}, estimate), { worker: Object.assign(Object.assign({}, estimate.worker), { avgStar,
-                    confirmedEstimateCount }) });
+                    confirmedEstimatesCount }) });
         });
         return { pendingEstimatesWithData, totalCount };
     }
@@ -186,7 +186,7 @@ const getEstimatesByEstimateRequestId = (_a) => __awaiter(void 0, [_a], void 0, 
             client_1.default.estimate.count({ where: { estimateRequestId } }),
         ]);
         const workerIds = estimates.map((estimate) => estimate.workerId);
-        const [avgStars, confirmedEstimateCounts] = yield Promise.all([
+        const [avgStars, confirmedEstimatesCounts] = yield Promise.all([
             client_1.default.review.groupBy({
                 by: ["workerId"],
                 where: { workerId: { in: workerIds } },
@@ -207,9 +207,9 @@ const getEstimatesByEstimateRequestId = (_a) => __awaiter(void 0, [_a], void 0, 
             const workerId = estimate.workerId;
             const avgStar = ((_a = avgStars.find((review) => review.workerId === workerId)) === null || _a === void 0 ? void 0 : _a._avg.star) ||
                 null;
-            const confirmedEstimateCount = ((_b = confirmedEstimateCounts.find((estimate) => estimate.workerId === workerId)) === null || _b === void 0 ? void 0 : _b._count._all) || 0;
+            const confirmedEstimatesCount = ((_b = confirmedEstimatesCounts.find((estimate) => estimate.workerId === workerId)) === null || _b === void 0 ? void 0 : _b._count._all) || 0;
             return Object.assign(Object.assign({}, estimate), { worker: Object.assign(Object.assign({}, estimate.worker), { avgStar,
-                    confirmedEstimateCount }) });
+                    confirmedEstimatesCount }) });
         });
         return { estimatesWithData, totalCount };
     }
@@ -262,13 +262,13 @@ const getSentEstimates = (_a) => __awaiter(void 0, [_a], void 0, function* ({ wo
     try {
         const [estimates, totalCount] = yield Promise.all([
             client_1.default.estimate.findMany({
-                where: { workerId, NOT: { status: "rejected", price: null } },
+                where: { workerId, status: { not: "rejected" }, price: { not: null } },
                 include: { customer: { select: { name: true } } },
                 skip: (page - 1) * pageSize,
                 take: pageSize,
             }),
             client_1.default.estimate.count({
-                where: { workerId, NOT: { status: "rejected", price: null } },
+                where: { workerId, status: { not: "rejected" }, price: { not: null } },
             }),
         ]);
         if (!estimates)
@@ -313,7 +313,7 @@ const getReviewableEstimates = (_a) => __awaiter(void 0, [_a], void 0, function*
                     workerId: true,
                     serviceType: true,
                     movingDate: true,
-                    departureAddress: true,
+                    departure: true,
                     destination: true,
                     price: true,
                     status: true,
@@ -322,6 +322,7 @@ const getReviewableEstimates = (_a) => __awaiter(void 0, [_a], void 0, function*
                             workProfile: {
                                 select: {
                                     nickname: true,
+                                    profileImage: true,
                                 },
                             },
                         },
