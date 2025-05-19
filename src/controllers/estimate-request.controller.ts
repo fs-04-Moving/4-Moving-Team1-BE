@@ -29,13 +29,13 @@ const createEstimateRequestController: RequestHandler = asyncHandler(
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: false,
+      secure: true,
       sameSite: "strict",
       maxAge: 1000 * 60 * 60 * 24 * 7, // 7일
     });
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
-      secure: false,
+      secure: true,
       sameSite: "strict",
       path: "/",
     });

@@ -58,7 +58,7 @@ export async function handleOAuthCallback(
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: false,
+      secure: true,
       sameSite: "strict",
       path: "/",
       maxAge: 1000 * 60 * 60 * 24 * 7,
@@ -66,7 +66,7 @@ export async function handleOAuthCallback(
 
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
-      secure: false,
+      secure: true,
       sameSite: "strict",
       path: "/",
     });
@@ -101,7 +101,7 @@ export function handleOAuthRedirect(
   // 백엔드 도메인 기준 쿠키 저장 (콜백에서 검증용)
   res.cookie("oauth_csrf_token", csrfToken, {
     httpOnly: true,
-    secure: false, // http 환경에서는 false, https 환경에선 true
+    secure: true, // http 환경에서는 false, https 환경에선 true
     sameSite: "lax", // 외부 리다이렉트 흐름에서도 쿠키 전송 허용
     path: "/",
     maxAge: 5 * 60 * 1000,
