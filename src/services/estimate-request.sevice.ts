@@ -112,10 +112,7 @@ const getRecivedEstimateReuests = async ({
             },
             {
               estimates: {
-                some: {
-                  status: "assigned",
-                  price: null,
-                },
+                some: { workerId, status: "assigned", price: null },
               },
             },
           ],
