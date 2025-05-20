@@ -14,6 +14,7 @@ const authMiddleware: RequestHandler = (req, res, next) => {
       req.url === "/auth/sign-up" ||
       req.url === "/auth/log-in" ||
       req.url === "/auth/refresh-token" ||
+      req.url === "/auth/log-out" ||
       req.url === "/kakao/callback" ||
       req.url === "/kakao"
     )
