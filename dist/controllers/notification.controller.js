@@ -13,7 +13,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const notification_service_1 = __importDefault(require("../services/notification.service"));
-const app_1 = require("../app");
 const notificaiotnClients_1 = require("../utils/notificaiotnClients");
 const notificationController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const userId = req.userId;
@@ -24,7 +23,7 @@ const notificationController = (req, res) => __awaiter(void 0, void 0, void 0, f
     res.setHeader("Content-Type", "text/event-stream");
     res.setHeader("Cache-Control", "no-cache"); // 캐싱 방지
     res.setHeader("Connection", "keep-alive"); // 연결 유지
-    res.setHeader("Access-Control-Allow-Origin", `${app_1.CLIENT_URL}`);
+    res.setHeader("Access-Control-Allow-Origin", "https://movings.kro.kr");
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.flushHeaders(); // 헤더를 강제로 전송
     const latestNotifications = yield notification_service_1.default.getNotification(userId);

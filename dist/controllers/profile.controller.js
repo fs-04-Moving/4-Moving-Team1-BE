@@ -36,15 +36,17 @@ const createCustomerProfileController = (0, error_middleware_1.asyncHandler)((re
     const { accessToken, refreshToken } = yield profile_service_1.default.updateUserProfileStatus(customerId); // 유저 프로필 상태 업데이트 (hasProfile :true)
     res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
-        secure: false,
+        secure: true,
         sameSite: "strict",
         maxAge: 1000 * 60 * 60 * 24 * 7, // 7일
+        domain: ".movings.kro.kr",
     });
     res.cookie("accessToken", accessToken, {
         httpOnly: true,
-        secure: false,
+        secure: true,
         sameSite: "strict",
         path: "/",
+        domain: ".movings.kro.kr",
     });
     res.status(200).send({ accessToken });
 }));
@@ -72,15 +74,17 @@ const createWorkerProfileController = (0, error_middleware_1.asyncHandler)((req,
     const { accessToken, refreshToken } = yield profile_service_1.default.updateUserProfileStatus(workerId); // 유저 프로필 상태 업데이트 (hasProfile :true)
     res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
-        secure: false,
+        secure: true,
         sameSite: "strict",
         maxAge: 1000 * 60 * 60 * 24 * 7, // 7일
+        domain: ".movings.kro.kr",
     });
     res.cookie("accessToken", accessToken, {
         httpOnly: true,
-        secure: false,
+        secure: true,
         sameSite: "strict",
         path: "/",
+        domain: ".movings.kro.kr",
     });
     res.status(200).send({ accessToken });
 }));
@@ -104,15 +108,17 @@ const updateCustomerProfileController = (0, error_middleware_1.asyncHandler)((re
     const { accessToken, refreshToken } = yield profile_service_1.default.updateUserProfileStatus(customerId); // 프로필 상태 업데이트 + 토큰 재발급
     res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
-        secure: false,
+        secure: true,
         sameSite: "strict",
         maxAge: 1000 * 60 * 60 * 24 * 7,
+        domain: ".movings.kro.kr",
     });
     res.cookie("accessToken", accessToken, {
         httpOnly: true,
-        secure: false,
+        secure: true,
         sameSite: "strict",
         path: "/",
+        domain: ".movings.kro.kr",
     });
     res.sendStatus(204);
 }));
@@ -140,15 +146,17 @@ const updateWorkerProfileController = (0, error_middleware_1.asyncHandler)((req,
     const { accessToken, refreshToken } = yield profile_service_1.default.updateUserProfileStatus(workerId); // 유저 프로필 상태 업데이트 (hasProfile :true)
     res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
-        secure: false,
+        secure: true,
         sameSite: "strict",
         maxAge: 1000 * 60 * 60 * 24 * 7, // 7일
+        domain: ".movings.kro.kr",
     });
     res.cookie("accessToken", accessToken, {
         httpOnly: true,
-        secure: false,
+        secure: true,
         sameSite: "strict",
         path: "/",
+        domain: ".movings.kro.kr",
     });
     res.sendStatus(204);
 }));

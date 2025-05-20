@@ -102,7 +102,7 @@ const getRecivedEstimateReuests = (_a) => __awaiter(void 0, [_a], void 0, functi
                 },
             ],
         }));
-    const orderByField = orderBy === "earliestMove" ? { movingDate: "asc" } : { createdAt: "asc" };
+    const orderByField = orderBy === "earliestMove" ? { movingDate: "asc" } : { createdAt: "desc" };
     const requests = yield client_1.default.estimateRequest.findMany({
         where,
         include: {
