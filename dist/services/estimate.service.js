@@ -102,7 +102,7 @@ const getPendingEstimates = (_a) => __awaiter(void 0, [_a], void 0, function* ({
     const now = new Date();
     try {
         // 아이디 찾기
-        const { id: estimateRequestId } = yield estimate_request_sevice_1.default.findActiveEstimateRequest(customerId);
+        const { id: estimateRequestId } = yield estimate_request_sevice_1.default.findpendingEstimateRequest(customerId);
         const [pendingEstimates, totalCount] = yield Promise.all([
             client_1.default.estimate.findMany({
                 where: { estimateRequestId },

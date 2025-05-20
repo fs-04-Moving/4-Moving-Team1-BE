@@ -4,9 +4,10 @@ import "dotenv/config";
 import express from "express";
 import { errorHandler } from "./middleware/error.middleware";
 import router from "./routes";
+import path from "path";
 
 // export const BASE_URL = 'http://localhost:5050';
-export const BASE_URL = "http://54.180.2.174";
+export const BASE_URL = "https://api.movings.kro.kr";
 export const CLIENT_URL = process.env.CLIENT_URL;
 const app = express();
 const port = 5050;
