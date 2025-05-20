@@ -3,8 +3,6 @@ import multer, { StorageEngine } from "multer";
 
 const storage: StorageEngine = multer.diskStorage({
   destination: function (req, file, cb) {
-    // __dirname: /home/ubuntu/4-Moving-Team1-BE/dist/controllers (예시)
-    // ../upload → /home/ubuntu/4-Moving-Team1-BE/upload
     const uploadPath = path.resolve(__dirname, "../upload");
     cb(null, uploadPath);
   },
