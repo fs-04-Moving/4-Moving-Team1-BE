@@ -279,7 +279,7 @@ const getRejectEstimatesController = (0, error_middleware_1.asyncHandler)((req, 
         page,
         pageSize,
     });
-    const list = yield Promise.all(estimates.map((_a) => __awaiter(void 0, [_a], void 0, function* ({ id, customerId, serviceType, movingDate, departure, destination, createdAt, updatedAt, status, customer, }) {
+    const list = yield Promise.all(estimates.map((_a) => __awaiter(void 0, [_a], void 0, function* ({ id, customerId, serviceType, movingDate, departure, destination, createdAt, updatedAt, status, customer, rejectionMessage, }) {
         return {
             id,
             customerId,
@@ -291,6 +291,7 @@ const getRejectEstimatesController = (0, error_middleware_1.asyncHandler)((req, 
             updatedAt,
             status,
             customerName: customer === null || customer === void 0 ? void 0 : customer.name,
+            rejectionMessage,
         };
     })));
     res.status(200).send({ list, totalCount });

@@ -136,6 +136,9 @@ const getPendingEstimates = async ({
               workerFavorites: { where: { customerId } },
             },
           },
+          estimateRequset: {
+            select: { status: true },
+          },
         },
         skip: (page - 1) * pageSize,
         take: pageSize,

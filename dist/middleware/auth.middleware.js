@@ -45,7 +45,7 @@ const authMiddleware = (req, res, next) => {
         // 쿠키로 오는경우
         else if (cookieToken) {
             const payload = jsonwebtoken_1.default.verify(cookieToken, jwtSecretKey);
-            console.log("쿠키로 토큰이 왔습니다!");
+            console.log("쿠키로 토큰이 왔습니다!:", cookieToken);
             req.userId = payload.sub;
         }
         next();

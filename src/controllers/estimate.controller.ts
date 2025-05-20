@@ -169,6 +169,7 @@ const getPendingEstimatesController: RequestHandler = asyncHandler(
           favoritesCount: worker._count?.workerFavorites,
           rating: worker.avgStar,
           isFavorite: !!worker.workerFavorites?.length,
+          estimateRequestStatus: estimate.estimateRequset.status,
         };
       })
     );
