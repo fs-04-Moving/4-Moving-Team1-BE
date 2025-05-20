@@ -106,7 +106,16 @@ const rejectEstimateController: RequestHandler = asyncHandler(
     const { rejectionMessage } = req.body;
     if (typeof estimateId !== "string")
       throw new Error("400/workerId is invalid");
-    await estimateService.rejectEstimate(estimateId, rejectionMessage);
+    const estimate = await estimateService.rejectEstimate(
+      estimateId,
+      rejectionMessage
+    );
+    const worker = await profileService.getnickname(estimate.workerId);
+    await notificationService.sendNotification({
+      message: `${worker.nickname} 기사님에게 보낸 견적이 반려되었어요.`,
+      userId: estimate.customerId,
+    });
+
     res.sendStatus(204);
   }
 );

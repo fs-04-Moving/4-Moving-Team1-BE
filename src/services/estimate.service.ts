@@ -75,7 +75,7 @@ const rejectEstimate = async (estimateId: string, rejectionMessage: string) => {
     // 견적이 있는지 확인
     const { price } = await findEstimate(estimateId, "assigned");
     if (price) throw new Error("400/estimate already sent to the user.");
-    await prisma.estimate.update({
+    return await prisma.estimate.update({
       where: { id: estimateId },
       data: { status: "rejected", rejectionMessage },
     });
