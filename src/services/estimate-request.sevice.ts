@@ -52,11 +52,22 @@ const deleteEstimateRequest = async (customerId: string) => {
 
 // 견적 요청의 상태를 confirm으로 변경하는함수
 const confirmEstimateRequest = async (customerId: string) => {
-  const { id: estimateRequestId } = await findActiveEstimateRequest(customerId);
-  await prisma.estimateRequest.update({
-    where: { id: estimateRequestId },
-    data: { status: "confirmed" },
-  });
+  try {
+    const { id: estimateRequestId, status } = await findActiveEstimateRequest(
+      customerId
+    );
+
+    if (status != "active") {
+      throw new Error("400/estimateRequest is not active");
+    }
+
+    await prisma.estimateRequest.update({
+      where: { id: estimateRequestId },
+      data: { status: "confirmed" },
+    });
+  } catch (e) {
+    throw e;
+  }
 };
 
 const getRecivedEstimateReuests = async ({

@@ -46,10 +46,10 @@ const confirmEstimateController: RequestHandler = asyncHandler(
     const customerId = req.userId as string;
     if (typeof estimateId !== "string")
       throw new Error("400/workerId is invalid");
+    // 유저의 견적 요청 상태값 변경
+    await estimateRequstService.confirmEstimateRequest(customerId);
     // isConfirmed ->ture로 변경
     const estimate = await estimateService.confirmEstimate(estimateId);
-    // 유저의 견적 요청 상태값 변경경
-    await estimateRequstService.confirmEstimateRequest(customerId);
 
     const customer = await userService.getUserMe(customerId);
     const worker = await profileService.getnickname(estimate.workerId);
@@ -106,7 +106,16 @@ const rejectEstimateController: RequestHandler = asyncHandler(
     const { rejectionMessage } = req.body;
     if (typeof estimateId !== "string")
       throw new Error("400/workerId is invalid");
-    await estimateService.rejectEstimate(estimateId, rejectionMessage);
+    const estimate = await estimateService.rejectEstimate(
+      estimateId,
+      rejectionMessage
+    );
+    const worker = await profileService.getnickname(estimate.workerId);
+    await notificationService.sendNotification({
+      message: `${worker.nickname} 기사님에게 보낸 견적이 반려되었어요.`,
+      userId: estimate.customerId,
+    });
+
     res.sendStatus(204);
   }
 );
