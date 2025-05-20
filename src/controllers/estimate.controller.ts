@@ -411,7 +411,7 @@ const getRejectEstimatesController: RequestHandler = asyncHandler(
             updatedAt,
             status,
             customerName: customer?.name,
-            rejectedMessage: rejectionMessage,
+            rejectionMessage,
           };
         }
       )
