@@ -5,6 +5,7 @@ type EstimateDto = {
   customerId: string;
   status: EstimateStatus;
   price?: number;
+  comment?: string;
 };
 
 export { EstimateDto };
