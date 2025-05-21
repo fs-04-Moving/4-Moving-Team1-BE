@@ -2,6 +2,7 @@ import { Request, RequestHandler, Response } from "express";
 import notificationService from "../services/notification.service";
 import { CLIENT_URL } from "../app";
 import { clientsByUserId } from "../utils/notificaiotnClients";
+import prisma from "../db/prisma/client";
 
 const notificationController: RequestHandler = async (
   req: Request,
@@ -33,5 +34,17 @@ const notificationController: RequestHandler = async (
   });
 };
 
-const notification = { notificationController };
+const readNotificationController: RequestHandler = async (
+  req: Request,
+  res: Response
+) => {
+  const id = req.params.id;
+  await prisma.notification.update({
+    where: { id },
+    data: { isRead: true },
+  });
+  res.status(200).json({ message: "읽음 처리 완료" });
+};
+
+const notification = { notificationController, readNotificationController };
 export default notification;

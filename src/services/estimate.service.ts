@@ -283,6 +283,9 @@ const getEstimateByEstimatetId = async (estimatetId: string) => {
   try {
     const estimate = await prisma.estimate.findFirst({
       where: { id: estimatetId },
+      include: {
+        worker: { include: { workProfile: { select: { summary: true } } } },
+      },
     });
     if (!estimate) throw new Error("400/Estimate not found");
     return estimate;
