@@ -7,7 +7,7 @@ import userService from "./user.service";
 // 견적 생성 함수
 const createEstimate = async (estimateDto: EstimateDto) => {
   try {
-    const { workerId, customerId, status, price } = estimateDto;
+    const { workerId, customerId, status, price, comment } = estimateDto;
 
     const estimateRequest =
       await estimateRequstService.findpendingEstimateRequest(customerId);
@@ -47,6 +47,7 @@ const createEstimate = async (estimateDto: EstimateDto) => {
         movingDate,
         status,
         departureArea,
+        comment,
         ...(status === "general" ? { price } : {}),
       },
     });
