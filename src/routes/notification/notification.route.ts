@@ -10,9 +10,6 @@ notificationRouter.get(
   notification.notificationController
 );
 
-notificationRouter.patch(
-  "/notification/:id/read",
-  notification.readNotificationController
-);
+notificationRouter.patch("/:id/read", notification.readNotificationController);
 
 export default notificationRouter;
