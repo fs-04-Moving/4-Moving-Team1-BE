@@ -363,6 +363,8 @@ const getSentEstimatesController: RequestHandler = asyncHandler(
           status,
           customer,
           price,
+          isConfirmed,
+          estimateRequset,
         }) => {
           return {
             id,
@@ -376,6 +378,8 @@ const getSentEstimatesController: RequestHandler = asyncHandler(
             status,
             customerName: customer?.name,
             price,
+            isConfirmed,
+            estimateRequestStatus: estimateRequset.status,
           };
         }
       )
@@ -444,7 +448,9 @@ const getReviewableEstimatesController: RequestHandler = asyncHandler(
 
     const list = estimates.map((estimate) => {
       const profileImage = estimate.worker.workProfile?.profileImage
-        ? `${BASE_URL}/static/${estimate.worker.workProfile.profileImage}`
+        ? `${BASE_URL}/static/${estimate.worker.workProfile.profileImage
+            .split("/")
+            .pop()}`
         : null;
       return {
         id: estimate.id,
