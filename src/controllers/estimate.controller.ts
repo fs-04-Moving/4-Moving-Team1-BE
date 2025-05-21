@@ -155,6 +155,7 @@ const getPendingEstimatesController: RequestHandler = asyncHandler(
           destination,
           isConfirmed,
           worker,
+          rejectionMessage,
         } = estimate;
         return {
           id,
@@ -179,6 +180,7 @@ const getPendingEstimatesController: RequestHandler = asyncHandler(
           rating: worker.avgStar,
           isFavorite: !!worker.workerFavorites?.length,
           estimateRequestStatus: estimate.estimateRequset.status,
+          rejectionMessage,
         };
       })
     );
