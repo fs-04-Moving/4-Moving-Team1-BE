@@ -38,6 +38,7 @@ const createEstimateRequestController: RequestHandler = asyncHandler(
       httpOnly: true,
       secure: true,
       sameSite: "strict",
+      maxAge: 1000 * 60 * 60 * 24 * 1, // 1일
       path: "/",
       domain: ".movings.kro.kr",
     });
