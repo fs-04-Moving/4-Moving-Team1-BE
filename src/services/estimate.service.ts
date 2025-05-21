@@ -500,7 +500,7 @@ const checkcreateAssignedButton = async (
     const estimateRequest =
       await estimateRequstService.findpendingEstimateRequest(customerId);
 
-    if ((estimateRequest.status = "confirmed")) {
+    if (estimateRequest.status === "confirmed") {
       return "alreadyConfirmed";
     }
     //2. 지정 견적이 있는지 확인
