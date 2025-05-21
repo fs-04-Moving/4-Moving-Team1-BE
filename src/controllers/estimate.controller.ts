@@ -18,10 +18,12 @@ const createAssignedEstimateController: RequestHandler = asyncHandler(
       throw new Error("400/workerId is invalid");
     const customerId = req.userId as string;
     // 지정 견적 생성
+    const { comment } = req.body;
     const estimateDto: EstimateDto = {
       workerId,
       customerId,
       status: "assigned",
+      comment,
     };
     const customer = await userService.getUserMe(customerId);
     const estimate = await estimateService.createEstimate(estimateDto);
@@ -72,7 +74,7 @@ const confirmEstimateController: RequestHandler = asyncHandler(
 const createGeneralEstimateController: RequestHandler = asyncHandler(
   async (req, res, next) => {
     const { customerId } = req.params;
-    const { price } = req.body;
+    const { price, comment } = req.body;
     const workerId = req.userId as string;
     if (typeof customerId !== "string")
       throw new Error("400/workerId is invalid");
@@ -82,6 +84,7 @@ const createGeneralEstimateController: RequestHandler = asyncHandler(
       customerId,
       status: "general",
       price,
+      comment,
     };
     const worker = await profileService.getnickname(workerId);
     const estimate = await estimateService.createEstimate(estimateDto);
