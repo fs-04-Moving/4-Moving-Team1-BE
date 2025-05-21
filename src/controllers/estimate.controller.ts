@@ -444,7 +444,9 @@ const getReviewableEstimatesController: RequestHandler = asyncHandler(
 
     const list = estimates.map((estimate) => {
       const profileImage = estimate.worker.workProfile?.profileImage
-        ? `${BASE_URL}/static/${estimate.worker.workProfile.profileImage}`
+        ? `${BASE_URL}/static/${estimate.worker.workProfile.profileImage
+            .split("/")
+            .pop()}`
         : null;
       return {
         id: estimate.id,

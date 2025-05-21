@@ -38,7 +38,9 @@ const getMyReviewController: RequestHandler = asyncHandler(
 
     const list = reviews.map((review) => {
       const profileImage = review.estimate.worker.workProfile?.profileImage
-        ? `${BASE_URL}/static/${review.estimate.worker.workProfile.profileImage}`
+        ? `${BASE_URL}/static/${review.estimate.worker.workProfile.profileImage
+            .split("/")
+            .pop()}`
         : null;
 
       return {
