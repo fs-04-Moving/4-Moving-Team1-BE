@@ -488,7 +488,7 @@ const checkcreateAssignedButton = async (
   try {
     //로그인 여부
     if (!customerId) {
-      return "unauthenticated";
+      return "available";
     }
 
     //1. 견적이 확정 되었는지
