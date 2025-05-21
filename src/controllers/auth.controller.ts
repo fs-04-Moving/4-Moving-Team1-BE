@@ -27,7 +27,7 @@ const logInController: RequestHandler = asyncHandler(async (req, res, next) => {
       secure: true,
       sameSite: "strict",
       path: "/",
-      maxAge: 1000 * 60 * 60 * 24 * 1, // 7일
+      maxAge: 1000 * 60 * 60 * 24 * 1, // 1일
       domain: ".movings.kro.kr",
     });
     // sameSite:none secure:ture

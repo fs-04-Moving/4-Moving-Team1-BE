@@ -155,7 +155,6 @@ const getPendingEstimatesController: RequestHandler = asyncHandler(
           destination,
           isConfirmed,
           worker,
-          rejectionMessage,
         } = estimate;
         return {
           id,
@@ -180,7 +179,6 @@ const getPendingEstimatesController: RequestHandler = asyncHandler(
           rating: worker.avgStar,
           isFavorite: !!worker.workerFavorites?.length,
           estimateRequestStatus: estimate.estimateRequset.status,
-          rejectionMessage,
         };
       })
     );
@@ -367,6 +365,7 @@ const getSentEstimatesController: RequestHandler = asyncHandler(
           price,
           isConfirmed,
           estimateRequset,
+          rejectionMessage,
         }) => {
           return {
             id,
@@ -382,6 +381,7 @@ const getSentEstimatesController: RequestHandler = asyncHandler(
             price,
             isConfirmed,
             estimateRequestStatus: estimateRequset.status,
+            rejectionMessage,
           };
         }
       )

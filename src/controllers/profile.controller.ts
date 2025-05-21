@@ -5,6 +5,7 @@ import favoriteService from "../services/favorite.service";
 import profileService from "../services/profile.service";
 import { CustomerProfileDto, WorkerProfileDto } from "../types/profile.type";
 import { GetWorkerProfilesQuery } from "../validations/profile.validation";
+import estimateService from "../services/estimate.service";
 
 // 일반 유저 프로필 생성
 const createCustomerProfileController: RequestHandler = asyncHandler(
@@ -209,7 +210,11 @@ const getWorkerProfileController: RequestHandler = asyncHandler(
       customerId,
       workerId,
     });
-    res.status(200).send({ ...workerProfile, isFavorite });
+    const buttonStatus = await estimateService.checkcreateAssignedButton(
+      workerId,
+      customerId
+    );
+    res.status(200).send({ ...workerProfile, isFavorite, buttonStatus });
   }
 );
 
