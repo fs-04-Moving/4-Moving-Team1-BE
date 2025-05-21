@@ -122,7 +122,12 @@ const getPendingEstimates = async ({
 
     const [pendingEstimates, totalCount] = await Promise.all([
       prisma.estimate.findMany({
-        where: { estimateRequestId },
+        where: {
+          estimateRequestId,
+          NOT: {
+            status: "rejected",
+          },
+        },
         include: {
           worker: {
             include: {
