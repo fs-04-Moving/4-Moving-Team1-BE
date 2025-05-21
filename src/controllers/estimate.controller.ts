@@ -365,7 +365,6 @@ const getSentEstimatesController: RequestHandler = asyncHandler(
           price,
           isConfirmed,
           estimateRequset,
-          rejectionMessage,
         }) => {
           return {
             id,
@@ -381,7 +380,6 @@ const getSentEstimatesController: RequestHandler = asyncHandler(
             price,
             isConfirmed,
             estimateRequestStatus: estimateRequset.status,
-            rejectionMessage,
           };
         }
       )
