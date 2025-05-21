@@ -124,9 +124,6 @@ const getPendingEstimates = async ({
       prisma.estimate.findMany({
         where: {
           estimateRequestId,
-          NOT: {
-            status: "rejected",
-          },
         },
         include: {
           worker: {
