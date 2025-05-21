@@ -299,6 +299,8 @@ const getEstimateDetailByCustomerController: RequestHandler = asyncHandler(
       isConfirmed,
       workerId,
       createdAt,
+      comment,
+      worker,
     } = estimate;
 
     const isFavorite = await favoriteService.checkFavorite({
@@ -336,6 +338,8 @@ const getEstimateDetailByCustomerController: RequestHandler = asyncHandler(
       reviewsCount: reviewsCount,
       isFavorite,
       requestDate: createdAt,
+      comment,
+      summary: worker.workProfile?.summary,
     };
     res.status(200).send(data);
   }

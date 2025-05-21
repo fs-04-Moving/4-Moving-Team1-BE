@@ -1,7 +1,7 @@
 import { Request, RequestHandler, Response } from "express";
 import notificationService from "../services/notification.service";
-import { CLIENT_URL } from "../app";
 import { clientsByUserId } from "../utils/notificaiotnClients";
+import prisma from "../db/prisma/client";
 
 const notificationController: RequestHandler = async (
   req: Request,
@@ -16,7 +16,7 @@ const notificationController: RequestHandler = async (
   res.setHeader("Content-Type", "text/event-stream");
   res.setHeader("Cache-Control", "no-cache"); // 캐싱 방지
   res.setHeader("Connection", "keep-alive"); // 연결 유지
-  res.setHeader("Access-Control-Allow-Origin", "https://movings.kro.kr");
+  res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
   res.setHeader("Access-Control-Allow-Credentials", "true");
   res.flushHeaders(); // 헤더를 강제로 전송
 
@@ -33,5 +33,17 @@ const notificationController: RequestHandler = async (
   });
 };
 
-const notification = { notificationController };
+const readNotificationController: RequestHandler = async (
+  req: Request,
+  res: Response
+) => {
+  const id = req.params.id;
+  await prisma.notification.update({
+    where: { id },
+    data: { isRead: true },
+  });
+  res.status(200).json({ message: "읽음 처리 완료" });
+};
+
+const notification = { notificationController, readNotificationController };
 export default notification;
