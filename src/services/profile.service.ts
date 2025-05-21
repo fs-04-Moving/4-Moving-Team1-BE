@@ -288,6 +288,16 @@ const getWorkerProfiles = async ({
         : ""
     }
     ${search ? `AND wp."nickname" ILIKE '%${search}%'` : ""}
+    ${
+      customerId
+        ? `AND NOT EXISTS (
+          SELECT 1 FROM "Estimate" e2
+          WHERE e2."workerId" = u.id
+            AND e2."customerId" = '${customerId}'
+            AND e2.status IN ('assigned', 'rejected')
+        )`
+        : ""
+    }
   `;
 
     const favoriteField = customerId
