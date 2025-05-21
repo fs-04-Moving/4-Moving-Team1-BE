@@ -75,6 +75,7 @@ const createGeneralEstimateController: RequestHandler = asyncHandler(
   async (req, res, next) => {
     const { customerId } = req.params;
     const { price, comment } = req.body;
+    console.log(comment);
     const workerId = req.userId as string;
     if (typeof customerId !== "string")
       throw new Error("400/workerId is invalid");
