@@ -363,6 +363,7 @@ const getSentEstimatesController: RequestHandler = asyncHandler(
           status,
           customer,
           price,
+          estimateRequset,
         }) => {
           return {
             id,
@@ -376,6 +377,7 @@ const getSentEstimatesController: RequestHandler = asyncHandler(
             status,
             customerName: customer?.name,
             price,
+            estimateRequestStatus: estimateRequset.status,
           };
         }
       )
