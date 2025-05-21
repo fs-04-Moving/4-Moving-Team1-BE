@@ -10,7 +10,7 @@ const createEstimate = async (estimateDto: EstimateDto) => {
     const { workerId, customerId, status, price } = estimateDto;
 
     const estimateRequest =
-      await estimateRequstService.findActiveEstimateRequest(customerId);
+      await estimateRequstService.findpendingEstimateRequest(customerId);
 
     if (estimateRequest.status === "confirmed")
       throw new Error("400/견적요청이 이미 확정되었습니다.");
