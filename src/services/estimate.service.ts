@@ -484,6 +484,43 @@ const findEstimate = async (estimateId: string, status?: EstimateStatus) => {
   }
 };
 
+const checkcreateAssignedButton = async (
+  workerId: string,
+  customerId: string | undefined
+): Promise<
+  "alreadyConfirmed" | "alreadyAssigned" | "available" | "unauthenticated"
+> => {
+  try {
+    //로그인 여부
+    if (!customerId) {
+      return "unauthenticated";
+    }
+
+    //1. 견적이 확정 되었는지
+    const estimateRequest =
+      await estimateRequstService.findpendingEstimateRequest(customerId);
+
+    if ((estimateRequest.status = "confirmed")) {
+      return "alreadyConfirmed";
+    }
+    //2. 지정 견적이 있는지 확인
+    const estimate = await prisma.estimate.findFirst({
+      where: {
+        customerId,
+        workerId,
+        status: "assigned",
+      },
+    });
+
+    if (estimate) {
+      return "alreadyAssigned";
+    }
+    return "available";
+  } catch (e) {
+    throw e;
+  }
+};
+
 const estimateService = {
   createEstimate,
   confirmEstimate,
@@ -498,6 +535,7 @@ const estimateService = {
   getReviewableEstimates,
   getworkerIdByEstimateId,
   findEstimate,
+  checkcreateAssignedButton,
 };
 
 export default estimateService;
